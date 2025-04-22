@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "9McomzCqhuok0VVg4NngnmkYcIdVjAkRbPCoIADirU0=",
+  "Source": "backend-lab",
+  "BasePath": "_content/backend-lab",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
