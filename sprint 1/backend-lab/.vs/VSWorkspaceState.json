@@ -1,8 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\backend-lab"
+    "\\backend-lab",
+    "\\backend-lab\\Controllers",
+    "\\backend-lab\\Data",
+    "\\backend-lab\\Handlers"
   ],
-  "SelectedNode": "\\backend-lab.sln",
+  "SelectedNode": "\\backend-lab\\backend-lab.csproj",
   "PreviewInSolutionExplorer": false
 }

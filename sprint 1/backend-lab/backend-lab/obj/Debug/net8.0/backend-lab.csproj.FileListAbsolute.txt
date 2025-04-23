@@ -122,3 +122,14 @@ C:\Users\quesa\source\repos\my_labs\backend-lab\backend-lab\bin\Debug\net8.0\run
 C:\Users\quesa\source\repos\my_labs\backend-lab\backend-lab\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\quesa\source\repos\my_labs\backend-lab\backend-lab\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
 C:\Users\quesa\source\repos\my_labs\backend-lab\backend-lab\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.csproj.AssemblyReference.cache
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.AssemblyInfoInputs.cache
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.AssemblyInfo.cs
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.csproj.CoreCompileInputs.cache
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.sourcelink.json
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.dll
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\refint\backend-lab.dll
+C:\Users\quesa\source\repos\GEEMS\sprint 1\backend-lab\backend-lab\obj\Debug\net8.0\backend-lab.pdb

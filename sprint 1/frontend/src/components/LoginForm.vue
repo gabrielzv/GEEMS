@@ -24,10 +24,15 @@ export default {
   methods: {
     async login() {
       try {
-        const res = await axios.post("", {
-          nombreUsuario: this.nombreUsuario,
-          contrasena: this.contrasena,
-        });
+        const res = await axios
+          .post("https://localhost:7014/api/Auth/login", {
+            nombreUsuario: this.nombreUsuario,
+            contrasena: this.contrasena,
+          })
+          .then(function (response) {
+            console.log(response);
+            window.location.href = "http://localhost:8080/home";
+          });
         this.mensaje = res.data.message;
       } catch (err) {
         this.mensaje = err.response?.data?.message || "Error al iniciar sesión";

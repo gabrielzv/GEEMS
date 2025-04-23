@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\quesa\\source\\repos\\my_labs\\backend-lab\\backend-lab\\backend-lab.csproj": {}
+    "C:\\Users\\quesa\\source\\repos\\GEEMS\\sprint 1\\backend-lab\\backend-lab\\backend-lab.csproj": {}
   },
   "projects": {
-    "C:\\Users\\quesa\\source\\repos\\my_labs\\backend-lab\\backend-lab\\backend-lab.csproj": {
+    "C:\\Users\\quesa\\source\\repos\\GEEMS\\sprint 1\\backend-lab\\backend-lab\\backend-lab.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\quesa\\source\\repos\\my_labs\\backend-lab\\backend-lab\\backend-lab.csproj",
+        "projectUniqueName": "C:\\Users\\quesa\\source\\repos\\GEEMS\\sprint 1\\backend-lab\\backend-lab\\backend-lab.csproj",
         "projectName": "backend-lab",
-        "projectPath": "C:\\Users\\quesa\\source\\repos\\my_labs\\backend-lab\\backend-lab\\backend-lab.csproj",
+        "projectPath": "C:\\Users\\quesa\\source\\repos\\GEEMS\\sprint 1\\backend-lab\\backend-lab\\backend-lab.csproj",
         "packagesPath": "C:\\Users\\quesa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\quesa\\source\\repos\\my_labs\\backend-lab\\backend-lab\\obj\\",
+        "outputPath": "C:\\Users\\quesa\\source\\repos\\GEEMS\\sprint 1\\backend-lab\\backend-lab\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -53,6 +53,20 @@
             "Microsoft.Data.SqlClient": {
               "target": "Package",
               "version": "[6.0.1, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.4, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

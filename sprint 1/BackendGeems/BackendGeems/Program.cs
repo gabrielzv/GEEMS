@@ -1,46 +1,33 @@
-using backend.Data;
-using backend.Models;
+using BackendGeems.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-builder.Services.AddControllers();
+// Agregar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:8080") // Puerto de Vue
+        policy.WithOrigins("http://localhost:8080")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-
-builder.Services.AddScoped<AuthHandler>();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
+// Usar Swagger en desarrollo
+app.UseSwagger();
+app.UseSwaggerUI();
+
 app.UseCors();
-
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
