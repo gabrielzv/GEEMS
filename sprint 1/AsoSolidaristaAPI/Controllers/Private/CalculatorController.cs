@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AsoSolidaristaAPI.Models.Requests;
 using AsoSolidaristaAPI.Models.Responses;
 
-namespace AsoSolidaristaAPI.Controllers.Public
+namespace AsoSolidaristaAPI.Controllers.Private
 {
     [ApiController]
-    [Route("api/public/calculator")]
+    [Route("api/private/calculator")]
+    [Authorize]
     public class CalculatorController : ControllerBase
     {
         private readonly CalculatorService _calculator;
@@ -20,8 +22,13 @@ namespace AsoSolidaristaAPI.Controllers.Public
         {
             try
             {
-                var (amount, _) = _calculator.CalculateFee(request);
-                return Ok(new PublicResult { AmountToCharge = amount });
+                var (amount, formula) = _calculator.CalculateFee(request);
+                return Ok(new PrivateResult
+                {
+                    Percentage = (amount / request.EmployeeSalary) * 100,
+                    AmountToCharge = amount,
+                    FormulaUsed = $"Fórmula para {request.AssociationName}: {formula}"
+                });
             }
             catch (ArgumentException ex)
             {
