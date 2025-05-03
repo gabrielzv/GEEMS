@@ -1,15 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-namespace BackendGeems.Models
+﻿namespace BackendGeems.Models
 {
     public class Usuario
     {
-        [Key]
-        public int Id { get; set; }
-
-        [Required]
-        public string NombreUsuario { get; set; }
-
-        [Required]
+        public Guid Id { get; set; } 
+        public string Username { get; set; }
         public string Contrasena { get; set; }
+        public string Tipo { get; set; }
+        public int CedulaPersona { get; set; }
     }
 }

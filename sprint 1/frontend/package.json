@@ -12,8 +12,10 @@
     "@vue/cli": "^5.0.8",
     "axios": "^1.8.4",
     "core-js": "^3.8.3",
+    "pinia": "^3.0.2",
     "vue": "^3.2.13",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

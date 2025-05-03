@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using BackendGeems.Models;
-using BackendGeems.Data;
-using Microsoft.AspNetCore.Identity.Data;
 
 namespace BackendGeems.Controllers
 {
@@ -10,30 +8,54 @@ namespace BackendGeems.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(AppDbContext context)
+        public AuthController(IConfiguration configuration)
         {
-            _context = context;
+            _configuration = configuration;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Usuario request)
+        public IActionResult Login([FromBody] Usuario request)
         {
-            if (string.IsNullOrEmpty(request.NombreUsuario) || string.IsNullOrEmpty(request.Contrasena))
+            Console.WriteLine($"Nombre de usuario recibido: {request.Username}");
+            Console.WriteLine($"Contraseña:{ request.Contrasena}");
+            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Contrasena))
             {
                 return BadRequest(new { message = "Debe completar todos los campos" });
             }
 
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.NombreUsuario == request.NombreUsuario);
 
-            if (usuario == null || usuario.Contrasena != request.Contrasena)
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                return Unauthorized(new { message = "Credenciales inválidas" });
-            }
+                string query = "SELECT * FROM Usuario WHERE Username = @username";
 
-            return Ok(new { message = "Inicio de sesión exitoso" });
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@username", request.Username);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    string contrasenaDB = reader["Contrasena"].ToString();
+
+                    if (request.Contrasena == contrasenaDB)
+                    {
+                        return Ok(new { message = "Inicio de sesión exitoso" });
+                    }
+                    else
+                    {
+                        return Unauthorized(new { message = "Usuario o Contraseña Contraseña incorrecta" });
+                    }
+                }
+                else
+                {
+                    return Unauthorized(new { message = "Usuario o Contraseña Incorrectos" });
+                }
+            }
         }
     }
 }
