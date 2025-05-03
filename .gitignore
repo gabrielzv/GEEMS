@@ -5,6 +5,7 @@ obj/
 *.suo
 *.userosscache
 *.sln.docstates
+appsettings.json
 
 ## ASP.NET Scaffolding
 ScaffoldingReadMe.txt
