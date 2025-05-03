@@ -2,8 +2,10 @@
 {
     public class Usuario
     {
-        public int Id { get; set; }
-        public string NombreUsuario { get; set; }
+        public Guid Id { get; set; } 
+        public string Username { get; set; }
         public string Contrasena { get; set; }
+        public string Tipo { get; set; }
+        public int CedulaPersona { get; set; }
     }
 }

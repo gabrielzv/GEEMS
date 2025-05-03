@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
 using BackendGeems.Models;
 
 namespace BackendGeems.Controllers
@@ -19,41 +18,44 @@ namespace BackendGeems.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] Usuario request)
         {
-            if (string.IsNullOrEmpty(request.NombreUsuario) || string.IsNullOrEmpty(request.Contrasena))
+            Console.WriteLine($"Nombre de usuario recibido: {request.Username}");
+            Console.WriteLine($"Contraseña:{ request.Contrasena}");
+            if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Contrasena))
             {
                 return BadRequest(new { message = "Debe completar todos los campos" });
             }
 
+
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
-            Usuario usuario = null;
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                conn.Open();
-                string query = "SELECT * FROM Usuarios WHERE NombreUsuario = @NombreUsuario";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@NombreUsuario", request.NombreUsuario);
+                string query = "SELECT * FROM Usuario WHERE Username = @username";
 
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                SqlCommand command = new SqlCommand(query, connection);
+                command.Parameters.AddWithValue("@username", request.Username);
+
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                if (reader.Read())
                 {
-                    if (reader.Read())
+                    string contrasenaDB = reader["Contrasena"].ToString();
+
+                    if (request.Contrasena == contrasenaDB)
                     {
-                        usuario = new Usuario
-                        {
-                            Id = (int)reader["Id"], 
-                            NombreUsuario = reader["NombreUsuario"].ToString(),
-                            Contrasena = reader["Contrasena"].ToString()
-                        };
+                        return Ok(new { message = "Inicio de sesión exitoso" });
+                    }
+                    else
+                    {
+                        return Unauthorized(new { message = "Usuario o Contraseña Contraseña incorrecta" });
                     }
                 }
+                else
+                {
+                    return Unauthorized(new { message = "Usuario o Contraseña Incorrectos" });
+                }
             }
-
-            if (usuario == null || usuario.Contrasena != request.Contrasena)
-            {
-                return Unauthorized(new { message = "Credenciales inválidas" });
-            }
-
-            return Ok(new { message = "Inicio de sesión exitoso" });
         }
     }
 }
