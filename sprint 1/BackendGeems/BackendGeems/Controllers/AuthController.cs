@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using BackendGeems.Models;
-using BackendGeems.Data;
-using Microsoft.AspNetCore.Identity.Data;
 
 namespace BackendGeems.Controllers
 {
@@ -10,23 +9,44 @@ namespace BackendGeems.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public AuthController(AppDbContext context)
+        public AuthController(IConfiguration configuration)
         {
-            _context = context;
+            _configuration = configuration;
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Usuario request)
+        public IActionResult Login([FromBody] Usuario request)
         {
             if (string.IsNullOrEmpty(request.NombreUsuario) || string.IsNullOrEmpty(request.Contrasena))
             {
                 return BadRequest(new { message = "Debe completar todos los campos" });
             }
 
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.NombreUsuario == request.NombreUsuario);
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            Usuario usuario = null;
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT * FROM Usuarios WHERE NombreUsuario = @NombreUsuario";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@NombreUsuario", request.NombreUsuario);
+
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        usuario = new Usuario
+                        {
+                            Id = (int)reader["Id"], 
+                            NombreUsuario = reader["NombreUsuario"].ToString(),
+                            Contrasena = reader["Contrasena"].ToString()
+                        };
+                    }
+                }
+            }
 
             if (usuario == null || usuario.Contrasena != request.Contrasena)
             {
