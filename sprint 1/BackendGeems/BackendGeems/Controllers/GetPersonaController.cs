@@ -1,9 +1,7 @@
 ﻿// Controllers/PersonaController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using System.Data;
-using BackendGeems.Models;
-using Azure.Core;
+
 
 [Route("api/[controller]")]
 [ApiController]

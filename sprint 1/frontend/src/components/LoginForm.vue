@@ -101,10 +101,10 @@ export default {
       if (!this.nombreUsuario) {
         this.emailError = "El correo o usuario es obligatorio.";
         isValid = false;
-      } else if (!this.validateEmail(this.nombreUsuario)) {
+      } /*else if (!this.validateEmail(this.nombreUsuario)) {
         this.emailError = "Formato de correo inválido.";
         isValid = false;
-      }
+      }*/
 
       // Validación de la contraseña
       if (!this.contrasena) {
@@ -146,11 +146,11 @@ export default {
           id: user.data.id,
           tipo: user.data.tipo,
           cedulaPersona: user.data.cedulaPersona,
-          nombreUsuario: user.data.username,
+          nombreUsuario: this.nombreUsuario,
           contrasena: user.data.contrasena,
         });
         this.mensaje = "Inicio de sesión exitoso.";
-        window.location.href = "http://localhost:8080/home";
+        this.$router.push("/home");
       } catch (err) {
         console.error(err);
         this.mensaje =

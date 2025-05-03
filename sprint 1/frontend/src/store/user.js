@@ -5,11 +5,20 @@ export const useUserStore = defineStore("user", {
     usuario: null,
   }),
   actions: {
-    setUsuario(data) {
-      this.usuario = data;
+    setUsuario(usuario) {
+      this.usuario = usuario;
+      // Guardar en sessionStorage en lugar de localStorage
+      sessionStorage.setItem("usuario", JSON.stringify(usuario));
     },
-    clearUsuario() {
+    cargarDesdeSessionStorage() {
+      const usuario = sessionStorage.getItem("usuario");
+      if (usuario) {
+        this.usuario = JSON.parse(usuario);
+      }
+    },
+    logout() {
       this.usuario = null;
+      sessionStorage.removeItem("usuario");
     },
   },
 });

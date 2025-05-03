@@ -6,6 +6,7 @@ import Home from "./components/HomePage.vue";
 import Recuperar from "./components/RecuperarCont.vue";
 import UserView from "./components/UserView.vue";
 import { createPinia } from "pinia";
+import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
 
 const router = createRouter({
@@ -21,4 +22,6 @@ const router = createRouter({
 const app = createApp(App);
 app.use(createPinia());
 app.use(router);
+const userStore = useUserStore();
+userStore.cargarDesdeSessionStorage();
 app.mount("#app");

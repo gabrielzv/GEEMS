@@ -17,13 +17,14 @@
       class="bg-white shadow-md rounded-lg p-6 space-y-4"
       aria-label="Vista del usuario"
     >
-      <h2 class="text-xl font-bold">Vista de Usuario (UserView)</h2>
+      <h2 class="text-xl font-bold">Vista de Usuario</h2>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <UserInfo label="Nombre completo" :value="userView.fullName" />
         <UserInfo label="Correo electrónico" :value="userView.email" />
         <UserInfo label="Teléfono" :value="userView.phone" />
         <UserInfo label="Rol" :value="userView.role" />
+        <UserInfo label="Dirección" :value="userView.address" />
       </div>
     </div>
   </div>
@@ -33,10 +34,10 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import UserInfo from "./UserInfo.vue";
-import { useUserStore } from "../store/user"; // ajusta la ruta si es diferente
+import { useUserStore } from "../store/user";
 
-const userStore = useUserStore(); // acceder al store de usuario
-const usuario = userStore.usuario; // acceder al usuario global almacenado
+const userStore = useUserStore();
+const usuario = userStore.usuario;
 
 const loading = ref(true);
 const error = ref(false);
@@ -67,7 +68,6 @@ const fetchUserView = async () => {
 
 onMounted(() => {
   if (!usuario || !usuario.cedulaPersona) {
-    // Redirige si no hay usuario cargado
     window.location.href = "/";
   } else {
     fetchUserView();
