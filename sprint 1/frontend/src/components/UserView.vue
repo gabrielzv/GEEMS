@@ -25,6 +25,12 @@
         <UserInfo label="Teléfono" :value="userView.phone" />
         <UserInfo label="Rol" :value="userView.role" />
         <UserInfo label="Dirección" :value="userView.address" />
+        <UserInfo label="Contrato" :value="userView.contract" />
+        <UserInfo label="Género" :value="userView.genre" />
+        <UserInfo label="Estado" :value="userView.state" />
+        <UserInfo label="Tipo" :value="userView.type" />
+        <UserInfo label="Fecha de ingreso" :value="userView.dateIn" />
+        <UserInfo label="Compañía" :value="userView.company" />
       </div>
     </div>
   </div>
@@ -48,16 +54,29 @@ const fetchUserView = async () => {
   error.value = false;
 
   try {
-    const { data } = await axios.get(
+    const personaRes = await axios.get(
       `https://localhost:7014/api/Persona/${usuario.cedulaPersona}`
     );
+    const empleadoRes = await axios.get(
+      `https://localhost:7014/api/GetEmpleado/${usuario.cedulaPersona}`
+    );
 
+    const data = personaRes.data;
+    const dataEmpleado = empleadoRes.data;
+    console.log(data);
+    console.log(dataEmpleado);
     userView.value = {
       fullName: data.fullName || "Dato no disponible",
       email: data.email || "Dato no disponible",
       phone: data.phone || "Dato no disponible",
       role: usuario.tipo || "Dato no disponible",
       address: data.address || "Dato no disponible",
+      contract: dataEmpleado.contrato || "Dato no disponible",
+      genre: dataEmpleado.genero || "Dato no disponible",
+      state: dataEmpleado.estadoLaboral || "Dato no disponible",
+      type: dataEmpleado.tipo || "Dato no disponible",
+      dateIn: dataEmpleado.fechaIngreso || "Dato no disponible",
+      company: dataEmpleado.nombreEmpresa || "Dato no disponible",
     };
   } catch (err) {
     error.value = true;

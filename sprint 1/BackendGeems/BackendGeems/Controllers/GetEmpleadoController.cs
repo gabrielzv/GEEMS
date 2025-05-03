@@ -32,12 +32,17 @@ namespace BackendGeems.Controllers
                 {
                     return Ok(new
                     {
-                        contract = reader["Contrato"],
-                        genre = reader["Genero"],
-                        state = reader["EstadoLaboral"],
-                        type = reader["Tipo"],
-                        dateIn = reader["FechaIngreso"],
-                        Company = reader["NombreEmpresa"],
+                        id = reader["Id"],
+                        cedulaPersona = reader["CedulaPersona"],
+                        contrato = reader["Contrato"],
+                        numHorasTrabajadas = reader["NumHorasTrabajadas"],
+                        genero = reader["Genero"],
+                        estadoLaboral = reader["EstadoLaboral"],
+                        salarioBruto = reader["SalarioBruto"],
+                        tipo = reader["Tipo"],
+                        fechaIngreso = reader["FechaIngreso"],
+                        nombreEmpresa = reader["NombreEmpresa"]
+
 
                     });
                 }
