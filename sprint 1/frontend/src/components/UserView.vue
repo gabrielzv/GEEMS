@@ -57,14 +57,19 @@ const fetchUserView = async () => {
     const personaRes = await axios.get(
       `https://localhost:7014/api/Persona/${usuario.cedulaPersona}`
     );
-    const empleadoRes = await axios.get(
-      `https://localhost:7014/api/GetEmpleado/${usuario.cedulaPersona}`
-    );
 
     const data = personaRes.data;
-    const dataEmpleado = empleadoRes.data;
-    console.log(data);
-    console.log(dataEmpleado);
+
+    let dataEmpleado = {}; // valor por defecto si no hay empleado
+    try {
+      const empleadoRes = await axios.get(
+        `https://localhost:7014/api/GetEmpleado/${usuario.cedulaPersona}`
+      );
+      dataEmpleado = empleadoRes.data;
+    } catch (empleadoError) {
+      console.warn("Empleado no encontrado, se usarán valores por defecto");
+    }
+
     userView.value = {
       fullName: data.fullName || "Dato no disponible",
       email: data.email || "Dato no disponible",
@@ -79,6 +84,7 @@ const fetchUserView = async () => {
       company: dataEmpleado.nombreEmpresa || "Dato no disponible",
     };
   } catch (err) {
+    console.error("Error al obtener los datos de la persona", err);
     error.value = true;
   } finally {
     loading.value = false;
