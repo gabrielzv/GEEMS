@@ -152,7 +152,7 @@ export default {
 
         // // Obtener datos del empleado
         // const empleado = await axios.get(
-        //   `https://localhost:7014/api/GetEmpleado/${this.empleado}`
+        //   `https://localhost:7014/api/GetEmpleado/${usuario.cedulaPersona}`
         // );
         // console.log(empleado.data);
 
