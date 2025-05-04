@@ -149,6 +149,26 @@ export default {
           nombreUsuario: this.nombreUsuario,
           contrasena: user.data.contrasena,
         });
+
+        // // Obtener datos del empleado
+        // const empleado = await axios.get(
+        //   `https://localhost:7014/api/GetEmpleado/${usuario.cedulaPersona}`
+        // );
+        // console.log(empleado.data);
+
+        // await userStore.setEmpleado({
+        //   id: empleado.data.id,
+        //   cedulaEmpleado: empleado.data.cedulaPersona,
+        //   contrato: empleado.data.contrato,
+        //   numHorasTrabajadas: empleado.data.numHorasTrabajadas,
+        //   genero: empleado.data.genero,
+        //   estadoLaboral: empleado.data.estadoLaboral,
+        //   salarioBruto: empleado.data.salarioBruto,
+        //   tipo: empleado.data.tipo,
+        //   fechaIngreso: empleado.data.fechaIngreso,
+        //   nombreEmpresa: empleado.data.nombreEmpresa,
+        // });
+
         this.mensaje = "Inicio de sesión exitoso.";
         this.$router.push("/home");
       } catch (err) {

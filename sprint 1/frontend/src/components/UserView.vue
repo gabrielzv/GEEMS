@@ -54,21 +54,17 @@ const fetchUserView = async () => {
   error.value = false;
 
   try {
+    // Obtén los datos de la persona
     const personaRes = await axios.get(
       `https://localhost:7014/api/Persona/${usuario.cedulaPersona}`
     );
-
     const data = personaRes.data;
 
-    let dataEmpleado = {}; // valor por defecto si no hay empleado
-    try {
-      const empleadoRes = await axios.get(
-        `https://localhost:7014/api/GetEmpleado/${usuario.cedulaPersona}`
-      );
-      dataEmpleado = empleadoRes.data;
-    } catch (empleadoError) {
-      console.warn("Empleado no encontrado, se usarán valores por defecto");
-    }
+    // Llama a fetchEmpleado desde el store
+    await userStore.fetchEmpleado(usuario.cedulaPersona);
+
+    // Usa los datos del empleado desde el store
+    const dataEmpleado = userStore.empleado || {};
 
     userView.value = {
       fullName: data.fullName || "Dato no disponible",
