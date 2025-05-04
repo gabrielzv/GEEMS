@@ -60,12 +60,15 @@ const fetchUserView = async () => {
 
     const data = personaRes.data;
 
-    let dataEmpleado = {}; // valor por defecto si no hay empleado
+    let dataEmpleado = {}; // Valor por defecto si no hay empleado
     try {
       const empleadoRes = await axios.get(
         `https://localhost:7014/api/GetEmpleado/${usuario.cedulaPersona}`
       );
       dataEmpleado = empleadoRes.data;
+
+      // Guarda los datos del empleado en el store
+      userStore.setEmpleado(dataEmpleado);
     } catch (empleadoError) {
       console.warn("Empleado no encontrado, se usarán valores por defecto");
     }
