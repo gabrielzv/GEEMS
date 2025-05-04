@@ -7,6 +7,18 @@
     >
       Ir a User
     </button>
+    <button
+      class="px-4 py-2 bg-blue-600 text-white rounded transition-all hover:bg-blue-500"
+      @click="goToRegistroEmpresaPage"
+    >
+      Ir a Registro Empresa
+    </button>
+    <button
+      class="px-4 py-2 bg-blue-600 text-white rounded transition-all hover:bg-blue-500"
+      @click="goToVerEmpresaIndvPage"
+    >
+      Ir a Ver Empresa Indv
+    </button>
   </div>
 </template>
 
@@ -21,7 +33,15 @@ export default {
       router.push("/user"); // Redirige a la página de usuario
     };
 
-    return { goToUserPage };
+    const goToRegistroEmpresaPage = () => {
+      router.push("/registroEmpresa"); // Redirige a la página de registro de empresa
+    };
+
+    const goToVerEmpresaIndvPage = () => {
+      router.push("/verEmpresaIndv"); // Redirige a la página de registro de empresa
+    };
+
+    return { goToUserPage, goToRegistroEmpresaPage, goToVerEmpresaIndvPage };
   },
 };
 </script>
