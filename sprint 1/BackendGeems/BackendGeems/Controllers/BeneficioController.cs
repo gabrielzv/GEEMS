@@ -21,7 +21,8 @@ namespace BackendGeems.Controllers
             if (string.IsNullOrWhiteSpace(beneficio.Nombre) || 
                 string.IsNullOrWhiteSpace(beneficio.Descripcion) || 
                 beneficio.Costo <= 0 || 
-                beneficio.TiempoMinimo < 0)
+                beneficio.TiempoMinimo < 0 || 
+                beneficio.CedulaJuridica < 0)
             {
                 return BadRequest("Todos los campos son obligatorios y deben ser válidos.");
             }
@@ -30,15 +31,16 @@ namespace BackendGeems.Controllers
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     connection.Open();
-                    var query = "INSERT INTO Beneficio (Id, Costo, TiempoMinimoEnEmpresa, Descripcion, Nombre) " +
-                                "VALUES (NEWID(), @Costo, @TiempoMinimo, @Descripcion, @Nombre)";
+                    var query = "INSERT INTO Beneficio (Id, Costo, TiempoMinimoEnEmpresa, Descripcion, Nombre, CedulaJuridica) " +
+                                "VALUES (NEWID(), @Costo, @TiempoMinimo, @Descripcion, @Nombre, @CedulaJuridica)";
                     using (var command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Costo", beneficio.Costo);
                         command.Parameters.AddWithValue("@TiempoMinimo", beneficio.TiempoMinimo);
                         command.Parameters.AddWithValue("@Descripcion", beneficio.Descripcion);
                         command.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
-
+                        command.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
+                        
                         command.ExecuteNonQuery();
                     }
                 }

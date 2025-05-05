@@ -102,6 +102,19 @@
           class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
+      <!-- Cédula Jurídica -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Cédula Jurídica de la Empresa</label
+        >
+        <input
+          v-model="form.cedulaJuridica"
+          type="number"
+          min="0"
+          placeholder="Ej: 987123"
+          class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
 
       <!-- Botón -->
       <div class="flex justify-center pt-2">
@@ -134,6 +147,7 @@ export default {
         // tipoBeneficio: "",
         costo: "",
         tiempoMinimo: "",
+        cedulaJuridica: "",
         // tipoEmpleado: [],
       },
     };
@@ -147,6 +161,7 @@ export default {
         // tipoBeneficio,
         costo,
         tiempoMinimo,
+        cedulaJuridica,
         // tipoEmpleado,
       } = this.form;
 
@@ -155,7 +170,8 @@ export default {
         !descripcion.trim() ||
         // !tipoBeneficio ||
         !costo ||
-        !tiempoMinimo //||
+        !tiempoMinimo ||
+        !cedulaJuridica // ||
         // tipoEmpleado.length === 0
       ) {
         alert(
