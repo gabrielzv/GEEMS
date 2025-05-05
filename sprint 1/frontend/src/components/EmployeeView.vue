@@ -26,9 +26,15 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UserInfo label="Cedula" :value="userView.cedulaPersona" />
         <UserInfo label="Teléfono" :value="userView.phone" />
-        <UserInfo label="Correo electrónico" :value="userView.email" />
+        <UserInfo label="Dirección" :value="userView.address" />
         <UserInfo label="Fecha de ingreso" :value="userView.dateIn" />
+        <UserInfo label="Correo electrónico" :value="userView.email" />
         <UserInfo label="Rol" :value="userView.role" />
+        <UserInfo label="Contrato" :value="userView.contract" />
+        <UserInfo label="Género" :value="userView.genre" />
+        <UserInfo label="Estado" :value="userView.state" />
+        <UserInfo label="Tipo" :value="userView.type" />
+        <UserInfo label="Salario" :value="userView.salario" />
         <UserInfo label="Compañía" :value="userView.company" />
       </div>
 
@@ -43,14 +49,13 @@
           to="/actualizar-perfil"
           class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          Editar perfil
+          Editar perfil de Empleado
         </router-link>
-
         <router-link
-          to="/employee"
+          to="/eliminar-perfil"
           class="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700"
         >
-          empleadoView
+          Eliminar Empleado
         </router-link>
       </div>
     </div>
@@ -97,6 +102,7 @@ const fetchUserView = async () => {
       dateIn: dataEmpleado.fechaIngreso || "Dato no disponible",
       company: dataEmpleado.nombreEmpresa || "Dato no disponible",
       cedulaPersona: usuario.cedulaPersona || "Dato no disponible",
+      salario: dataEmpleado.salarioBruto || "Dato no disponible",
     };
 
     if (dataEmpleado.genero == "F") {

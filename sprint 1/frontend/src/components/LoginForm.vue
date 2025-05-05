@@ -65,6 +65,13 @@
       >
         ¿Olvidaste tu contraseña?
       </router-link>
+
+      <router-link
+        to="/registro"
+        class="block text-center text-sm text-blue-600 hover:underline"
+      >
+        ¿No tienes cuenta?
+      </router-link>
     </form>
   </div>
 </template>

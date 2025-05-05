@@ -5,6 +5,7 @@ import Login from "./components/LoginForm.vue";
 import Home from "./components/HomePage.vue";
 import Recuperar from "./components/RecuperarCont.vue";
 import UserView from "./components/UserView.vue";
+import EmployeeView from "./components/EmployeeView.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -16,6 +17,7 @@ const router = createRouter({
     { path: "/home", name: "Home", component: Home },
     { path: "/recuperar", name: "Recuperar", component: Recuperar },
     { path: "/user", name: "User", component: UserView },
+    { path: "/employee", name: "Employee", component: EmployeeView },
   ],
 });
 
