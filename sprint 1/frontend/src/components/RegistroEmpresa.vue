@@ -19,6 +19,7 @@
             type="text"
             id="nombre"
             v-model="empresa.nombre"
+            maxlength="90"
             placeholder=""
             class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
@@ -26,30 +27,55 @@
 
         <!-- Teléfono -->
         <div>
-          <label for="telefono" class="block text-sm font-medium text-gray-700">
+          <label class="block text-sm font-medium text-gray-700">
             Teléfono
           </label>
-          <input
-            type="tel"
-            id="telefono"
-            v-model="empresa.telefono"
-            placeholder="XXXX-XXXX"
-            class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          />
+          <div class="flex space-x-2">
+            <input
+              type="text"
+              v-model="telefonoParte1"
+              maxlength="4"
+              placeholder=""
+              class="w-1/2 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <input
+              type="text"
+              v-model="telefonoParte2"
+              maxlength="4"
+              placeholder=""
+              class="w-1/2 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </div>
         </div>
 
         <!-- Cédula jurídica -->
         <div>
-          <label for="cedula" class="block text-sm font-medium text-gray-700">
+          <label class="block text-sm font-medium text-gray-700">
             Cédula jurídica
           </label>
-          <input
-            type="text"
-            id="cedula"
-            v-model="empresa.cedulaJuridica"
-            placeholder="X-XXX-XXXXXXX"
-            class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-          />
+          <div class="flex space-x-2">
+            <input
+              type="text"
+              v-model="cedulaParte1"
+              maxlength="1"
+              placeholder=""
+              class="w-1/4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <input
+              type="text"
+              v-model="cedulaParte2"
+              maxlength="3"
+              placeholder=""
+              class="w-1/4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+            <input
+              type="text"
+              v-model="cedulaParte3"
+              maxlength="7"
+              placeholder=""
+              class="w-1/2 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </div>
         </div>
 
         <!-- Correo -->
@@ -61,7 +87,7 @@
             type="email"
             id="correo"
             v-model="empresa.correo"
-            placeholder="XXX@XXXX.XXX"
+            placeholder=""
             class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
@@ -146,7 +172,6 @@
     </form>
   </div>
 </template>
-
 <script>
 import axios from "axios";
 
@@ -155,8 +180,6 @@ export default {
     return {
       empresa: {
         nombre: "",
-        telefono: "",
-        cedulaJuridica: "",
         correo: "",
         descripcion: "",
         direccion: {
@@ -166,6 +189,11 @@ export default {
           senas: "",
         },
       },
+      cedulaParte1: "",
+      cedulaParte2: "",
+      cedulaParte3: "",
+      telefonoParte1: "",
+      telefonoParte2: "",
     };
   },
   methods: {
@@ -173,8 +201,11 @@ export default {
       // Validar datos antes de enviarlos
       if (
         !this.empresa.nombre ||
-        !this.empresa.telefono ||
-        !this.empresa.cedulaJuridica ||
+        !this.telefonoParte1 ||
+        !this.telefonoParte2 ||
+        !this.cedulaParte1 ||
+        !this.cedulaParte2 ||
+        !this.cedulaParte3 ||
         !this.empresa.correo ||
         !this.empresa.descripcion ||
         !this.empresa.direccion.provincia ||
@@ -186,11 +217,21 @@ export default {
         return;
       }
 
-      // Convertir cedulaJuridica a un número entero eliminando caracteres no numéricos
-      const cedulaJuridica = parseInt(this.empresa.cedulaJuridica.replace(/[^0-9]/g, ""), 10);
+      // Concatenar los valores de cédula jurídica y teléfono
+      const cedulaJuridica = `${this.cedulaParte1}-${this.cedulaParte2}-${this.cedulaParte3}`;
+      const telefono = `${this.telefonoParte1}${this.telefonoParte2}`;
 
-      if (isNaN(cedulaJuridica)) {
-        alert("La cédula jurídica debe ser un número válido.");
+      // Validar que la cédula jurídica tenga el formato correcto
+      if (!/^\d{1}-\d{3}-\d{7}$/.test(cedulaJuridica)) {
+        alert("La cédula jurídica debe tener el formato X-XXX-XXXXXXX.");
+        console.error("Error: La cédula jurídica no tiene el formato correcto:", cedulaJuridica);
+        return;
+      }
+
+      // Validar que el teléfono tenga exactamente 8 dígitos
+      if (telefono.length !== 8 || isNaN(parseInt(telefono, 10))) {
+        alert("El teléfono debe tener exactamente 8 dígitos.");
+        console.error("Error: El teléfono no es válido:", telefono);
         return;
       }
 
@@ -199,13 +240,15 @@ export default {
         cedulaJuridica: cedulaJuridica,
         nombre: this.empresa.nombre,
         descripcion: this.empresa.descripcion,
-        telefono: this.empresa.telefono,
+        telefono: telefono,
         correo: this.empresa.correo,
         provincia: this.empresa.direccion.provincia,
         canton: this.empresa.direccion.canton,
         distrito: this.empresa.direccion.distrito,
         senas: this.empresa.direccion.senas,
       };
+
+      console.log("Datos enviados al backend:", empresaPayload);
 
       try {
         // Enviar datos al backend
@@ -216,14 +259,13 @@ export default {
         alert("Empresa registrada exitosamente.");
         console.log("Respuesta del servidor:", response.data);
       } catch (error) {
-        console.error("Error al registrar la empresa:", error);
+        console.error("Error al registrar la empresa:", error.response?.data || error.message);
         alert("Ocurrió un error al registrar la empresa.");
       }
     },
   },
 };
 </script>
-
 <style scoped>
 /* Puedes agregar estilos personalizados aquí */
 </style>

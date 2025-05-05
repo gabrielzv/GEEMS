@@ -16,7 +16,7 @@ public class SetEmpresaController : ControllerBase
 
     public class EmpresaModel
     {
-        public int CedulaJuridica { get; set; }
+        public string CedulaJuridica { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
         public string Telefono { get; set; }
