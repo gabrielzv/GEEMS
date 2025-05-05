@@ -13,7 +13,7 @@ DECLARE @uid8 UNIQUEIDENTIFIER = NEWID();
 INSERT INTO Persona VALUES (101, 'Av Central', 'Carlos', 'Perez', 'Mora', 'geems@gmail.com', '8888-8888');
 INSERT INTO Persona VALUES (102, 'Calle 2', 'Ana', 'Lopez', 'Soto', 'ana@example.com', '8777-7777');
 INSERT INTO Persona VALUES (103, 'Calle 3', 'Luis', 'Ramirez', 'Acosta', 'luis@example.com', '8666-6666');
-
+        
 -- Usuario
 INSERT INTO Usuario VALUES (@uid1, 'geems@gmail.com', '1234', 'SuperAdmin', 101);
 INSERT INTO Usuario VALUES (@uid2, 'alopez', 'pass5678', 'DuenoEmpresa', 102);

@@ -118,6 +118,7 @@ export default {
         loading.value = false;
       }
     };
+    
     onMounted(() => {
       if (!user || !user.cedulaPersona) {
         router.push("/"); // Redirige si no hay sesión
@@ -134,11 +135,7 @@ export default {
       router.push("/verEmpresaIndv");
     };
 
-    const goToEditarEmpresa = () => {
-      router.push("/registroEmpresa");
-    };
-
-    return { goToUserPage, goToVerEmpresaIndv, goToEditarEmpresa, user, empleado, loading, error };
+    return { goToUserPage, goToVerEmpresaIndv, user, empleado, loading, error };
   },
 };
 </script>
