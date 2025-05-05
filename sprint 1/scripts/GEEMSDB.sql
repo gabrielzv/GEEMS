@@ -76,17 +76,19 @@ CREATE TABLE
 		--Formula NVARCHAR (20) NOT NULL,
 		TiempoMinimoEnEmpresa int NOT NULL,
 		Descripcion NVARCHAR (200) NOT NULL,
-		Nombre NVARCHAR (32) NOT NULL
+		Nombre NVARCHAR (32) NOT NULL,
+		CedulaJuridica INT NOT NULL,
+		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE
 	);
 
-CREATE TABLE
-	BeneficiosDisponibles (
-		IdBeneficio UNIQUEIDENTIFIER NOT NULL,
-		CedulaJuridica INT NOT NULL,
-		PRIMARY KEY (IdBeneficio, CedulaJuridica),
-		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
-		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE CASCADE
-	);
+-- CREATE TABLE
+-- 	BeneficiosDisponibles (
+-- 		IdBeneficio UNIQUEIDENTIFIER NOT NULL,
+-- 		CedulaJuridica INT NOT NULL,
+-- 		PRIMARY KEY (IdBeneficio, CedulaJuridica),
+-- 		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
+-- 		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE CASCADE
+-- 	);
 
 CREATE TABLE
 	BeneficioContratoElegible (
@@ -205,7 +207,7 @@ SELECT * FROM SuperAdminAdministraEmpresa;
 SELECT * FROM DuenoEmpresa;
 SELECT * FROM DatosPrivadosEmpresa;
 SELECT * FROM Beneficio;
-SELECT * FROM BeneficiosDisponibles;
+-- SELECT * FROM BeneficiosDisponibles;
 SELECT * FROM BeneficioContratoElegible;
 SELECT * FROM Empleado;
 SELECT * FROM SupervisorSupervisaEmpleado;

@@ -35,10 +35,10 @@ INSERT INTO DuenoEmpresa VALUES (@uid2, 555, 102);
 INSERT INTO DatosPrivadosEmpresa VALUES (555, 'Mensual', 2);
 
 -- Beneficio
-INSERT INTO Beneficio VALUES (@uid4, 5000, 6, 'Gimnasio Corporativo', 'Gimnasio');
+INSERT INTO Beneficio VALUES (@uid4, 5000, 6, 'Gimnasio Corporativo', 'Gimnasio', 555);
 
 -- Beneficios disponibles
-INSERT INTO BeneficiosDisponibles VALUES (@uid4, 555);
+-- INSERT INTO BeneficiosDisponibles VALUES (@uid4, 555);
 
 -- Beneficio Contrato Elegible
 INSERT INTO BeneficioContratoElegible VALUES (@uid4, 'Tiempo Completo');
