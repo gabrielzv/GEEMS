@@ -3,9 +3,13 @@
     <div class="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-md">
       <!-- Encabezado -->
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">{{ empresa?.nombre || "Nombre de empresa" }}</h1>
+        <h1 class="text-3xl font-bold text-gray-800">
+          {{ empresa?.nombre || "Nombre de empresa" }}
+        </h1>
         <div class="text-center bg-white px-4 py-2 rounded-full shadow">
-          <p class="text-lg font-semibold text-gray-800">{{ pagosPendientes }}</p>
+          <p class="text-lg font-semibold text-gray-800">
+            {{ pagosPendientes }}
+          </p>
           <p class="text-sm text-gray-600">Pagos Pendientes</p>
         </div>
       </div>
@@ -15,27 +19,43 @@
         <!-- Columna izquierda -->
         <div>
           <p class="text-lg font-bold text-gray-800">Nombre:</p>
-          <p class="text-gray-700 mb-4">{{ empresa?.nombre || "Dato no disponible" }}</p>
+          <p class="text-gray-700 mb-4">
+            {{ empresa?.nombre || "Dato no disponible" }}
+          </p>
 
           <p class="text-lg font-bold text-gray-800">Cédula jurídica:</p>
-          <p class="text-gray-700 mb-4">{{ empresa?.cedulaJuridica || "Dato no disponible" }}</p>
+          <p class="text-gray-700 mb-4">
+            {{ empresa?.cedulaJuridica || "Dato no disponible" }}
+          </p>
 
           <p class="text-lg font-bold text-gray-800">Dirección:</p>
           <p class="text-gray-700">
-            <span class="block">Provincia: {{ empresa?.provincia || "Dato no disponible" }}</span>
-            <span class="block">Cantón: {{ empresa?.canton || "Dato no disponible" }}</span>
-            <span class="block">Distrito: {{ empresa?.distrito || "Dato no disponible" }}</span>
-            <span class="block">Señas: {{ empresa?.senas || "Dato no disponible" }}</span>
+            <span class="block"
+              >Provincia: {{ empresa?.provincia || "Dato no disponible" }}</span
+            >
+            <span class="block"
+              >Cantón: {{ empresa?.canton || "Dato no disponible" }}</span
+            >
+            <span class="block"
+              >Distrito: {{ empresa?.distrito || "Dato no disponible" }}</span
+            >
+            <span class="block"
+              >Señas: {{ empresa?.senas || "Dato no disponible" }}</span
+            >
           </p>
         </div>
 
         <!-- Columna derecha -->
         <div>
           <p class="text-lg font-bold text-gray-800">Teléfono:</p>
-          <p class="text-gray-700 mb-4">{{ empresa?.telefono || "Dato no disponible" }}</p>
+          <p class="text-gray-700 mb-4">
+            {{ empresa?.telefono || "Dato no disponible" }}
+          </p>
 
           <p class="text-lg font-bold text-gray-800">Correo:</p>
-          <p class="text-gray-700 mb-4">{{ empresa?.correo || "Dato no disponible" }}</p>
+          <p class="text-gray-700 mb-4">
+            {{ empresa?.correo || "Dato no disponible" }}
+          </p>
         </div>
       </div>
 
@@ -51,11 +71,12 @@
             >
               <span class="text-gray-700">{{ empleado.nombre }}</span>
               <div class="flex space-x-2">
-                <button
-                  class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                <router-link
+                  :to="`/employee/${empleado.cedula}`"
+                  class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
                 >
                   Detalles
-                </button>
+                </router-link>
                 <button
                   class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                 >

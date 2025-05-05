@@ -64,13 +64,15 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import axios from "axios";
 import UserInfo from "./UserInfo.vue";
 import { useUserStore } from "../store/user";
 
+const route = useRoute();
+const cedula = route.params.cedula; // Aquí obtienes la cédula de la URL
+console.log(cedula); // Verifica que la cédula se esté obteniendo correctamente
 const userStore = useUserStore();
-const usuario = userStore.usuario;
-
 const loading = ref(true);
 const error = ref(false);
 const userView = ref({});
@@ -81,35 +83,28 @@ const fetchUserView = async () => {
 
   try {
     const personaRes = await axios.get(
-      `https://localhost:7014/api/Persona/${usuario.cedulaPersona}`
+      `https://localhost:7014/api/Persona/${cedula}`
     );
     const data = personaRes.data;
 
-    await userStore.fetchEmpleado(usuario.cedulaPersona);
-
+    await userStore.fetchEmpleado(cedula);
     const dataEmpleado = userStore.empleado || {};
 
     userView.value = {
       fullName: data.fullName || "Dato no disponible",
       email: data.email || "Dato no disponible",
       phone: data.phone || "Dato no disponible",
-      role: usuario.tipo || "Dato no disponible",
+      role: dataEmpleado.tipo || "Dato no disponible",
       address: data.address || "Dato no disponible",
       contract: dataEmpleado.contrato || "Dato no disponible",
-      genre: dataEmpleado.genero || "Dato no disponible",
+      genre: dataEmpleado.genero === "F" ? "Femenino" : "Masculino",
       state: dataEmpleado.estadoLaboral || "Dato no disponible",
       type: dataEmpleado.tipo || "Dato no disponible",
       dateIn: dataEmpleado.fechaIngreso || "Dato no disponible",
       company: dataEmpleado.nombreEmpresa || "Dato no disponible",
-      cedulaPersona: usuario.cedulaPersona || "Dato no disponible",
+      cedulaPersona: cedula,
       salario: dataEmpleado.salarioBruto || "Dato no disponible",
     };
-
-    if (dataEmpleado.genero == "F") {
-      userView.value.genre = "Femenino";
-    } else {
-      userView.value.genre = "Masculino";
-    }
   } catch (err) {
     console.error("Error al obtener los datos de la persona", err);
     error.value = true;
@@ -119,7 +114,7 @@ const fetchUserView = async () => {
 };
 
 onMounted(() => {
-  if (!usuario || !usuario.cedulaPersona) {
+  if (!cedula) {
     window.location.href = "/";
   } else {
     fetchUserView();

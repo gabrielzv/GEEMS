@@ -21,7 +21,7 @@ const router = createRouter({
     { path: "/user", name: "User", component: UserView },
     { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
     { path: "/verEmpresaIndv", name: "VerEmpresaIndv", component: VerEmpresaIndv },
-    { path: "/employee", name: "Employee", component: EmployeeView },
+    { path: "/employee/:cedula", name: "Employee", component: EmployeeView },
   ],
 });
 
