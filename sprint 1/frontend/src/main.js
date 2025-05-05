@@ -6,6 +6,7 @@ import Home from "./components/HomePage.vue";
 import Recuperar from "./components/RecuperarCont.vue";
 import BenefitCreation from "./components/BenefitCreation.vue";
 import UserView from "./components/UserView.vue";
+import CompanyBenefits from "./components/CompanyBenefits.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -18,6 +19,7 @@ const router = createRouter({
     { path: "/recuperar", name: "Recuperar", component: Recuperar },
     { path: "/user", name: "User", component: UserView },
     { path: "/benefitCreation", name: "BenefitCreation", component: BenefitCreation},
+    { path: "/companyBenefits", name: "CompanyBenefits", component: CompanyBenefits},
   ],
 });
 
