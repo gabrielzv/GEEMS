@@ -1,36 +1,30 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+// Configuración de servicios
 builder.Services.AddControllers();
-builder.Services.AddScoped<CalculatorService>(); // Servicio de cálculo
-
-// Configuración JWT
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]))
-        };
-    });
+builder.Services.AddScoped<CalculatorService>();
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
+
+// Middleware de autenticación con clave estática
+app.Use(async (context, next) =>
+{
+    const string staticApiKey = "Tralalerotralala";
+    
+    // Verificar la clave en el header
+    if (!context.Request.Headers.TryGetValue("X-API-KEY", out var receivedApiKey) || 
+        receivedApiKey != staticApiKey)
+    {
+        context.Response.StatusCode = 401; // Unauthorized
+        await context.Response.WriteAsync("Clave API no válida");
+        return;
+    }
+    
+    await next();
+});
+
 app.MapControllers();
 
 app.Run();
