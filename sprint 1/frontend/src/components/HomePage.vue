@@ -50,8 +50,9 @@
 
           <!-- Opciones para DuenoEmpresa -->
           <div v-else-if="user.tipo === 'DuenoEmpresa'" class="space-y-2">
-            <button class="btn-option">Editar empresa</button>
+            <button class="btn-option" @click="goToEditarEmpresa">Editar empresa</button>
             <button class="btn-option">Añadir nuevo empleado</button>
+            <button class="btn-option" @click="goToVerEmpresaIndv">Ver información empresa</button>
           </div>
 
           <!-- Opciones para Empleado -->
@@ -117,16 +118,6 @@ export default {
         loading.value = false;
       }
     };
-
-    const goToRegistroEmpresaPage = () => {
-      router.push("/registroEmpresa"); // Redirige a la página de registro de empresa
-    };
-
-    const goToVerEmpresaIndvPage = () => {
-      router.push("/verEmpresaIndv"); // Redirige a la página de registro de empresa
-    };
-
-    return { goToUserPage, goToRegistroEmpresaPage, goToVerEmpresaIndvPage };
     onMounted(() => {
       if (!user || !user.cedulaPersona) {
         router.push("/"); // Redirige si no hay sesión
@@ -139,7 +130,15 @@ export default {
       router.push("/user");
     };
 
-    return { goToUserPage, user, empleado, loading, error };
+    const goToVerEmpresaIndv = () => {
+      router.push("/verEmpresaIndv");
+    };
+
+    const goToEditarEmpresa = () => {
+      router.push("/registroEmpresa");
+    };
+
+    return { goToUserPage, goToVerEmpresaIndv, goToEditarEmpresa, user, empleado, loading, error };
   },
 };
 </script>
