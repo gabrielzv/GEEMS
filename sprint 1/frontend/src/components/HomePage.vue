@@ -50,8 +50,9 @@
 
           <!-- Opciones para DuenoEmpresa -->
           <div v-else-if="user.tipo === 'DuenoEmpresa'" class="space-y-2">
-            <button class="btn-option">Editar empresa</button>
+            <button class="btn-option" @click="goToEditarEmpresa">Editar empresa</button>
             <button class="btn-option">Añadir nuevo empleado</button>
+            <button class="btn-option" @click="goToVerEmpresaIndv">Ver información empresa</button>
           </div>
 
           <!-- Opciones para Empleado -->
@@ -117,7 +118,7 @@ export default {
         loading.value = false;
       }
     };
-
+    
     onMounted(() => {
       if (!user || !user.cedulaPersona) {
         router.push("/"); // Redirige si no hay sesión
@@ -130,15 +131,17 @@ export default {
       router.push("/user");
     };
 
-    return { goToUserPage, user, empleado, loading, error };
+    const goToVerEmpresaIndv = () => {
+      router.push("/verEmpresaIndv");
+    };
+
+    return { goToUserPage, goToVerEmpresaIndv, user, empleado, loading, error };
   },
 };
 </script>
 
 <style scoped>
-.btn-option {
-  @apply w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition;
-}
+/* Ya no es necesario SCSS ni CSS adicionales, Tailwind lo maneja */
 </style>
 
 
