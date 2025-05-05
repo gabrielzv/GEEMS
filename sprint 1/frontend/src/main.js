@@ -8,6 +8,7 @@ import UserView from "./components/UserView.vue";
 import EmployeeView from "./components/EmployeeView.vue";
 import RegistroEmpresa from "./components/RegistroEmpresa.vue";
 import VerEmpresaIndv from "./components/VerEmpresaIndv.vue";
+import ConsultaEmpresa from "./components/ConsultaEmpresas.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -22,6 +23,7 @@ const router = createRouter({
     { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
     { path: "/verEmpresaIndv", name: "VerEmpresaIndv", component: VerEmpresaIndv },
     { path: "/employee/:cedula", name: "Employee", component: EmployeeView },
+    { path: "/ConsulEmpresa", name: "ConsultaEmpresa", component: ConsultaEmpresa },
   ],
 });
 
