@@ -16,9 +16,9 @@ namespace BackendGeems.Controllers
         }
 
         [HttpGet("{CedulaJuridica}")]
-        public IActionResult GetCompanyBenefits(int CedulaJuridica)
+        public IActionResult GetCompanyBenefits(string CedulaJuridica)
         {
-            if (CedulaJuridica <= 0)
+            if (string.IsNullOrWhiteSpace(CedulaJuridica))
             {
                 return BadRequest(new { message = "El ID de la empresa es obligatorio y debe ser válido." });
             }
