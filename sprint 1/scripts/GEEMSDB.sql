@@ -1,7 +1,17 @@
-use master
+USE master;
+GO
+
+ALTER DATABASE GEEMSDB
+SET SINGLE_USER
+WITH ROLLBACK IMMEDIATE;
+GO
+
 DROP DATABASE GEEMSDB;
+GO
+
 
 Create DATABASE GEEMSDB;
+GO
 use GEEMSDB;
 
 CREATE TABLE
@@ -11,7 +21,7 @@ CREATE TABLE
 		NombrePila NVARCHAR (30),
 		Apellido1 NVARCHAR (30),
 		Apellido2 NVARCHAR (30),
-		Correo VARCHAR(100) unique,
+		Correo VARCHAR(100) UNIQUE,
 		Telefono VARCHAR(100)
 	);
 
@@ -123,7 +133,7 @@ CREATE TABLE
 		EstadoLaboral VARCHAR(10) CHECK (EstadoLaboral IN ('Activo', 'Inactivo')),
 		SalarioBruto INT NOT NULL,
 		Tipo VARCHAR(20) CHECK (Tipo IN ('Colaborador', 'Supervisor', 'Payroll')),
-		FechaIngreso DATETIME,
+		FechaIngreso NVARCHAR(10),
 		NombreEmpresa NVARCHAR (100) NOT NULL,
 		FOREIGN KEY (CedulaPersona) REFERENCES Persona (Cedula) ON UPDATE CASCADE,
 		FOREIGN key (NombreEmpresa) REFERENCES Empresa (Nombre) ON UPDATE CASCADE
@@ -207,6 +217,11 @@ FROM
 	Usuario;
 
 SELECT
+*
+FROM
+	Empleado;
+
+SELECT
 	*
 FROM
 	SuperAdmin;
@@ -246,10 +261,7 @@ SELECT
 FROM
 	BeneficioContratoElegible;
 
-SELECT
-	*
-FROM
-	Empleado;
+
 
 SELECT
 	*
