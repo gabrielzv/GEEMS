@@ -70,8 +70,8 @@ import UserInfo from "./UserInfo.vue";
 import { useUserStore } from "../store/user";
 
 const route = useRoute();
-const cedula = route.params.cedula; // Aquí obtienes la cédula de la URL
-console.log(cedula); // Verifica que la cédula se esté obteniendo correctamente
+const cedula = route.params.cedula;
+console.log(cedula);
 const userStore = useUserStore();
 const usuario = userStore.usuario;
 const loading = ref(true);

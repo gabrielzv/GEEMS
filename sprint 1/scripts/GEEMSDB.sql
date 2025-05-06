@@ -1,5 +1,8 @@
 --Create DATABASE GEEMSDB;
---use master
+--USE master;
+--GO
+
+--ALTER DATABASE GEEMSDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 --DROP DATABASE GEEMSDB;
 use GEEMSDB;
 
@@ -10,17 +13,21 @@ CREATE TABLE
 		NombrePila NVARCHAR (30),
 		Apellido1 NVARCHAR (30),
 		Apellido2 NVARCHAR (30),
-		Correo VARCHAR(100),
+		Correo VARCHAR(100) unique,
 		Telefono VARCHAR(100)
 	);
 
 CREATE TABLE
 	Usuario (
 		Id UNIQUEIDENTIFIER NOT NULL,
-		Username NVARCHAR (32) NOT NULL,
+		Username NVARCHAR (32) UNIQUE NOT NULL ,
 		Contrasena VARCHAR(32) NOT NULL,
-		Tipo VARCHAR(20) CHECK (Tipo IN ('DuenoEmpresa', 'Empleado', 'SuperAdmin')),
+		Tipo VARCHAR(20) CHECK (
+			Tipo IN ('DuenoEmpresa', 'Empleado', 'SuperAdmin')
+		),
 		CedulaPersona INT UNIQUE NOT NULL,
+		CorreoPersona VARCHAR(100) NOT NULL,
+		FOREIGN KEY (CorreoPersona) REFERENCES Persona (Correo),
 		FOREIGN KEY (CedulaPersona) REFERENCES Persona (Cedula) ON UPDATE CASCADE
 	);
 
@@ -33,7 +40,7 @@ CREATE TABLE
 
 CREATE TABLE
 	Empresa (
-		CedulaJuridica NVARCHAR(20) NOT NULL PRIMARY KEY, -- Cambiado a NVARCHAR para permitir tamano estandar
+		CedulaJuridica NVARCHAR (20) NOT NULL PRIMARY KEY, -- Cambiado a NVARCHAR para permitir tamano estandar
 		Nombre NVARCHAR (100) UNIQUE NOT NULL,
 		Descripcion NVARCHAR (420) NOT NULL,
 		Telefono VARCHAR(30) NOT NULL,
@@ -47,7 +54,7 @@ CREATE TABLE
 CREATE TABLE
 	SuperAdminAdministraEmpresa (
 		IdAdministrador UNIQUEIDENTIFIER NOT NULL,
-		CedulaJuridicaEmpresa INT NOT NULL,
+		CedulaJuridicaEmpresa  NVARCHAR (20) NOT NULL,
 		PRIMARY KEY (IdAdministrador, CedulaJuridicaEmpresa),
 		FOREIGN KEY (IdAdministrador) REFERENCES SuperAdmin (Id) ON UPDATE CASCADE,
 		FOREIGN KEY (CedulaJuridicaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE
@@ -55,7 +62,7 @@ CREATE TABLE
 CREATE TABLE
 	DuenoEmpresa (
 		Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-		CedulaEmpresa INT UNIQUE NOT NULL,
+		CedulaEmpresa NVARCHAR (20) UNIQUE NOT NULL,
 		CedulaPersona INT UNIQUE NOT NULL,
 		FOREIGN KEY (CedulaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
 		FOREIGN KEY (CedulaPersona) REFERENCES Persona (Cedula) ON UPDATE CASCADE
@@ -63,7 +70,7 @@ CREATE TABLE
 
 CREATE TABLE
 	DatosPrivadosEmpresa (
-		CedulaJuridica INT NOT NULL PRIMARY KEY,
+		CedulaJuridica  NVARCHAR (20) NOT NULL PRIMARY KEY,
 		PlazoPago VARCHAR(20) NOT NULL,
 		CantidadBeneficiosXEmpleado INT NOT NULL,
 		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE
@@ -82,7 +89,7 @@ CREATE TABLE
 CREATE TABLE
 	BeneficiosDisponibles (
 		IdBeneficio UNIQUEIDENTIFIER NOT NULL,
-		CedulaJuridica INT NOT NULL,
+		CedulaJuridica  NVARCHAR (20) NOT NULL,
 		PRIMARY KEY (IdBeneficio, CedulaJuridica),
 		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
 		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE CASCADE
@@ -117,13 +124,7 @@ CREATE TABLE
 		Genero CHAR NOT NULL CHECK (Genero IN ('M', 'F')),
 		EstadoLaboral VARCHAR(10) CHECK (EstadoLaboral IN ('Activo', 'Inactivo')),
 		SalarioBruto INT NOT NULL,
-		Tipo VARCHAR(20) CHECK (
-			Tipo IN (
-				'Colaborador',
-				'Supervisor',
-				'Payroll'
-			)
-		),
+		Tipo VARCHAR(20) CHECK (Tipo IN ('Colaborador', 'Supervisor', 'Payroll')),
 		FechaIngreso DATETIME,
 		NombreEmpresa NVARCHAR (100) NOT NULL,
 		FOREIGN KEY (CedulaPersona) REFERENCES Persona (Cedula) ON UPDATE CASCADE,
@@ -197,19 +198,82 @@ CREATE TABLE
 		FOREIGN KEY (IdPago) REFERENCES Pago (Id)
 	);
 
-SELECT * FROM Persona;
-SELECT * FROM Usuario;
-SELECT * FROM SuperAdmin;
-SELECT * FROM Empresa;
-SELECT * FROM SuperAdminAdministraEmpresa;
-SELECT * FROM DuenoEmpresa;
-SELECT * FROM DatosPrivadosEmpresa;
-SELECT * FROM Beneficio;
-SELECT * FROM BeneficiosDisponibles;
-SELECT * FROM BeneficioContratoElegible;
-SELECT * FROM Empleado;
-SELECT * FROM SupervisorSupervisaEmpleado;
-SELECT * FROM Pago;
-SELECT * FROM Registro;
-SELECT * FROM BeneficiosEmpleado;
-SELECT * FROM HistorialDePagos;
+SELECT
+	*
+FROM
+	Persona;
+
+SELECT
+	*
+FROM
+	Usuario;
+
+SELECT
+	*
+FROM
+	SuperAdmin;
+
+SELECT
+	*
+FROM
+	Empresa;
+
+SELECT
+	*
+FROM
+	SuperAdminAdministraEmpresa;
+
+SELECT
+	*
+FROM
+	DuenoEmpresa;
+
+SELECT
+	*
+FROM
+	DatosPrivadosEmpresa;
+
+SELECT
+	*
+FROM
+	Beneficio;
+
+SELECT
+	*
+FROM
+	BeneficiosDisponibles;
+
+SELECT
+	*
+FROM
+	BeneficioContratoElegible;
+
+SELECT
+	*
+FROM
+	Empleado;
+
+SELECT
+	*
+FROM
+	SupervisorSupervisaEmpleado;
+
+SELECT
+	*
+FROM
+	Pago;
+
+SELECT
+	*
+FROM
+	Registro;
+
+SELECT
+	*
+FROM
+	BeneficiosEmpleado;
+
+SELECT
+	*
+FROM
+	HistorialDePagos;
