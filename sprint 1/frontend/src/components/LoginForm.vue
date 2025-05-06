@@ -70,14 +70,16 @@
           ¿Olvidaste tu contraseña?
         </router-link>
 
-      <!-- Nuevo botón de registro -->
-      <router-link
-        to="/register"
-        class="block text-center text-sm text-blue-600 hover:underline"
-      >
-        ¿No tiene una cuenta aún? <span class="font-semibold">Regístrese</span>
-      </router-link>
-    </form>
+        <!-- Nuevo botón de registro -->
+        <router-link
+          to="/register"
+          class="block text-center text-sm text-blue-600 hover:underline"
+        >
+          ¿No tiene una cuenta aún?
+          <span class="font-semibold">Regístrese</span>
+        </router-link>
+      </form>
+    </div>
   </div>
   </div>
 </template>

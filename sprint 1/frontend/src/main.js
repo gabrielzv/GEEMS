@@ -10,6 +10,7 @@ import Prueba from "./components/Prueba.vue";
   import EmployeeView from "./components/EmployeeView.vue";
   import RegistroEmpresa from "./components/RegistroEmpresa.vue";
   import VerEmpresaIndv from "./components/VerEmpresaIndv.vue";
+  import VerEmpresaIndvSuperAdmin from "./components/VerEmpresaIndvSuperAdmin.vue";
   import ConsultaEmpresa from "./components/ConsultaEmpresas.vue";
   import AnadirEmpleado from "./components/AnadirEmpleado.vue";
   import { createPinia } from "pinia";
@@ -31,6 +32,7 @@ import Prueba from "./components/Prueba.vue";
       { path: "/employee/:cedula", name: "Employee", component: EmployeeView },
       { path: "/ConsulEmpresa", name: "ConsultaEmpresa", component: ConsultaEmpresa },
       { path: "/anadirEmpleado", name: "AnadirEmpleado", component: AnadirEmpleado },
+      { path: "/VerEmpresaIndvSuperAdmin/:empresaId", name: "VerEmpresaIndvSuperAdmin", component: VerEmpresaIndvSuperAdmin },
     ],
   });
 

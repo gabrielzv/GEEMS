@@ -46,6 +46,7 @@
             <button class="btn-option">Gestionar usuarios</button>
             <button class="btn-option">Ver reportes generales</button>
             <button class="btn-option">Configurar sistema</button>
+            <button class="btn-option" @click="goToVerEmpresasRegistradas">Ver empresas registradas</button>
           </div>
 
           <!-- Opciones para DuenoEmpresa -->
@@ -139,7 +140,11 @@ export default {
       router.push("/anadirEmpleado");
     };
 
-    return { goToUserPage, goToVerEmpresaIndv, goToAnadirEmpleado ,user, empleado, loading, error };
+    const goToVerEmpresasRegistradas = () => {
+      router.push("/ConsulEmpresa");
+    };
+
+    return { goToUserPage, goToVerEmpresaIndv, goToVerEmpresasRegistradas, goToAnadirEmpleado ,user, empleado, loading, error };
   },
 };
 </script>

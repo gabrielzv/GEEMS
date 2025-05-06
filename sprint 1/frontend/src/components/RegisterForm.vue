@@ -313,5 +313,4 @@ export default {
 </script>
 
 <style scoped>
-/* Puedes agregar estilos adicionales aquí */
 </style>
