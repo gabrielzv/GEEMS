@@ -79,6 +79,7 @@
       </router-link>
     </form>
   </div>
+  </div>
 </template>
 
 <script>

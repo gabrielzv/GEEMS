@@ -50,8 +50,8 @@
 
           <!-- Opciones para DuenoEmpresa -->
           <div v-else-if="user.tipo === 'DuenoEmpresa'" class="space-y-2">
-            <button class="btn-option" @click="goToEditarEmpresa">Editar empresa</button>
-            <button class="btn-option">Añadir nuevo empleado</button>
+            <button class="btn-option" @click="goToEditarEmpresa" >Editar empresa</button>
+            <button class="btn-option" @click="goToAnadirEmpleado">Añadir nuevo empleado</button>
             <button class="btn-option" @click="goToVerEmpresaIndv">Ver información empresa</button>
           </div>
 
@@ -135,7 +135,11 @@ export default {
       router.push("/verEmpresaIndv");
     };
 
-    return { goToUserPage, goToVerEmpresaIndv, user, empleado, loading, error };
+    const goToAnadirEmpleado = () => {
+      router.push("/anadirEmpleado");
+    };
+
+    return { goToUserPage, goToVerEmpresaIndv, goToAnadirEmpleado ,user, empleado, loading, error };
   },
 };
 </script>

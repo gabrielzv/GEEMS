@@ -195,7 +195,7 @@ export default {
       cedulaParte3: "",
       telefonoParte1: "",
       telefonoParte2: "",
-      idPersona: null, // NUEVO
+      idUsuario: null, // NUEVO
       cedulaPersona: null, // NUEVO
     };
   },
@@ -207,7 +207,7 @@ export default {
     return;
   }
 
-  this.idPersona = id;
+  this.idUsuario = id;
   this.cedulaPersona = cedulaPersona;
 },
   methods: {
@@ -260,7 +260,7 @@ export default {
       console.log("Datos enviados al backend:", empresaPayload);
       // imprimir los datos que llegaron por query
       console.log("Datos del dueno:", {
-        id: this.idPersona,
+        id: this.idUsuario,
         cedulaPersona: this.cedulaPersona,
         cedulaEmpresa: cedulaJuridica,
       });
@@ -275,7 +275,7 @@ export default {
 
         try {
           const responseDuenoEmpresa = await axios.post("https://localhost:7014/api/Register/duenoempresa", {
-            id: this.idPersona,
+            id: this.idUsuario,
             cedulaPersona: this.cedulaPersona,
             cedulaEmpresa: cedulaJuridica,
           });
