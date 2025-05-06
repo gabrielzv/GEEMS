@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col" role="group" :aria-label="label">
-    <span class="text-sm font-semibold text-gray-700">{{ label }}</span>
-    <span class="text-base text-gray-900">{{ value }}</span>
+    <span class="text-xl font-semibold text-gray-700">{{ label }}</span>
+    <span class="text-xl text-gray-900">{{ value }}</span>
   </div>
 </template>
 
