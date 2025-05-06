@@ -7,5 +7,6 @@
         public string Contrasena { get; set; }
         public string Tipo { get; set; }
         public int CedulaPersona { get; set; }
+        public string CorreoPersona { get; set; }
     }
 }

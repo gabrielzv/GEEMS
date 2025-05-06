@@ -46,6 +46,7 @@ namespace BackendGeems.Controllers
                         Contrasena = reader["Contrasena"].ToString(),
                         Tipo = reader["Tipo"].ToString(),
                         CedulaPersona = Convert.ToInt32(reader["CedulaPersona"]),
+                        CorreoPersona = reader["CorreoPersona"].ToString(),
                     };
 
                     return Ok(usuario);

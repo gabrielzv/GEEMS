@@ -194,11 +194,54 @@ export default {
       cedulaParte3: "",
       telefonoParte1: "",
       telefonoParte2: "",
+      idUsuario: null, // NUEVO
+      cedulaPersona: null, // NUEVO
     };
   },
+  created() {
+    const { id, cedulaPersona } = this.$route.query;
+
+    if (!id || !cedulaPersona) {
+      alert("Faltan datos necesarios para registrar al dueño.");
+      return;
+    }
+
+  this.idUsuario = id;
+  this.cedulaPersona = cedulaPersona;
+},
   methods: {
+    async validarDuplicados(nombre, cedulaJuridica) {
+      try {
+        const response = await axios.get("https://localhost:7014/api/Empresa");
+        const empresas = response.data;
+
+        const nombreDuplicado = empresas.some(
+          (empresa) => empresa.nombre.toLowerCase() === nombre.toLowerCase()
+        );
+
+        const cedulaDuplicada = empresas.some(
+          (empresa) => empresa.cedulaJuridica === cedulaJuridica
+        );
+
+        if (nombreDuplicado) {
+          alert("El nombre de la empresa ya está registrado.");
+          return false;
+        }
+
+        if (cedulaDuplicada) {
+          alert("La cédula jurídica ya está registrada.");
+          return false;
+        }
+
+        return true;
+      } catch (error) {
+        console.error("Error al validar duplicados:", error);
+        alert("Ocurrió un error al validar los datos. Intente nuevamente.");
+        return false;
+      }
+    },
+
     async registrarEmpresa() {
-      // Validar datos antes de enviarlos
       if (
         !this.empresa.nombre ||
         !this.telefonoParte1 ||
@@ -207,65 +250,108 @@ export default {
         !this.cedulaParte2 ||
         !this.cedulaParte3 ||
         !this.empresa.correo ||
-        !this.empresa.descripcion ||
         !this.empresa.direccion.provincia ||
         !this.empresa.direccion.canton ||
-        !this.empresa.direccion.distrito ||
-        !this.empresa.direccion.senas
+        !this.empresa.direccion.distrito
       ) {
-        alert("Por favor, complete todos los campos.");
+        alert("Por favor, complete todos los campos obligatorios.");
         return;
       }
 
-      // Concatenar los valores de cédula jurídica y teléfono
       const cedulaJuridica = `${this.cedulaParte1}-${this.cedulaParte2}-${this.cedulaParte3}`;
-      const telefono = `${this.telefonoParte1}${this.telefonoParte2}`;
+      const telefono = `${this.telefonoParte1}-${this.telefonoParte2}`;
 
-      // Validar que la cédula jurídica tenga el formato correcto
+      // Validar formato de cédula jurídica
       if (!/^\d{1}-\d{3}-\d{7}$/.test(cedulaJuridica)) {
         alert("La cédula jurídica debe tener el formato X-XXX-XXXXXXX.");
-        console.error("Error: La cédula jurídica no tiene el formato correcto:", cedulaJuridica);
+        console.error(
+          "Error: La cédula jurídica no tiene el formato correcto:",
+          cedulaJuridica
+        );
         return;
       }
 
-      // Validar que el teléfono tenga exactamente 8 dígitos
-      if (telefono.length !== 8 || isNaN(parseInt(telefono, 10))) {
-        alert("El teléfono debe tener exactamente 8 dígitos.");
-        console.error("Error: El teléfono no es válido:", telefono);
+      // Validar formato de teléfono
+      if (!/^\d{4}-\d{4}$/.test(telefono)) {
+        alert("El teléfono debe tener el formato XXXX-XXXX y contener solo números.");
+        console.error("Error: El teléfono no tiene el formato correcto:", telefono);
         return;
       }
 
-      // Aplanar el objeto empresa para que coincida con el modelo del backend
+      // Validar formato de correo electrónico
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.empresa.correo)) {
+        alert("Por favor, ingrese un correo electrónico válido.");
+        console.error("Error: El correo no tiene el formato correcto:", this.empresa.correo);
+        return;
+      }
+
+      // Validar duplicados antes de enviar los datos
+      const esValido = await this.validarDuplicados(
+        this.empresa.nombre,
+        cedulaJuridica
+      );
+      if (!esValido) {
+        return;
+      }
+
+      // Si los campos opcionales están vacíos, enviar un string vacío
+      const descripcion = this.empresa.descripcion || "";
+      const senas = this.empresa.direccion.senas || "";
+
       const empresaPayload = {
         cedulaJuridica: cedulaJuridica,
         nombre: this.empresa.nombre,
-        descripcion: this.empresa.descripcion,
+        descripcion: descripcion,
         telefono: telefono,
         correo: this.empresa.correo,
         provincia: this.empresa.direccion.provincia,
         canton: this.empresa.direccion.canton,
         distrito: this.empresa.direccion.distrito,
-        senas: this.empresa.direccion.senas,
+        senas: senas,
       };
 
       console.log("Datos enviados al backend:", empresaPayload);
+      // imprimir los datos que llegaron por query
+      console.log("Datos del dueno:", {
+        id: this.idUsuario,
+        cedulaPersona: this.cedulaPersona,
+        cedulaEmpresa: cedulaJuridica,
+      });
 
       try {
-        // Enviar datos al backend
         const response = await axios.post(
           "https://localhost:7014/api/SetEmpresa/crearEmpresa",
           empresaPayload
         );
         alert("Empresa registrada exitosamente.");
         console.log("Respuesta del servidor:", response.data);
+
+        try {
+          const responseDuenoEmpresa = await axios.post("https://localhost:7014/api/Register/duenoempresa", {
+            id: this.idUsuario,
+            cedulaPersona: this.cedulaPersona,
+            cedulaEmpresa: cedulaJuridica,
+          });
+          console.log("Respuesta de dueño de empresa:", responseDuenoEmpresa.data);
+          alert("Dueño de empresa registrado exitosamente.");
+
+          this.$router.push("/login");
+        } catch (error) {
+          console.error("Error al registrar al dueño de la empresa:", error.response?.data || error.message);
+          alert("Ocurrió un error al registrar al dueño de la empresa.");
+        }
       } catch (error) {
-        console.error("Error al registrar la empresa:", error.response?.data || error.message);
+        console.error(
+          "Error al registrar la empresa:",
+          error.response?.data || error.message
+        );
         alert("Ocurrió un error al registrar la empresa.");
       }
     },
   },
 };
 </script>
+
 <style scoped>
-/* Puedes agregar estilos personalizados aquí */
 </style>

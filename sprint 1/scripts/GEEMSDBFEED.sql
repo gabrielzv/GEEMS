@@ -18,6 +18,9 @@ INSERT INTO Persona VALUES (103, 'Calle 3', 'Luis', 'Ramirez', 'Acosta', 'luis@e
 INSERT INTO Usuario VALUES (@uid1, 'geems@gmail.com', '1234', 'SuperAdmin', 101, 'geems@gmail.com');
 INSERT INTO Usuario VALUES (@uid2, 'alopez', 'pass5678', 'DuenoEmpresa', 102, 'ana@example.com');
 INSERT INTO Usuario VALUES (@uid3, 'lramirez', 'pass9999', 'Empleado', 103,'luis@example.com');
+INSERT INTO Usuario VALUES (@uid1, 'geems@gmail.com', '1234', 'SuperAdmin', 101, 'geems@gmail.com');
+INSERT INTO Usuario VALUES (@uid2, 'alopez', 'pass5678', 'DuenoEmpresa', 102, 'ana@example.com');
+INSERT INTO Usuario VALUES (@uid3, 'lramirez', 'pass9999', 'Empleado', 103,'luis@example.com');
 
 -- SuperAdmin
 INSERT INTO SuperAdmin VALUES (@uid1, 101);
@@ -57,6 +60,7 @@ INSERT INTO SupervisorSupervisaEmpleado VALUES (@uid5, 103);
 
 -- Payroll (también empleado)
 INSERT INTO Persona VALUES (105, 'Calle 5', 'Pedro', 'Gomez', 'Sánchez', 'pedro@example.com', '8444-4444');
+INSERT INTO Usuario VALUES (@uid6, 'pgomez', 'clave321', 'Empleado', 105, 'pedro@example.com');
 INSERT INTO Usuario VALUES (@uid6, 'pgomez', 'clave321', 'Empleado', 105, 'pedro@example.com');
 INSERT INTO Empleado VALUES (@uid6, 105, 'Tiempo Completo', 160, 'M', 'Activo', 1000000, 'Payroll', GETDATE(), 'GEEMS Solutions');
 

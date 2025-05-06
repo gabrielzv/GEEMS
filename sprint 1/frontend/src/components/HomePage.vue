@@ -46,12 +46,13 @@
             <button class="btn-option">Gestionar usuarios</button>
             <button class="btn-option">Ver reportes generales</button>
             <button class="btn-option">Configurar sistema</button>
+            <button class="btn-option" @click="goToVerEmpresasRegistradas">Ver empresas registradas</button>
           </div>
 
           <!-- Opciones para DuenoEmpresa -->
           <div v-else-if="user.tipo === 'DuenoEmpresa'" class="space-y-2">
-            <button class="btn-option" @click="goToEditarEmpresa">Editar empresa</button>
-            <button class="btn-option">Añadir nuevo empleado</button>
+            <button class="btn-option" @click="goToEditarEmpresa" >Editar empresa</button>
+            <button class="btn-option" @click="goToAnadirEmpleado">Añadir nuevo empleado</button>
             <button class="btn-option" @click="goToVerEmpresaIndv">Ver información empresa</button>
           </div>
 
@@ -135,7 +136,15 @@ export default {
       router.push("/verEmpresaIndv");
     };
 
-    return { goToUserPage, goToVerEmpresaIndv, user, empleado, loading, error };
+    const goToAnadirEmpleado = () => {
+      router.push("/anadirEmpleado");
+    };
+
+    const goToVerEmpresasRegistradas = () => {
+      router.push("/ConsulEmpresa");
+    };
+
+    return { goToUserPage, goToVerEmpresaIndv, goToVerEmpresasRegistradas, goToAnadirEmpleado ,user, empleado, loading, error };
   },
 };
 </script>

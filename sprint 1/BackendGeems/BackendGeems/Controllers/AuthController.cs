@@ -18,22 +18,25 @@ namespace BackendGeems.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] Usuario request)
         {
-            Console.WriteLine($"Nombre de usuario recibido: {request.Username}");
-            Console.WriteLine($"Contraseña:{ request.Contrasena}");
+            Console.WriteLine($"Identificador recibido: {request.Username}");
+            Console.WriteLine($"Contraseña: {request.Contrasena}");
+
             if (string.IsNullOrEmpty(request.Username) || string.IsNullOrEmpty(request.Contrasena))
             {
                 return BadRequest(new { message = "Debe completar todos los campos" });
             }
 
-
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                string query = "SELECT * FROM Usuario WHERE Username = @username";
+                string query = @"
+            SELECT * FROM Usuario
+            WHERE Username = @identificador OR CorreoPersona = @identificador
+        ";
 
                 SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@username", request.Username);
+                command.Parameters.AddWithValue("@identificador", request.Username);
 
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -44,18 +47,30 @@ namespace BackendGeems.Controllers
 
                     if (request.Contrasena == contrasenaDB)
                     {
-                        return Ok(new { message = "Inicio de sesión exitoso" });
+                        return Ok(new
+                        {
+                            message = "Inicio de sesión exitoso",
+                            usuario = new
+                            {
+                                id = reader["Id"].ToString(),
+                                tipo = reader["Tipo"].ToString(),
+                                cedulaPersona = Convert.ToInt32(reader["CedulaPersona"]),
+                                nombreUsuario = reader["Username"].ToString(),
+                                contrasena = reader["Contrasena"].ToString()
+                            }
+                        });
                     }
                     else
                     {
-                        return Unauthorized(new { message = "Usuario o Contraseña Contraseña incorrecta" });
+                        return Unauthorized(new { message = "Usuario o contraseña incorrecta" });
                     }
                 }
                 else
                 {
-                    return Unauthorized(new { message = "Usuario o Contraseña Incorrectos" });
+                    return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
                 }
             }
         }
+
     }
 }

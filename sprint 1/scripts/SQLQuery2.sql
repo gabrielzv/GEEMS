@@ -10,3 +10,7 @@ CREATE TABLE Usuarios (
 
 INSERT INTO Usuarios (NombreUsuario, Contrasena)
 VALUES ('admin', '1234');
+
+use GEEMSDB
+DELETE FROM DuenoEmpresa
+WHERE CedulaEmpresa = '1-222-33333' AND CedulaPersona = 102;
