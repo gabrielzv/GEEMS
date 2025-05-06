@@ -1,7 +1,7 @@
-Create DATABASE GEEMSDB;
+use master
+DROP DATABASE GEEMSDB;
 
---use master
---DROP DATABASE GEEMSDB;
+Create DATABASE GEEMSDB;
 use GEEMSDB;
 
 CREATE TABLE
@@ -52,7 +52,7 @@ CREATE TABLE
 CREATE TABLE
 	SuperAdminAdministraEmpresa (
 		IdAdministrador UNIQUEIDENTIFIER NOT NULL,
-		CedulaJuridicaEmpresa NVARCHAR (20) NOT NULL,
+		CedulaJuridicaEmpresa NVARCHAR(20) NOT NULL,
 		PRIMARY KEY (IdAdministrador, CedulaJuridicaEmpresa),
 		FOREIGN KEY (IdAdministrador) REFERENCES SuperAdmin (Id) ON UPDATE CASCADE,
 		FOREIGN KEY (CedulaJuridicaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE
@@ -60,7 +60,7 @@ CREATE TABLE
 CREATE TABLE
 	DuenoEmpresa (
 		Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-		CedulaEmpresa NVARCHAR (20) UNIQUE NOT NULL,
+		CedulaEmpresa NVARCHAR(20) UNIQUE NOT NULL,
 		CedulaPersona INT UNIQUE NOT NULL,
 		FOREIGN KEY (CedulaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
 		FOREIGN KEY (CedulaPersona) REFERENCES Persona (Cedula) ON UPDATE CASCADE
@@ -68,7 +68,7 @@ CREATE TABLE
 
 CREATE TABLE
 	DatosPrivadosEmpresa (
-		CedulaJuridica NVARCHAR (20) NOT NULL PRIMARY KEY,
+		CedulaJuridica NVARCHAR(20) NOT NULL PRIMARY KEY,
 		PlazoPago VARCHAR(20) NOT NULL,
 		CantidadBeneficiosXEmpleado INT NOT NULL,
 		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE
@@ -87,9 +87,9 @@ CREATE TABLE
 CREATE TABLE
 	BeneficiosDisponibles (
 		IdBeneficio UNIQUEIDENTIFIER NOT NULL,
-		CedulaJuridica NVARCHAR (20) NOT NULL,
-		PRIMARY KEY (IdBeneficio, CedulaJuridica),
-		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
+		CedulaJuridicaEmpresa NVARCHAR(20) NOT NULL,
+		PRIMARY KEY (IdBeneficio, CedulaJuridicaEmpresa),
+		FOREIGN KEY (CedulaJuridicaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
 		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE CASCADE
 	);
 

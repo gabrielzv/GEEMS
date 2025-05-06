@@ -70,14 +70,14 @@
           ¿Olvidaste tu contraseña?
         </router-link>
 
-        <router-link
-          to="/registro"
-          class="block text-center text-sm text-blue-600 hover:underline"
-        >
-          ¿No tienes cuenta?
-        </router-link>
-      </form>
-    </div>
+      <!-- Nuevo botón de registro -->
+      <router-link
+        to="/register"
+        class="block text-center text-sm text-blue-600 hover:underline"
+      >
+        ¿No tiene una cuenta aún? <span class="font-semibold">Regístrese</span>
+      </router-link>
+    </form>
   </div>
 </template>
 
@@ -158,7 +158,7 @@ export default {
           contrasena: usuario.contrasena,
         });
 
-        this.mensaje = res.data.message;
+        this.mensaje = "Inicio de sesión exitoso.";
         this.$router.push("/home");
       } catch (err) {
         console.error(err);

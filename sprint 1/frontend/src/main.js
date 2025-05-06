@@ -5,6 +5,8 @@
   import Home from "./components/HomePage.vue";
   import Recuperar from "./components/RecuperarCont.vue";
   import UserView from "./components/UserView.vue";
+import Register from "./components/RegisterForm.vue";
+import Prueba from "./components/Prueba.vue";
   import EmployeeView from "./components/EmployeeView.vue";
   import RegistroEmpresa from "./components/RegistroEmpresa.vue";
   import VerEmpresaIndv from "./components/VerEmpresaIndv.vue";
@@ -16,10 +18,13 @@
   const router = createRouter({
     history: createWebHistory(),
     routes: [
-      { path: "/", name: "Login", component: Login },
+      { path: "/", redirect: "/login" }, // Redirige automáticamente a /login
+    { path: "/login", name: "Login", component: Login },
       { path: "/home", name: "Home", component: Home },
       { path: "/recuperar", name: "Recuperar", component: Recuperar },
       { path: "/user", name: "User", component: UserView },
+    { path: "/register", name: "Register", component: Register },
+    { path: "/prueba", name: "Prueba", component: Prueba },
       { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
       { path: "/verEmpresaIndv", name: "VerEmpresaIndv", component: VerEmpresaIndv },
       { path: "/employee/:cedula", name: "Employee", component: EmployeeView },
