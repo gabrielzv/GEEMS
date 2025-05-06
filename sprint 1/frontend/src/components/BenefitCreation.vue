@@ -113,6 +113,7 @@
           min="0"
           placeholder="Ej: 987123"
           class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          readonly
         />
       </div>
 
@@ -132,47 +133,31 @@
 
 <script>
 import axios from "axios";
+import { useUserStore } from "../store/user";
+import { onMounted, ref } from "vue";
+
 export default {
-  data() {
-    return {
-      // tiposDeEmpleado: [
-      //   "Tiempo Completo",
-      //   "Medio Tiempo",
-      //   "Servicios Profesionales",
-      //   "Por Horas",
-      // ],
-      form: {
-        nombre: "",
-        descripcion: "",
-        // tipoBeneficio: "",
-        costo: "",
-        tiempoMinimo: "",
-        cedulaJuridica: "",
-        // tipoEmpleado: [],
-      },
-    };
-  },
-  methods: {
-    // Método para validar el formulario, verifica que todos los campos estén llenos
-    validarFormulario() {
-      const {
-        nombre,
-        descripcion,
-        // tipoBeneficio,
-        costo,
-        tiempoMinimo,
-        cedulaJuridica,
-        // tipoEmpleado,
-      } = this.form;
+  setup() {
+    const userStore = useUserStore();
+    const form = ref({
+      nombre: "",
+      descripcion: "",
+      costo: "",
+      tiempoMinimo: "",
+      cedulaJuridica: "", // Se llena automáticamente por el fetch de la empresa
+    });
+
+    // Método para validar el formulario
+    const validarFormulario = () => {
+      const { nombre, descripcion, costo, tiempoMinimo, cedulaJuridica } =
+        form.value;
 
       if (
         !nombre.trim() ||
         !descripcion.trim() ||
-        // !tipoBeneficio ||
         !costo ||
         !tiempoMinimo ||
-        !cedulaJuridica // ||
-        // tipoEmpleado.length === 0
+        !cedulaJuridica
       ) {
         alert(
           "Complete todos los espacios para la creación correcta del beneficio."
@@ -181,19 +166,16 @@ export default {
       }
 
       return true;
-    },
-    // Método para crear el beneficio (Solo revisa los datos en consola por ahora)
-    // crearBeneficio() {
-    //   if (!this.validarFormulario()) return;
-    //   console.log("Beneficio creado:", this.form);
-    // },
-    async crearBeneficio() {
-      if (!this.validarFormulario()) return;
+    };
+
+    // Método para crear el beneficio
+    const crearBeneficio = async () => {
+      if (!validarFormulario()) return;
 
       try {
         const response = await axios.post(
           "https://localhost:7014/api/Beneficio/crearBeneficio",
-          this.form
+          form.value
         );
         alert(response.data);
       } catch (error) {
@@ -203,7 +185,36 @@ export default {
             "Ocurrió un error al intentar crear el beneficio."
         );
       }
-    },
+    };
+
+    // Obtener la empresa automáticamente al montar el componente
+    const fetchEmpresaData = async () => {
+      try {
+        await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
+        if (userStore.empresa) {
+          // Asigna la cédula jurídica automáticamente
+          form.value.cedulaJuridica = userStore.empresa.cedulaJuridica;
+        } else {
+          alert("No se pudo obtener la información de la empresa.");
+        }
+      } catch (error) {
+        console.error("Error al obtener los datos de la empresa:", error);
+        alert("Ocurrió un error al cargar la información de la empresa.");
+      }
+    };
+    // Se llama a la función al montar el componente
+    onMounted(() => {
+      if (!userStore.usuario || !userStore.usuario.cedulaPersona) {
+        window.location.href = "/";
+      } else {
+        fetchEmpresaData();
+      }
+    });
+
+    return {
+      form,
+      crearBeneficio,
+    };
   },
 };
 </script>

@@ -168,24 +168,8 @@ export default {
   <div class="flex justify-center items-center min-h-screen bg-gray-100">
     <div class="bg-white shadow rounded p-6 max-w-md w-full">
       <h1 class="text-2xl font-bold mb-4 text-center">
-        Buscar Beneficios por Empresa
+        Beneficios de la Empresa
       </h1>
-
-      <!-- Ingreso de cédula jurídica -->
-      <input
-        v-model="cedula"
-        type="number"
-        placeholder="Ingrese cédula jurídica"
-        class="border border-gray-300 rounded px-4 py-2 w-full mb-4"
-      />
-
-      <!-- Botón -->
-      <button
-        @click="buscarBeneficios"
-        class="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600"
-      >
-        Buscar
-      </button>
 
       <!-- Mensaje de error -->
       <p v-if="error" class="text-red-500 mt-4 text-center">{{ error }}</p>
@@ -211,49 +195,64 @@ export default {
           </li>
         </ul>
       </div>
+
+      <!-- Mensaje si no hay beneficios -->
+      <p v-else class="text-center text-gray-500 mt-4">
+        No se encontraron beneficios para esta empresa.
+      </p>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import { useUserStore } from "../store/user";
+import { onMounted, ref } from "vue";
 
 export default {
-  data() {
-    return {
-      cedula: "",
-      beneficios: [],
-      error: "",
-    };
-  },
-  methods: {
-    // Método para validar la cédula jurídica ingresada
-    validarSolicitud() {
-      if (!this.cedula || isNaN(this.cedula) || this.cedula.length < 11) {
-        alert("Debe ingresar una cédula jurídica válida.");
-        return false;
-      }
-      return true;
-    },
-    // Método para buscar los beneficios de la empresa
-    async buscarBeneficios() {
-      this.beneficios = [];
-      if (!this.validarSolicitud()) {
-        return;
-      }
+  setup() {
+    const userStore = useUserStore();
+    const beneficios = ref([]);
+    const error = ref("");
+
+    // Método para obtener los beneficios de la empresa
+    const fetchBeneficios = async () => {
       try {
-        const response = await axios.get(
-          `https://localhost:7014/api/GetCompanyBenefits/${this.cedula}`
-        );
-        this.beneficios = response.data;
-      } catch (err) {
-        if (err.response && err.response.data) {
-          alert(err.response.data.message);
+        // Se llama a fetchEmpresa para obtener la cédula jurídica
+        await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
+
+        if (userStore.empresa) {
+          const cedulaJuridica = userStore.empresa.cedulaJuridica;
+
+          // Se hace el get para obtener los beneficios creados de la empresa
+          const response = await axios.get(
+            `https://localhost:7014/api/GetCompanyBenefits/${cedulaJuridica}`
+          );
+          beneficios.value = response.data;
         } else {
-          alert("Error al obtener beneficios.");
+          error.value = "No se pudo obtener la información de la empresa.";
         }
+      } catch (err) {
+        console.error("Error al obtener los beneficios:", err);
+        error.value =
+          err.response?.data?.message ||
+          "Ocurrió un error al obtener los beneficios.";
       }
-    },
+    };
+
+    // Se llama a la función al montar el componente
+    onMounted(() => {
+      if (!userStore.usuario || !userStore.usuario.cedulaPersona) {
+        window.location.href = "/";
+      } else {
+        fetchBeneficios();
+      }
+    });
+
+    return {
+      beneficios,
+      error,
+    };
   },
 };
 </script>
