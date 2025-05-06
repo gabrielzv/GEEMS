@@ -6,7 +6,7 @@ export const useUserStore = defineStore("user", {
     usuario: null,
     empleado: null,
     empresa: null,
-    empleadosEmpresa: [], // Nueva propiedad para almacenar la lista de empleados de la empresa
+    empleadosEmpresa: [], 
   }),
   actions: {
     setUsuario(usuario) {
@@ -31,14 +31,13 @@ export const useUserStore = defineStore("user", {
           `https://localhost:7014/api/Empresa/${cedulaPersona}`
         );
     
-        // Extraer información de la empresa y la lista de empleados
+
         const { empresa, empleados } = empresaRes.data;
-    
-        // Guardar la información de la empresa
+
         this.empresa = empresa;
         sessionStorage.setItem("empresa", JSON.stringify(this.empresa));
     
-        // Guardar la lista de empleados de la empresa
+       
         this.empleadosEmpresa = empleados || [];
         sessionStorage.setItem("empleadosEmpresa", JSON.stringify(this.empleadosEmpresa));
       } catch (error) {

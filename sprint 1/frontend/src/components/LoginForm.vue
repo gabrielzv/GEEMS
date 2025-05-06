@@ -1,89 +1,91 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-    <form
-      @submit.prevent="login"
-      novalidate
-      class="bg-white p-6 rounded-xl shadow-md w-full max-w-sm space-y-5"
-    >
-      <p class="text-2xl font-bold text-center text-gray-800">Iniciar sesión</p>
+    <div class="flex flex-col items-center space-y-6">
+      <img src="../assets/GEEMSLogo.jpg" class="h-20 w-auto mx-auto" />
+      <form
+        @submit.prevent="login"
+        novalidate
+        class="bg-white p-6 rounded-xl shadow-md w-full max-w-sm space-y-5"
+      >
+        <p class="text-2xl font-bold text-center text-gray-800">
+          Iniciar sesión
+        </p>
 
-      <div>
-        <input
-          type="text"
-          v-model="nombreUsuario"
-          placeholder="Correo o Usuario"
-          :class="[
-            'w-full px-4 py-2 rounded border focus:outline-none focus:ring-2',
-            emailError
-              ? 'border-red-500 focus:ring-red-300'
-              : 'border-gray-300 focus:ring-blue-300',
-          ]"
-          required
-          aria-describedby="emailError"
-        />
-        <span v-if="emailError" id="emailError" class="text-red-500 text-sm">{{
-          emailError
-        }}</span>
-      </div>
+        <div>
+          <input
+            type="text"
+            v-model="nombreUsuario"
+            placeholder="Correo o Usuario"
+            :class="[
+              'w-full px-4 py-2 rounded border focus:outline-none focus:ring-2',
+              emailError
+                ? 'border-red-500 focus:ring-red-300'
+                : 'border-gray-300 focus:ring-blue-300',
+            ]"
+            required
+            aria-describedby="emailError"
+          />
+          <span v-if="emailError" id="emailError" class="text-red-500 text-sm">
+            {{ emailError }}
+          </span>
+        </div>
 
-      <div>
-        <input
-          type="password"
-          v-model="contrasena"
-          placeholder="Contraseña"
-          :class="[
-            'w-full px-4 py-2 rounded border focus:outline-none focus:ring-2',
-            passwordError
-              ? 'border-red-500 focus:ring-red-300'
-              : 'border-gray-300 focus:ring-blue-300',
-          ]"
-          required
-          aria-describedby="passwordError"
-        />
-        <span
-          v-if="passwordError"
-          id="passwordError"
-          class="text-red-500 text-sm"
+        <div>
+          <input
+            type="password"
+            v-model="contrasena"
+            placeholder="Contraseña"
+            :class="[
+              'w-full px-4 py-2 rounded border focus:outline-none focus:ring-2',
+              passwordError
+                ? 'border-red-500 focus:ring-red-300'
+                : 'border-gray-300 focus:ring-blue-300',
+            ]"
+            required
+            aria-describedby="passwordError"
+          />
+          <span
+            v-if="passwordError"
+            id="passwordError"
+            class="text-red-500 text-sm"
+          >
+            {{ passwordError }}
+          </span>
+        </div>
+
+        <button
+          type="submit"
+          :disabled="isSubmitting"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50"
         >
-          {{ passwordError }}
-        </span>
-      </div>
+          Entrar
+        </button>
 
-      <button
-        type="submit"
-        :disabled="isSubmitting"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50"
-      >
-        Entrar
-      </button>
+        <p v-if="mensaje" class="text-center text-red-600">{{ mensaje }}</p>
 
-      <p v-if="mensaje" class="text-center text-red-600">{{ mensaje }}</p>
+        <router-link
+          to="/recuperar"
+          class="block text-center text-sm text-blue-600 hover:underline"
+        >
+          ¿Olvidaste tu contraseña?
+        </router-link>
 
-      <router-link
-        to="/recuperar"
-        class="block text-center text-sm text-blue-600 hover:underline"
-      >
-        ¿Olvidaste tu contraseña?
-      </router-link>
-
-      <router-link
-        to="/registro"
-        class="block text-center text-sm text-blue-600 hover:underline"
-      >
-        ¿No tienes cuenta?
-      </router-link>
-    </form>
+        <router-link
+          to="/registro"
+          class="block text-center text-sm text-blue-600 hover:underline"
+        >
+          ¿No tienes cuenta?
+        </router-link>
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-//import { mapActions } from "vuex";
-//import { useStore } from "vuex";
-import "../styles/login.css"; // Importar el archivo CSS
+import "../styles/login.css";
 import { useUserStore } from "../store/user";
 
-//const store = useStore();
 export default {
   data() {
     return {
@@ -91,6 +93,7 @@ export default {
       tipo: "",
       cedulaPersona: 0,
       nombreUsuario: "",
+      CorreoPersona: "",
       contrasena: "",
       mensaje: "",
       emailError: "",
@@ -104,16 +107,11 @@ export default {
       this.emailError = "";
       this.passwordError = "";
 
-      // Validación del correo
       if (!this.nombreUsuario) {
         this.emailError = "El correo o usuario es obligatorio.";
         isValid = false;
-      } /*else if (!this.validateEmail(this.nombreUsuario)) {
-        this.emailError = "Formato de correo inválido.";
-        isValid = false;
-      }*/
+      }
 
-      // Validación de la contraseña
       if (!this.contrasena) {
         this.passwordError = "La contraseña es obligatoria.";
         isValid = false;
@@ -121,10 +119,15 @@ export default {
 
       return isValid;
     },
-
-    validateEmail(email) {
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return regex.test(email);
+    async hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      return hashHex;
     },
 
     async login() {
@@ -132,51 +135,30 @@ export default {
 
       this.isSubmitting = true;
       this.mensaje = "";
-
+      //const hashedPassword = await this.hashPassword(this.contrasena);
       try {
         const res = await axios.post("https://localhost:7014/api/Auth/login", {
-          Id: this.Id || "00000000-0000-0000-0000-000000000000", // Asignar un Guid vacío
+          Id: this.Id || "00000000-0000-0000-0000-000000000000",
           Username: this.nombreUsuario,
           Contrasena: this.contrasena,
-          Tipo: this.tipo || "", // Valor vacío por defecto si no tienes "Tipo"
-          CedulaPersona: this.cedulaPersona || 0, // Valor por defecto si no tienes "CedulaPersona"
+          Tipo: this.tipo || "",
+          CedulaPersona: this.cedulaPersona || 0,
+          CorreoPersona: this.CorreoPersona || "",
         });
 
-        console.log(res.data);
-        const user = await axios.get(
-          `https://localhost:7014/api/GetUser/getUser/${this.nombreUsuario}`
-        );
-        console.log(user.data);
+        // Ya no necesitas hacer el segundo axios.get
+        const usuario = res.data.usuario;
 
         const userStore = useUserStore();
         await userStore.setUsuario({
-          id: user.data.id,
-          tipo: user.data.tipo,
-          cedulaPersona: user.data.cedulaPersona,
-          nombreUsuario: this.nombreUsuario,
-          contrasena: user.data.contrasena,
+          id: usuario.id,
+          tipo: usuario.tipo,
+          cedulaPersona: usuario.cedulaPersona,
+          nombreUsuario: usuario.nombreUsuario,
+          contrasena: usuario.contrasena,
         });
 
-        // // Obtener datos del empleado
-        // const empleado = await axios.get(
-        //   `https://localhost:7014/api/GetEmpleado/${usuario.cedulaPersona}`
-        // );
-        // console.log(empleado.data);
-
-        // await userStore.setEmpleado({
-        //   id: empleado.data.id,
-        //   cedulaEmpleado: empleado.data.cedulaPersona,
-        //   contrato: empleado.data.contrato,
-        //   numHorasTrabajadas: empleado.data.numHorasTrabajadas,
-        //   genero: empleado.data.genero,
-        //   estadoLaboral: empleado.data.estadoLaboral,
-        //   salarioBruto: empleado.data.salarioBruto,
-        //   tipo: empleado.data.tipo,
-        //   fechaIngreso: empleado.data.fechaIngreso,
-        //   nombreEmpresa: empleado.data.nombreEmpresa,
-        // });
-
-        this.mensaje = "Inicio de sesión exitoso.";
+        this.mensaje = res.data.message;
         this.$router.push("/home");
       } catch (err) {
         console.error(err);
