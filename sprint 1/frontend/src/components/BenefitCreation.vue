@@ -103,7 +103,7 @@
         />
       </div>
       <!-- Cédula Jurídica -->
-      <div>
+      <!-- <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
           >Cédula Jurídica de la Empresa</label
         >
@@ -115,7 +115,7 @@
           class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           readonly
         />
-      </div>
+      </div> -->
 
       <!-- Botón -->
       <div class="flex justify-center pt-2">

@@ -22,7 +22,7 @@ namespace BackendGeems.Controllers
                 string.IsNullOrWhiteSpace(beneficio.Descripcion) || 
                 beneficio.Costo <= 0 || 
                 beneficio.TiempoMinimo < 0 || 
-                beneficio.CedulaJuridica < 0)
+                string.IsNullOrWhiteSpace(beneficio.CedulaJuridica))
             {
                 return BadRequest("Todos los campos son obligatorios y deben ser válidos.");
             }
