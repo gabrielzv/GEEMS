@@ -10,6 +10,8 @@ import CompanyBenefits from "./components/CompanyBenefits.vue";
 import EmployeeView from "./components/EmployeeView.vue";
 import RegistroEmpresa from "./components/RegistroEmpresa.vue";
 import VerEmpresaIndv from "./components/VerEmpresaIndv.vue";
+// import MatricularBeneficio from "./components/MatricularBeneficio.vue";
+import EmployeeBenefits from "./components/EmployeeBenefits.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -26,6 +28,8 @@ const router = createRouter({
     { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
     { path: "/verEmpresaIndv", name: "VerEmpresaIndv", component: VerEmpresaIndv },
     { path: "/employee/:cedula", name: "Employee", component: EmployeeView },
+    // { path: "/matricularBeneficio", name: "MatricularBeneficio", component: MatricularBeneficio },
+    { path: "/employeeBenefits", name: "EmployeeBenefits", component: EmployeeBenefits },
   ],
 });
 
