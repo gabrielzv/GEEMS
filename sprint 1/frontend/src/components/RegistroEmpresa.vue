@@ -172,6 +172,7 @@
     </form>
   </div>
 </template>
+
 <script>
 import axios from "axios";
 
@@ -194,11 +195,23 @@ export default {
       cedulaParte3: "",
       telefonoParte1: "",
       telefonoParte2: "",
+      idPersona: null, // NUEVO
+      cedulaPersona: null, // NUEVO
     };
   },
+  created() {
+  const { id, cedulaPersona } = this.$route.query;
+
+  if (!id || !cedulaPersona) {
+    alert("Faltan datos necesarios para registrar al dueno.");
+    return;
+  }
+
+  this.idPersona = id;
+  this.cedulaPersona = cedulaPersona;
+},
   methods: {
     async registrarEmpresa() {
-      // Validar datos antes de enviarlos
       if (
         !this.empresa.nombre ||
         !this.telefonoParte1 ||
@@ -217,25 +230,21 @@ export default {
         return;
       }
 
-      // Concatenar los valores de cédula jurídica y teléfono
       const cedulaJuridica = `${this.cedulaParte1}-${this.cedulaParte2}-${this.cedulaParte3}`;
       const telefono = `${this.telefonoParte1}${this.telefonoParte2}`;
 
-      // Validar que la cédula jurídica tenga el formato correcto
       if (!/^\d{1}-\d{3}-\d{7}$/.test(cedulaJuridica)) {
         alert("La cédula jurídica debe tener el formato X-XXX-XXXXXXX.");
         console.error("Error: La cédula jurídica no tiene el formato correcto:", cedulaJuridica);
         return;
       }
 
-      // Validar que el teléfono tenga exactamente 8 dígitos
       if (telefono.length !== 8 || isNaN(parseInt(telefono, 10))) {
         alert("El teléfono debe tener exactamente 8 dígitos.");
         console.error("Error: El teléfono no es válido:", telefono);
         return;
       }
 
-      // Aplanar el objeto empresa para que coincida con el modelo del backend
       const empresaPayload = {
         cedulaJuridica: cedulaJuridica,
         nombre: this.empresa.nombre,
@@ -249,15 +258,35 @@ export default {
       };
 
       console.log("Datos enviados al backend:", empresaPayload);
+      // imprimir los datos que llegaron por query
+      console.log("Datos del dueno:", {
+        id: this.idPersona,
+        cedulaPersona: this.cedulaPersona,
+        cedulaEmpresa: cedulaJuridica,
+      });
 
       try {
-        // Enviar datos al backend
         const response = await axios.post(
           "https://localhost:7014/api/SetEmpresa/crearEmpresa",
           empresaPayload
         );
         alert("Empresa registrada exitosamente.");
         console.log("Respuesta del servidor:", response.data);
+
+        try {
+          const responseDuenoEmpresa = await axios.post("https://localhost:7014/api/Register/duenoempresa", {
+            id: this.idPersona,
+            cedulaPersona: this.cedulaPersona,
+            cedulaEmpresa: cedulaJuridica,
+          });
+          console.log("Respuesta de dueño de empresa:", responseDuenoEmpresa.data);
+          alert("Dueño de empresa registrado exitosamente.");
+
+          this.$router.push("/login");
+        } catch (error) {
+          console.error("Error al registrar al dueño de la empresa:", error.response?.data || error.message);
+          alert("Ocurrió un error al registrar al dueño de la empresa.");
+        }
       } catch (error) {
         console.error("Error al registrar la empresa:", error.response?.data || error.message);
         alert("Ocurrió un error al registrar la empresa.");
@@ -266,6 +295,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 /* Puedes agregar estilos personalizados aquí */
 </style>

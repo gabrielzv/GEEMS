@@ -23,22 +23,22 @@ INSERT INTO Usuario VALUES (@uid3, 'lramirez', 'pass9999', 'Empleado', 103);
 INSERT INTO SuperAdmin VALUES (@uid1, 101);
 
 -- Empresa
-INSERT INTO Empresa VALUES ('555', 'GEEMS Solutions', 'Consultora de RRHH', '2222-2222', 'empresa@example.com', 'San José', 'San José', 'Carmen', '300 m norte del parque');
+INSERT INTO Empresa VALUES ('1-2222-3333', 'GEEMS Solutions', 'Consultora de RRHH', '2222-2222', 'empresa@example.com', 'San José', 'San José', 'Carmen', '300 m norte del parque');
 
 -- Relación SuperAdmin-Empresa
-INSERT INTO SuperAdminAdministraEmpresa VALUES (@uid1, 555);
+INSERT INTO SuperAdminAdministraEmpresa VALUES (@uid1, '1-2222-3333');
 
 -- Dueño de Empresa
-INSERT INTO DuenoEmpresa VALUES (@uid2, 555, 102);
+INSERT INTO DuenoEmpresa VALUES (@uid2, '1-2222-3333', 102);
 
 -- Datos Privados Empresa
-INSERT INTO DatosPrivadosEmpresa VALUES (555, 'Mensual', 2);
+INSERT INTO DatosPrivadosEmpresa VALUES ('1-2222-3333', 'Mensual', 2);
 
 -- Beneficio
 INSERT INTO Beneficio VALUES (@uid4, 5000, 6, 'Gimnasio Corporativo', 'Gimnasio');
 
 -- Beneficios disponibles
-INSERT INTO BeneficiosDisponibles VALUES (@uid4, 555);
+INSERT INTO BeneficiosDisponibles VALUES (@uid4, '1-2222-3333');
 
 -- Beneficio Contrato Elegible
 INSERT INTO BeneficioContratoElegible VALUES (@uid4, 'Tiempo Completo');

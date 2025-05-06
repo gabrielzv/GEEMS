@@ -3,7 +3,7 @@
     public class DuenoEmpresa
     {
         public Guid Id { get; set; }
-        public int CedulaEmpresa { get; set; }
+        public string CedulaEmpresa { get; set; }
         public int CedulaPersona { get; set; }
     }
 }
