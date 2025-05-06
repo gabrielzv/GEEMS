@@ -99,4 +99,90 @@ public class EmpresaController : ControllerBase
             return StatusCode(500, new { message = "Error interno", error = ex.Message });
         }
     }
+
+
+    [HttpGet("por-cedula-juridica/{cedulaJuridica}")]
+    public IActionResult GetEmpresaPorCedulaJuridica(string cedulaJuridica)
+    {
+        Console.WriteLine($"Cédula jurídica recibida: {cedulaJuridica}");
+
+        try
+        {
+            using SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            conn.Open();
+
+            // Obtener datos directamente desde la tabla Empresa usando la cédula jurídica
+            string queryEmpresa = @"
+            SELECT 
+                e.CedulaJuridica,
+                e.Nombre,
+                e.Descripcion,
+                e.Telefono,
+                e.Provincia,
+                e.Canton,
+                e.Distrito,
+                e.Senas,
+                e.Correo
+            FROM Empresa e
+            WHERE e.CedulaJuridica = @CedulaJuridica;";
+
+            using SqlCommand cmdEmpresa = new SqlCommand(queryEmpresa, conn);
+            cmdEmpresa.Parameters.AddWithValue("@CedulaJuridica", cedulaJuridica);
+
+            using SqlDataReader readerEmpresa = cmdEmpresa.ExecuteReader();
+            if (!readerEmpresa.Read())
+                return NotFound(new { message = "Empresa no encontrada con la cédula jurídica indicada." });
+
+            var empresa = new
+            {
+                cedulaJuridica = readerEmpresa["CedulaJuridica"],
+                nombre = readerEmpresa["Nombre"].ToString(),
+                descripcion = readerEmpresa["Descripcion"],
+                telefono = readerEmpresa["Telefono"],
+                provincia = readerEmpresa["Provincia"],
+                canton = readerEmpresa["Canton"],
+                distrito = readerEmpresa["Distrito"],
+                senas = readerEmpresa["Senas"],
+                correo = readerEmpresa["Correo"]
+            };
+
+            string nombreEmpresa = empresa.nombre;
+            readerEmpresa.Close();
+
+            // Obtener empleados de la empresa por nombre
+            string queryEmpleados = @"
+            SELECT 
+                p.Cedula,
+                p.NombrePila + ' ' + p.Apellido1 + ' ' + p.Apellido2 AS NombreCompleto
+            FROM Empleado em
+            JOIN Persona p ON em.CedulaPersona = p.Cedula
+            WHERE em.NombreEmpresa = @NombreEmpresa;";
+
+            using SqlCommand cmdEmpleados = new SqlCommand(queryEmpleados, conn);
+            cmdEmpleados.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
+
+            using SqlDataReader readerEmpleados = cmdEmpleados.ExecuteReader();
+            List<object> empleados = new();
+
+            while (readerEmpleados.Read())
+            {
+                empleados.Add(new
+                {
+                    cedula = readerEmpleados["Cedula"],
+                    nombre = readerEmpleados["NombreCompleto"]
+                });
+            }
+
+            return Ok(new
+            {
+                empresa,
+                empleados
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error interno", error = ex.Message });
+        }
+    }
+
 }

@@ -46,6 +46,7 @@
             <button class="btn-option">Gestionar usuarios</button>
             <button class="btn-option">Ver reportes generales</button>
             <button class="btn-option">Configurar sistema</button>
+            <button class="btn-option" @click="goToVerEmpresasRegistradas">Ver empresas registradas</button>
           </div>
 
           <!-- Opciones para DuenoEmpresa -->
@@ -135,7 +136,11 @@ export default {
       router.push("/verEmpresaIndv");
     };
 
-    return { goToUserPage, goToVerEmpresaIndv, user, empleado, loading, error };
+    const goToVerEmpresasRegistradas = () => {
+      router.push("/ConsulEmpresa");
+    };
+
+    return { goToUserPage, goToVerEmpresaIndv, goToVerEmpresasRegistradas, user, empleado, loading, error };
   },
 };
 </script>

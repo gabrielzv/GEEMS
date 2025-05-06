@@ -91,11 +91,13 @@
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { useUserStore } from "../store/user";
+import { useRouter } from "vue-router"; 
 
 export default {
   setup() {
     const userStore = useUserStore();
     const usuario = userStore.usuario;
+    const router = useRouter();
     const companies = ref([]);
     const searchName = ref("");
     const error = ref(false);
@@ -128,7 +130,7 @@ export default {
     };
 
     const viewDetail = (companyId) => {
-      console.log("Ver detalle de empresa:", companyId);
+      router.push(`/VerEmpresaIndvSuperAdmin/${companyId}`);
     };
 
     onMounted(() => {

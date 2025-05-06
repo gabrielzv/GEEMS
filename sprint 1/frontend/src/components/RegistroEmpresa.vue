@@ -297,5 +297,4 @@ export default {
 </script>
 
 <style scoped>
-/* Puedes agregar estilos personalizados aquí */
 </style>
