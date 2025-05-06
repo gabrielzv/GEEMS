@@ -12,6 +12,7 @@ import Prueba from "./components/Prueba.vue";
   import VerEmpresaIndv from "./components/VerEmpresaIndv.vue";
   import VerEmpresaIndvSuperAdmin from "./components/VerEmpresaIndvSuperAdmin.vue";
   import ConsultaEmpresa from "./components/ConsultaEmpresas.vue";
+  import AnadirEmpleado from "./components/AnadirEmpleado.vue";
   import { createPinia } from "pinia";
   import { useUserStore } from "./store/user";
   import "./assets/tailwind.css";
@@ -30,6 +31,7 @@ import Prueba from "./components/Prueba.vue";
       { path: "/verEmpresaIndv", name: "VerEmpresaIndv", component: VerEmpresaIndv },
       { path: "/employee/:cedula", name: "Employee", component: EmployeeView },
       { path: "/ConsulEmpresa", name: "ConsultaEmpresa", component: ConsultaEmpresa },
+      { path: "/anadirEmpleado", name: "AnadirEmpleado", component: AnadirEmpleado },
       { path: "/VerEmpresaIndvSuperAdmin/:empresaId", name: "VerEmpresaIndvSuperAdmin", component: VerEmpresaIndvSuperAdmin },
     ],
   });

@@ -70,14 +70,15 @@ namespace BackendGeems.Controllers
                 {
                     connection.Open();
 
-                    string usuarioQuery = "INSERT INTO Usuario (Id, Username, Contrasena, Tipo, CedulaPersona) " +
-                                          "VALUES (@Id, @Username, @Contrasena, @Tipo, @CedulaPersona)";
+                    string usuarioQuery = "INSERT INTO Usuario (Id, Username, Contrasena, Tipo, CedulaPersona, CorreoPersona) " +
+                                          "VALUES (@Id, @Username, @Contrasena, @Tipo, @CedulaPersona, @CorreoPersona)";
                     SqlCommand usuarioCmd = new SqlCommand(usuarioQuery, connection);
                     usuarioCmd.Parameters.AddWithValue("@Id", usuario.Id);
                     usuarioCmd.Parameters.AddWithValue("@Username", usuario.Username);
                     usuarioCmd.Parameters.AddWithValue("@Contrasena", usuario.Contrasena);
                     usuarioCmd.Parameters.AddWithValue("@Tipo", usuario.Tipo);
                     usuarioCmd.Parameters.AddWithValue("@CedulaPersona", usuario.CedulaPersona);
+                    usuarioCmd.Parameters.AddWithValue("@CorreoPersona", usuario.CorreoPersona);
                     usuarioCmd.ExecuteNonQuery();
 
                     return Ok(new { message = "Usuario registrado exitosamente." });
@@ -122,5 +123,46 @@ namespace BackendGeems.Controllers
                 return StatusCode(500, new { message = "Error al registrar el dueño de la empresa: " + ex.Message });
             }
         }
+
+        [HttpPost("empleado")]
+        public IActionResult RegistrarEmpleado([FromBody] Empleado empleado)
+        {
+            if (empleado == null)
+            {
+                return BadRequest(new { message = "El objeto Empleado es nulo." });
+            }
+
+            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    string empleadoQuery = "INSERT INTO Empleado (Id, CedulaPersona, Contrato, NumHorasTrabajadas, Genero, EstadoLaboral, SalarioBruto, Tipo, FechaIngreso, NombreEmpresa) " +
+                                           "VALUES (@Id, @CedulaPersona, @Contrato, @NumHorasTrabajadas, @Genero, @EstadoLaboral, @SalarioBruto, @Tipo, @FechaIngreso, @NombreEmpresa)";
+                    SqlCommand empleadoCmd = new SqlCommand(empleadoQuery, connection);
+                    empleadoCmd.Parameters.AddWithValue("@Id", empleado.Id);
+                    empleadoCmd.Parameters.AddWithValue("@CedulaPersona", empleado.CedulaPersona);
+                    empleadoCmd.Parameters.AddWithValue("@Contrato", empleado.Contrato);
+                    empleadoCmd.Parameters.AddWithValue("@NumHorasTrabajadas", empleado.NumHorasTrabajadas);
+                    empleadoCmd.Parameters.AddWithValue("@Genero", empleado.Genero);
+                    empleadoCmd.Parameters.AddWithValue("@EstadoLaboral", empleado.EstadoLaboral);
+                    empleadoCmd.Parameters.AddWithValue("@SalarioBruto", empleado.SalarioBruto);
+                    empleadoCmd.Parameters.AddWithValue("@Tipo", empleado.Tipo);
+                    empleadoCmd.Parameters.AddWithValue("@FechaIngreso", empleado.FechaIngreso); // Ahora es una cadena
+                    empleadoCmd.Parameters.AddWithValue("@NombreEmpresa", empleado.NombreEmpresa);
+                    empleadoCmd.ExecuteNonQuery();
+
+                    return Ok(new { message = "Empleado registrado exitosamente." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al registrar el empleado: " + ex.Message });
+            }
+        }
+
     }
 }

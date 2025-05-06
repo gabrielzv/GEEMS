@@ -194,8 +194,8 @@ export default {
       cedulaParte3: "",
       telefonoParte1: "",
       telefonoParte2: "",
-      idPersona: null,
-      cedulaPersona: null,
+      idUsuario: null, // NUEVO
+      cedulaPersona: null, // NUEVO
     };
   },
   created() {
@@ -206,9 +206,9 @@ export default {
       return;
     }
 
-    this.idPersona = id;
-    this.cedulaPersona = cedulaPersona;
-  },
+  this.idUsuario = id;
+  this.cedulaPersona = cedulaPersona;
+},
   methods: {
     async validarDuplicados(nombre, cedulaJuridica) {
       try {
@@ -312,6 +312,12 @@ export default {
       };
 
       console.log("Datos enviados al backend:", empresaPayload);
+      // imprimir los datos que llegaron por query
+      console.log("Datos del dueno:", {
+        id: this.idUsuario,
+        cedulaPersona: this.cedulaPersona,
+        cedulaEmpresa: cedulaJuridica,
+      });
 
       try {
         const response = await axios.post(
@@ -320,6 +326,21 @@ export default {
         );
         alert("Empresa registrada exitosamente.");
         console.log("Respuesta del servidor:", response.data);
+
+        try {
+          const responseDuenoEmpresa = await axios.post("https://localhost:7014/api/Register/duenoempresa", {
+            id: this.idUsuario,
+            cedulaPersona: this.cedulaPersona,
+            cedulaEmpresa: cedulaJuridica,
+          });
+          console.log("Respuesta de dueño de empresa:", responseDuenoEmpresa.data);
+          alert("Dueño de empresa registrado exitosamente.");
+
+          this.$router.push("/login");
+        } catch (error) {
+          console.error("Error al registrar al dueño de la empresa:", error.response?.data || error.message);
+          alert("Ocurrió un error al registrar al dueño de la empresa.");
+        }
       } catch (error) {
         console.error(
           "Error al registrar la empresa:",
