@@ -33,7 +33,7 @@ CREATE TABLE
 
 CREATE TABLE
 	Empresa (
-		CedulaJuridica INT NOT NULL PRIMARY KEY,
+		CedulaJuridica NVARCHAR(20) NOT NULL PRIMARY KEY, -- Cambiado a NVARCHAR para permitir tamano estandar
 		Nombre NVARCHAR (100) UNIQUE NOT NULL,
 		Descripcion NVARCHAR (420) NOT NULL,
 		Telefono VARCHAR(30) NOT NULL,

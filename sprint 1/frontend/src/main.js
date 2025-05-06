@@ -7,6 +7,9 @@ import Recuperar from "./components/RecuperarCont.vue";
 import BenefitCreation from "./components/BenefitCreation.vue";
 import UserView from "./components/UserView.vue";
 import CompanyBenefits from "./components/CompanyBenefits.vue";
+import EmployeeView from "./components/EmployeeView.vue";
+import RegistroEmpresa from "./components/RegistroEmpresa.vue";
+import VerEmpresaIndv from "./components/VerEmpresaIndv.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -20,6 +23,9 @@ const router = createRouter({
     { path: "/user", name: "User", component: UserView },
     { path: "/benefitCreation", name: "BenefitCreation", component: BenefitCreation},
     { path: "/companyBenefits", name: "CompanyBenefits", component: CompanyBenefits},
+    { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
+    { path: "/verEmpresaIndv", name: "VerEmpresaIndv", component: VerEmpresaIndv },
+    { path: "/employee/:cedula", name: "Employee", component: EmployeeView },
   ],
 });
 
