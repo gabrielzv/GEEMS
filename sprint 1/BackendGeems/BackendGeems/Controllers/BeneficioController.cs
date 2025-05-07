@@ -31,6 +31,18 @@ namespace BackendGeems.Controllers
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     connection.Open();
+                    // Se verifica si el nombre del beneficio ya existe
+                    var checkQuery = "SELECT COUNT(*) FROM Beneficio WHERE Nombre = @Nombre";
+                    using (var checkCommand = new SqlCommand(checkQuery, connection))
+                    {
+                        checkCommand.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
+                        int count = (int)checkCommand.ExecuteScalar();
+                        if (count > 0)
+                        {
+                            return BadRequest("El nombre del beneficio ya está en uso. Elige otro.");
+                        }
+                    }
+                    // Se hace la inserción del nuevo beneficio
                     var query = "INSERT INTO Beneficio (Id, Costo, TiempoMinimoEnEmpresa, Descripcion, Nombre, CedulaJuridica) " +
                                 "VALUES (NEWID(), @Costo, @TiempoMinimo, @Descripcion, @Nombre, @CedulaJuridica)";
                     using (var command = new SqlCommand(query, connection))

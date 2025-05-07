@@ -25,22 +25,14 @@
             <button class="btn-option">Gestionar usuarios</button>
             <button class="btn-option">Ver reportes generales</button>
             <button class="btn-option">Configurar sistema</button>
-            <button class="btn-option" @click="goToVerEmpresasRegistradas">
-              Ver empresas registradas
-            </button>
+            <button class="btn-option" @click="goToVerEmpresasRegistradas">Ver empresas registradas</button>
           </div>
 
           <!-- Opciones para DuenoEmpresa -->
           <div v-else-if="user.tipo === 'DuenoEmpresa'" class="space-y-2">
-            <button class="btn-option" @click="goToEditarEmpresa">
-              Editar empresa
-            </button>
-            <button class="btn-option" @click="goToAnadirEmpleado">
-              Añadir nuevo empleado
-            </button>
-            <button class="btn-option" @click="goToVerEmpresaIndv">
-              Ver información empresa
-            </button>
+            <button class="btn-option" @click="goToEditarEmpresa" >Editar empresa</button>
+            <button class="btn-option" @click="goToAnadirEmpleado">Añadir nuevo empleado</button>
+            <button class="btn-option" @click="goToVerEmpresaIndv">Ver información empresa</button>
           </div>
 
           <!-- Opciones para Empleado -->
