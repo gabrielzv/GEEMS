@@ -22,27 +22,27 @@
 
           <!-- Opciones para SuperAdmin -->
           <div v-if="user.tipo === 'SuperAdmin'" class="space-y-2">
-            <button class="btn-option">Gestionar usuarios</button>
-            <button class="btn-option">Ver reportes generales</button>
-            <button class="btn-option">Configurar sistema</button>
-            <button class="btn-option" @click="goToVerEmpresasRegistradas">Ver empresas registradas</button>
+            <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Gestionar usuarios</button>
+            <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Ver reportes generales</button>
+            <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Configurar sistema</button>
+            <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToVerEmpresasRegistradas">Ver empresas registradas</button>
           </div>
 
           <!-- Opciones para DuenoEmpresa -->
           <div v-else-if="user.tipo === 'DuenoEmpresa'" class="space-y-2">
-            <button class="btn-option" @click="goToEditarEmpresa" >Editar empresa</button>
-            <button class="btn-option" @click="goToAnadirEmpleado">Añadir nuevo empleado</button>
-            <button class="btn-option" @click="goToVerEmpresaIndv">Ver información empresa</button>
+            <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToEditarEmpresa" >Editar empresa</button>
+            <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToAnadirEmpleado">Añadir nuevo empleado</button>
+            <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToVerEmpresaIndv">Ver información empresa</button>
           </div>
 
           <!-- Opciones para Empleado -->
           <div v-else-if="user.tipo === 'Empleado'" class="space-y-2">
             <template v-if="empleado.tipo === 'Supervisor'">
-              <button class="btn-option">Registrar horas</button>
-              <button class="btn-option">Seleccionar beneficios</button>
-              <button class="btn-option">Desglose de pagos anteriores</button>
-              <button class="btn-option">Historial de registros</button>
-              <button class="btn-option" @click="goToMatricularBeneficios">
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Registrar horas</button>
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Seleccionar beneficios</button>
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Desglose de pagos anteriores</button>
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Historial de registros</button>
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToMatricularBeneficios">
                 Matricular Beneficios
               </button>
               <button class="btn-option" @click="goToVerBeneficiosMatriculados">
@@ -51,23 +51,23 @@
             </template>
 
             <template v-else-if="empleado?.tipo === 'Colaborador'">
-              <button class="btn-option">Registrar horas</button>
-              <button class="btn-option">Historial de registros</button>
-              <button class="btn-option" @click="goToMatricularBeneficios">
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Registrar horas</button>
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Historial de registros</button>
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToMatricularBeneficios">
                 Matricular Beneficios
               </button>
-              <button class="btn-option" @click="goToVerBeneficiosMatriculados">
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToVerBeneficiosMatriculados">
                 Ver Beneficios Matriculados
               </button>
             </template>
 
             <template v-else-if="empleado?.tipo === 'Payroll'">
-              <button class="btn-option">Registrar horas</button>
-              <button class="btn-option">Historial de registros</button>
-              <button class="btn-option" @click="goToMatricularBeneficios">
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Registrar horas</button>
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600">Historial de registros</button>
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToMatricularBeneficios">
                 Matricular Beneficios
               </button>
-              <button class="btn-option" @click="goToVerBeneficiosMatriculados">
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToVerBeneficiosMatriculados">
                 Ver Beneficios Matriculados
               </button>
             </template>
