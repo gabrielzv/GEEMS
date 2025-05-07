@@ -1,52 +1,60 @@
-// using Microsoft.AspNetCore.Mvc;
-// using Microsoft.Data.SqlClient;
-// using System;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using System;
 
-// namespace BackendGeems.Controllers
-// {
-//     [ApiController]
-//     [Route("api/[controller]")]
-//     public class SetBeneficioPorEmpleadoController : ControllerBase
-//     {
-//         private readonly IConfiguration _configuration;
+namespace BackendGeems.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SetBeneficioPorEmpleadoController : ControllerBase
+    {
+        private readonly IConfiguration _configuration;
 
-//         public SetBeneficioPorEmpleadoController(IConfiguration configuration)
-//         {
-//             _configuration = configuration;
-//         }
+        public SetBeneficioPorEmpleadoController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
-//         [HttpPost("matricularBeneficio")]
-//         public IActionResult MatricularBeneficio([FromBody] dynamic data)
-//         {
-//             string beneficioId = "E4915603-8DF1-4014-B400-08190B37D91B";
-//             string empleadoId = "26257399-F0F1-4E8A-9939-2C79D89C0E28";
+        public class BeneficiosEmpleadoModel
+        {
+            public required string IdEmpleado { get; set; }
+            public required string IdBeneficio { get; set; }
+        }
 
-//             if (string.IsNullOrWhiteSpace(beneficioId) || string.IsNullOrWhiteSpace(empleadoId))
-//             {
-//                 return BadRequest("El ID del beneficio y el ID del empleado son obligatorios.");
-//             }
+        [HttpPost("matricularBeneficio")]
+        public IActionResult MatricularBeneficio([FromBody] BeneficiosEmpleadoModel beneficiosEmpleado)
+        {
+            if (beneficiosEmpleado == null ||
+            string.IsNullOrWhiteSpace(beneficiosEmpleado.IdEmpleado) ||
+            string.IsNullOrWhiteSpace(beneficiosEmpleado.IdBeneficio))
+            {
+                return BadRequest("Los datos del beneficio y el empleado son obligatorios.");
+            }
 
-//             try
-//             {
-//                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-//                 {
-//                     connection.Open();
-//                     var query = "INSERT INTO BeneficiosEmpleado (IdEmpleado, IdBeneficio) VALUES (@EmpleadoId, @BeneficioId)";
-//                     using (var command = new SqlCommand(query, connection))
-//                     {
-//                         command.Parameters.AddWithValue("@EmpleadoId", empleadoId);
-//                         command.Parameters.AddWithValue("@BeneficioId", beneficioId);
+            try
+            {
+                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+                {
+                    connection.Open();
+                    var query = @"
+                        INSERT INTO BeneficiosEmpleado (IdEmpleado, IdBeneficio)
+                        VALUES (@IdEmpleado, @IdBeneficio);";
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdEmpleado", beneficiosEmpleado.IdEmpleado);
+                        command.Parameters.AddWithValue("@IdBeneficio", beneficiosEmpleado.IdBeneficio);
 
-//                         command.ExecuteNonQuery();
-//                     }
-//                 }
+                        command.ExecuteNonQuery();
+                    }
+                }
 
-//                 return Ok("Beneficio matriculado exitosamente.");
-//             }
-//             catch (Exception ex)
-//             {
-//                 return StatusCode(500, $"Error al matricular el beneficio: {ex.Message}");
-//             }
-//         }
-//     }
-// }
+                return Ok("Beneficio matriculado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al matricular el beneficio: {ex.Message}");
+            }
+        }
+        
+    }
+}
