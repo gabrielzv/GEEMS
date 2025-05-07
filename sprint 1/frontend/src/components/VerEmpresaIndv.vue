@@ -130,10 +130,11 @@ export default {
     const userStore = useUserStore();
     const empresa = ref(null);
     const empleadosEmpresa = ref([]);
-    const pagosPendientes = ref(0); // Ejemplo de dato adicional
+    const pagosPendientes = ref(0); 
 
     const fetchEmpresaData = async () => {
       try {
+        
         // Llama al método fetchEmpresa del store
         await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
 

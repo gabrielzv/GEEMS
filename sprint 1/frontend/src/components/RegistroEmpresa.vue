@@ -194,8 +194,8 @@ export default {
       cedulaParte3: "",
       telefonoParte1: "",
       telefonoParte2: "",
-      idUsuario: null, // NUEVO
-      cedulaPersona: null, // NUEVO
+      idUsuario: null,
+      cedulaPersona: null,
     };
   },
   created() {
@@ -312,6 +312,7 @@ export default {
       };
 
       console.log("Datos enviados al backend:", empresaPayload);
+      
       // imprimir los datos que llegaron por query
       console.log("Datos del dueno:", {
         id: this.idUsuario,

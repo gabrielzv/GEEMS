@@ -266,7 +266,7 @@ export default {
 
       // Validar campos antes de registrar
       if (!this.validateFields()) {
-        this.isSubmitting = false; // <-- Añade esta línea
+        this.isSubmitting = false; 
         this.mensaje = "Por favor, corrija los errores en el formulario.";
         return;
       }

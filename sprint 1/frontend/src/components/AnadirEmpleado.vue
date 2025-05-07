@@ -171,17 +171,6 @@
           />
           <p v-if="salarioBrutoError" class="text-sm text-red-500 mt-1">{{ salarioBrutoError }}</p>
         </div>
-
-        <!-- <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Empresa</label>
-          <input
-            v-model="nombreEmpresa"
-            type="text"
-            placeholder="Nombre Empresa"
-            :class="inputClass(nombreEmpresaError)"
-          />
-          <p v-if="nombreEmpresaError" class="text-sm text-red-500 mt-1">{{ nombreEmpresaError }}</p>
-        </div> -->
       </div>
 
       <!-- Botón -->

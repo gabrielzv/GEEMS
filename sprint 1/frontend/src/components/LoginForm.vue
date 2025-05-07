@@ -150,8 +150,7 @@ export default {
           CedulaPersona: this.cedulaPersona || 0,
           CorreoPersona: this.CorreoPersona || "",
         });
-
-        // Ya no necesitas hacer el segundo axios.get
+        
         const usuario = res.data.usuario;
 
         const userStore = useUserStore();

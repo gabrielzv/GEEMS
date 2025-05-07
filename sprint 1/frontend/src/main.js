@@ -8,7 +8,6 @@ import Recuperar from "./components/RecuperarCont.vue";
 import BenefitCreation from "./components/BenefitCreation.vue";
 import UserView from "./components/UserView.vue";
 import Register from "./components/RegisterForm.vue";
-import Prueba from "./components/Prueba.vue";
 import CompanyBenefits from "./components/CompanyBenefits.vue";
 import EmployeeView from "./components/EmployeeView.vue";
 import RegistroEmpresa from "./components/RegistroEmpresa.vue";
@@ -31,7 +30,6 @@ const router = createRouter({
     { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
     { path: "/register", name: "Register", component: Register },
     { path: "/recuperar", name: "Recuperar", component: Recuperar },
-    { path: "/prueba", name: "Prueba", component: Prueba },
     
     // Rutas que requieren autenticación (con header)
     {
