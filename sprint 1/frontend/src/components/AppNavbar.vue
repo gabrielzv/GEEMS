@@ -47,10 +47,11 @@
 
         <!-- Tipo de empleado -->
         <span
-          v-if="empleado?.tipo"
+          v-if="user?.tipo"
           class="hidden sm:inline text-gray-500 text-sm"
+          :title="user.tipo"
         >
-          {{ empleado.tipo }}
+          {{ user.tipo }}
         </span>
 
         <!-- Avatar -->
