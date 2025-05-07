@@ -28,12 +28,7 @@ const router = createRouter({
   routes: [
     { path: "/", redirect: "/login" },
     {path: "/login", name: "Login", component: Login},
-    {
-      path: '/anadirEmpleado',
-      name: 'anadirEmpleado',
-      component: AnadirEmpleado,
-      meta: { requiresAuth: true }
-    },
+    { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
     { path: "/register", name: "Register", component: Register },
     { path: "/recuperar", name: "Recuperar", component: Recuperar },
     { path: "/prueba", name: "Prueba", component: Prueba },
@@ -47,14 +42,18 @@ const router = createRouter({
         { path: "/user", name: "User", component: UserView },
         { path: "/benefitCreation", name: "BenefitCreation", component: BenefitCreation },
         { path: "/companyBenefits", name: "CompanyBenefits", component: CompanyBenefits },
-        { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
         { path: "/verEmpresaIndv", name: "VerEmpresaIndv", component: VerEmpresaIndv },
         { path: "/employee/:cedula", name: "Employee", component: EmployeeView },
         { path: "/ConsulEmpresa", name: "ConsultaEmpresa", component: ConsultaEmpresa },
-        { path: "/anadirEmpleado", name: "AnadirEmpleado", component: AnadirEmpleado },
         { path: "/VerEmpresaIndvSuperAdmin/:empresaId", name: "VerEmpresaIndvSuperAdmin", component: VerEmpresaIndvSuperAdmin },
         { path: "/matricularBeneficio", name: "MatricularBeneficio", component: MatricularBeneficio },
         { path: "/employeeBenefits", name: "EmployeeBenefits", component: EmployeeBenefits },
+        {
+      path: '/anadirEmpleado',
+      name: 'anadirEmpleado',
+      component: AnadirEmpleado,
+      meta: { requiresAuth: true }
+    },
       ]
     }
   ],
@@ -68,7 +67,7 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = userStore.usuario !== null;
 
   // Rutas que no requieren autenticación
-  const publicPages = ['/login', '/register', '/recuperar', '/prueba'];
+  const publicPages = ['/login', '/register', '/recuperar', '/prueba','/registroEmpresa'];
   const isPublicPage = publicPages.includes(to.path);
 
   if (!isPublicPage && !isAuthenticated) {
