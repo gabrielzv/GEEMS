@@ -135,9 +135,11 @@
 import axios from "axios";
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
+    const router = useRouter(); // Mover aquí la inicialización de router
     const userStore = useUserStore();
     const form = ref({
       nombre: "",
@@ -178,6 +180,8 @@ export default {
           form.value
         );
         alert(response.data);
+        // Redirigir al usuario a la página de inicio después de crear el beneficio
+        router.push("/home"); // Ahora router está correctamente inicializado
       } catch (error) {
         console.error("Error al crear el beneficio:", error);
         alert(
@@ -202,6 +206,7 @@ export default {
         alert("Ocurrió un error al cargar la información de la empresa.");
       }
     };
+
     // Se llama a la función al montar el componente
     onMounted(() => {
       if (!userStore.usuario || !userStore.usuario.cedulaPersona) {

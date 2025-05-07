@@ -30,29 +30,31 @@
           </span>
         </div>
 
-        <div>
+        <div class="relative">
           <input
-            type="password"
+            :type="showPassword ? 'text' : 'password'"
             v-model="contrasena"
             placeholder="Contraseña"
-            :class="[
-              'w-full px-4 py-2 rounded border focus:outline-none focus:ring-2',
-              passwordError
-                ? 'border-red-500 focus:ring-red-300'
-                : 'border-gray-300 focus:ring-blue-300',
-            ]"
+            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-1 focus:ring-blue-300 pr-14"
             required
-            aria-describedby="passwordError"
           />
-          <span
-            v-if="passwordError"
-            id="passwordError"
-            class="text-red-500 text-sm"
-          >
-            {{ passwordError }}
-          </span>
-        </div>
 
+          <p v-if="passwordError" class="text-red-500 text-sm mt-1">
+            {{ passwordError }}
+          </p>
+        </div>
+        <button
+          type="button"
+          @mousedown="showPassword = true"
+          @mouseup="showPassword = false"
+          @mouseleave="showPassword = false"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50"
+          :aria-label="
+            showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+          "
+        >
+          Ver Contraseña
+        </button>
         <button
           type="submit"
           :disabled="isSubmitting"
@@ -101,6 +103,7 @@ export default {
       emailError: "",
       passwordError: "",
       isSubmitting: false,
+      showPassword: false,
     };
   },
   methods: {

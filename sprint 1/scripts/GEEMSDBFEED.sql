@@ -8,26 +8,28 @@ DECLARE @uid5 UNIQUEIDENTIFIER = NEWID();
 DECLARE @uid6 UNIQUEIDENTIFIER = NEWID();
 DECLARE @uid7 UNIQUEIDENTIFIER = NEWID();
 DECLARE @uid8 UNIQUEIDENTIFIER = NEWID();
+DECLARE @uid9 UNIQUEIDENTIFIER = NEWID();
 
 -- Persona
 INSERT INTO Persona VALUES (101, 'Av Central', 'Carlos', 'Perez', 'Mora', 'geems@gmail.com', '8888-8888');
 INSERT INTO Persona VALUES (102, 'Calle 2', 'Ana', 'Lopez', 'Soto', 'ana@example.com', '8777-7777');
 INSERT INTO Persona VALUES (103, 'Calle 3', 'Luis', 'Ramirez', 'Acosta', 'luis@example.com', '8666-6666');
+INSERT INTO Persona VALUES (112, 'Calle 4', 'Javier', 'Batista', 'Vega', 'javier@example.com', '8666-6996');
 
 -- Usuario
-INSERT INTO Usuario VALUES (@uid1, 'geems@gmail.com', '1234', 'SuperAdmin', 101, 'geems@gmail.com');
 INSERT INTO Usuario VALUES (@uid2, 'alopez', 'pass5678', 'DuenoEmpresa', 102, 'ana@example.com');
 INSERT INTO Usuario VALUES (@uid3, 'lramirez', 'pass9999', 'Empleado', 103,'luis@example.com');
+INSERT INTO Usuario VALUES (@uid9, 'cperez', 'pass777', 'SuperAdmin', 101,'geems@gmail.com');
 
 -- SuperAdmin
-INSERT INTO SuperAdmin VALUES (@uid1, 101);
+INSERT INTO SuperAdmin VALUES (@uid9, 101);
 
 -- Empresa
 INSERT INTO Empresa VALUES ('1-2222-3333', 'GEEMS Solutions', 'Consultora de RRHH', '2222-2222', 'empresa@example.com', 'San José', 'San José', 'Carmen', '300 m norte del parque');
 INSERT INTO Empresa VALUES ('9-8888-7777', 'Lol Solutions', 'Consultora de RRHH', '2222-2222', 'empresa@example.com', 'San José', 'San José', 'Carmen', '300 m norte del parque');
 
 -- Relación SuperAdmin-Empresa
-INSERT INTO SuperAdminAdministraEmpresa VALUES (@uid1, '1-2222-3333');
+INSERT INTO SuperAdminAdministraEmpresa VALUES (@uid9, '1-2222-3333');
 
 -- Dueño de Empresa
 INSERT INTO DuenoEmpresa VALUES (@uid2, '1-2222-3333', 102);
@@ -71,3 +73,4 @@ INSERT INTO BeneficiosEmpleado VALUES (@uid3, @uid4);
 
 -- HistorialDePagos
 INSERT INTO HistorialDePagos VALUES (@uid3, @uid7, 'Abril', 1, GETDATE());
+

@@ -5,14 +5,7 @@ obj/
 *.suo
 *.userosscache
 *.sln.docstates
-appsettings.json
 
-# Ignorar appsettings.json en todas las ubicaciones
-**/appsettings.json
-
-# O específicamente para estas rutas
-
-sprint 1/BackendGeems/BackendGeems/appsettings.json
 
 ## ASP.NET Scaffolding
 ScaffoldingReadMe.txt

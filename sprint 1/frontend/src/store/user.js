@@ -67,5 +67,16 @@ export const useUserStore = defineStore("user", {
         this.empleadosEmpresa = JSON.parse(empleadosEmpresa);
       }
     },
+    logout() {
+      this.usuario = null;
+      this.empleado = null;
+      this.empresa = null;
+      this.empleadosEmpresa = [];
+      
+      sessionStorage.removeItem("usuario");
+      sessionStorage.removeItem("empleado");
+      sessionStorage.removeItem("empresa");
+      sessionStorage.removeItem("empleadosEmpresa");
+    },
   },
 });

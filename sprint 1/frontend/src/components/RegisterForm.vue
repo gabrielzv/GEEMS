@@ -47,6 +47,7 @@
             v-model="nombreUsuario"
             :class="inputClass(usernameError)"
             placeholder="Nombre de Usuario"
+            @blur="checkUsername"
           />
           <p v-if="usernameError" class="text-sm text-red-500 mt-1">{{ usernameError }}</p>
         </div>
@@ -59,6 +60,7 @@
             v-model="correo"
             :class="inputClass(emailError)"
             placeholder="Correo Electrónico"
+            @blur="checkCorreo"
           />
           <p v-if="emailError" class="text-sm text-red-500 mt-1">{{ emailError }}</p>
         </div>
@@ -71,6 +73,7 @@
             v-model="cedula"
             :class="inputClass(cedulaError)"
             placeholder="Cédula"
+            @blur="checkCedula"
           />
           <p v-if="cedulaError" class="text-sm text-red-500 mt-1">{{ cedulaError }}</p>
         </div>
@@ -125,13 +128,13 @@
 
         <div>
           <button
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || hasErrors"
             class="w-full bg-blue-600 hover:bg-blue-700 transition-colors duration-200 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50"
           >
             {{ isSubmitting ? "Registrando..." : "Registrar" }}
           </button>
         </div>
-        <p v-if="mensaje" :class="['text-center text-sm', isSubmitting ? 'text-gray-500' : 'text-green-600']">{{ mensaje }}</p>
+        <p v-if="mensaje" :class="['text-center text-sm', isSubmitting ? 'text-gray-500' : 'text-red-600']">{{ mensaje }}</p>
       </form>
     </div>
   </div>
@@ -171,6 +174,59 @@ export default {
       isSubmitting: false,
     };
   },
+  computed: {
+    hasErrors() {
+      return (
+        !!this.usernameError ||
+        !!this.emailError ||
+        !!this.cedulaError ||
+        !!this.nombreError ||
+        !!this.apellido1Error ||
+        !!this.apellido2Error ||
+        !!this.telefonoError ||
+        !!this.direccionError ||
+        !!this.passwordError ||
+        !!this.confirmPasswordError
+      );
+    },
+  },
+  watch: {
+    nombre(value) {
+      this.nombreError = value ? "" : "El nombre es obligatorio.";
+    },
+    apellido1(value) {
+      this.apellido1Error = value ? "" : "El primer apellido es obligatorio.";
+    },
+    apellido2(value) {
+      this.apellido2Error = value ? "" : "El segundo apellido es obligatorio.";
+    },
+    nombreUsuario(value) {
+      this.usernameError = value ? "" : "El nombre de usuario es obligatorio.";
+    },
+    correo(value) {
+      this.emailError = value ? "" : "El correo electrónico es obligatorio.";
+    },
+    cedula(value) {
+      this.cedulaError = value ? "" : "La cédula es obligatoria.";
+    },
+    telefono(value) {
+      this.telefonoError = value ? "" : "El teléfono es obligatorio.";
+    },
+    direccion(value) {
+      this.direccionError = value ? "" : "La dirección es obligatoria.";
+    },
+    contrasena(value) {
+      this.passwordError = value ? "" : "La contraseña es obligatoria.";
+      if (this.confirmarContrasena) {
+        this.confirmPasswordError =
+          value === this.confirmarContrasena ? "" : "Las contraseñas no coinciden.";
+      }
+    },
+    confirmarContrasena(value) {
+      this.confirmPasswordError =
+        value === this.contrasena ? "" : "Las contraseñas no coinciden.";
+    },
+  },
   methods: {
     inputClass(error) {
       return [
@@ -179,93 +235,62 @@ export default {
       ];
     },
 
-    validateEmail(email) {
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return regex.test(email);
+    async checkUsername() {
+      if (!this.nombreUsuario) return;
+      try {
+        const response = await axios.get(`https://localhost:7014/api/CheckDupe/username/${this.nombreUsuario}`);
+        if (response.data) {
+          this.usernameError = "El nombre de usuario ya está en uso.";
+        } else {
+          this.usernameError = "";
+        }
+      } catch (error) {
+        console.error("Error al verificar el nombre de usuario:", error);
+      }
     },
 
-    validateFields() {
-      let valid = true;
-
-      // Reset errores
-      this.nombreError = "";
-      this.apellido1Error = "";
-      this.apellido2Error = "";
-      this.usernameError = "";
-      this.emailError = "";
-      this.cedulaError = "";
-      this.telefonoError = "";
-      this.direccionError = "";
-      this.passwordError = "";
-      this.confirmPasswordError = "";
-
-      if (!this.nombre) {
-        this.nombreError = "Nombre es obligatorio.";
-        valid = false;
+    async checkCorreo() {
+      if (!this.correo) return;
+      try {
+        const response = await axios.get(`https://localhost:7014/api/CheckDupe/correo/${this.correo}`);
+        if (response.data) {
+          this.emailError = "El correo electrónico ya está en uso.";
+        } else {
+          this.emailError = "";
+        }
+      } catch (error) {
+        console.error("Error al verificar el correo electrónico:", error);
       }
+    },
 
-      if (!this.apellido1) {
-        this.apellido1Error = "Primer apellido es obligatorio.";
-        valid = false;
+    async checkCedula() {
+      if (!this.cedula) return;
+      try {
+        const response = await axios.get(`https://localhost:7014/api/CheckDupe/cedula/${this.cedula}`);
+        if (response.data) {
+          this.cedulaError = "La cédula ya está en uso.";
+        } else {
+          this.cedulaError = "";
+        }
+      } catch (error) {
+        console.error("Error al verificar la cédula:", error);
       }
-
-      if (!this.apellido2) {
-        this.apellido2Error = "Segundo apellido es obligatorio.";
-        valid = false;
-      }
-
-      if (!this.nombreUsuario || this.nombreUsuario.length > 30) {
-        this.usernameError = "Nombre de usuario requerido y máximo 30 caracteres.";
-        valid = false;
-      }
-
-      if (!this.correo || !this.validateEmail(this.correo)) {
-        this.emailError = "Formato de correo inválido.";
-        valid = false;
-      }
-
-      if (!/^\d{3}$/.test(this.cedula)) {
-        this.cedulaError = "Cédula inválida, debe tener 3 dígitos.";
-        valid = false;
-      }
-
-      if (!this.telefono || !/^\d{4}-\d{4}$/.test(this.telefono)) {
-        this.telefonoError = "Teléfono inválido. El formato debe ser 1234-5678.";
-        valid = false;
-      }
-
-      if (!this.direccion) {
-        this.direccionError = "Dirección requerida.";
-        valid = false;
-      }
-
-      if (!this.contrasena) {
-        this.passwordError = "Contraseña requerida.";
-        valid = false;
-      }
-
-      if (this.contrasena !== this.confirmarContrasena) {
-        this.confirmPasswordError = "Las contraseñas no coinciden.";
-        valid = false;
-      }
-
-      return valid;
     },
 
     async register() {
       this.isSubmitting = true;
 
       // Validar campos antes de registrar
-      if (!this.validateFields()) {
+      if (this.hasErrors) {
         this.isSubmitting = false;
         return;
       }
 
       // Generar UUID único
-      const uniqueId = uuidv4(); // Este ID será el mismo para Persona y DuenoEmpresa
+      const uniqueId = uuidv4();
 
       try {
-        // Hacer las tres solicitudes POST por separado
+        // Hacer las solicitudes POST
         const responsePersona = await axios.post("https://localhost:7014/api/Register/persona", {
           cedula: this.cedula,
           direccion: this.direccion,
@@ -276,7 +301,6 @@ export default {
           correo: this.correo,
         });
 
-        // imprimir respuesta de persona
         console.log("Respuesta de Persona:", responsePersona.data);
 
         const responseUsuario = await axios.post("https://localhost:7014/api/Register/usuario", {
@@ -288,11 +312,9 @@ export default {
           correoPersona: this.correo,
         });
 
-        // imprimir respuesta de usuario
         console.log("Respuesta de Usuario:", responseUsuario.data);
 
-        // Manejo de la respuesta final
-        this.mensaje = "Registro exitoso.";
+        this.mensaje = "";
         this.$router.push({
           path: "/registroEmpresa",
           query: {
@@ -300,10 +322,9 @@ export default {
             cedulaPersona: this.cedula,
           },
         });
-
       } catch (error) {
         console.error("Error durante el registro:", error);
-        this.mensaje = "Error al registrarse.";
+        this.mensaje = "Campos obligatorios vacios";
       } finally {
         this.isSubmitting = false;
       }
