@@ -63,16 +63,22 @@
               <button class="btn-option">Seleccionar beneficios</button>
               <button class="btn-option">Desglose de pagos anteriores</button>
               <button class="btn-option">Historial de registros</button>
+              <button class="btn-option" @click="goToMatricularBeneficios">Matricular Beneficios</button>
+              <button class="btn-option" @click="goToVerBeneficiosMatriculados">Ver Beneficios Matriculados</button>
             </template>
 
             <template v-else-if="empleado?.tipo === 'Colaborador'">
               <button class="btn-option">Registrar horas</button>
               <button class="btn-option">Historial de registros</button>
+              <button class="btn-option" @click="goToMatricularBeneficios">Matricular Beneficios</button>
+              <button class="btn-option" @click="goToVerBeneficiosMatriculados">Ver Beneficios Matriculados</button>
             </template>
 
             <template v-else-if="empleado?.tipo === 'Payroll'">
               <button class="btn-option">Registrar horas</button>
               <button class="btn-option">Historial de registros</button>
+              <button class="btn-option" @click="goToMatricularBeneficios">Matricular Beneficios</button>
+              <button class="btn-option" @click="goToVerBeneficiosMatriculados">Ver Beneficios Matriculados</button>
             </template>
 
             <template v-else>
@@ -144,7 +150,15 @@ export default {
       router.push("/ConsulEmpresa");
     };
 
-    return { goToUserPage, goToVerEmpresaIndv, goToVerEmpresasRegistradas, goToAnadirEmpleado ,user, empleado, loading, error };
+    const goToMatricularBeneficios = () => {
+      router.push("/matricularBeneficio");
+    };
+
+    const goToVerBeneficiosMatriculados = () => {
+      router.push("/employeeBenefits");
+    };
+
+    return { goToUserPage, goToVerEmpresaIndv, goToVerEmpresasRegistradas, goToAnadirEmpleado, goToMatricularBeneficios, goToVerBeneficiosMatriculados, user, empleado, loading, error };
   },
 };
 </script>
