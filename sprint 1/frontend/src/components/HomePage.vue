@@ -1,29 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-100">
     <!-- Header -->
-    <header class="bg-white shadow flex justify-between items-center px-6 py-4">
-      <img src="../assets/GEEMSLogo.jpg" class="h-20 w-auto" />
-
-      <!-- Navegación -->
-      <nav class="space-x-6 text-gray-700 hidden md:flex">
-        <a href="#" class="hover:text-blue-600">Inicio</a>
-        <a href="#" class="hover:text-blue-600">Servicios</a>
-        <a href="#" class="hover:text-blue-600">Contacto</a>
-        <a href="#" class="hover:text-blue-600">Acerca</a>
-      </nav>
-
-      <!-- Usuario -->
-      <div class="flex items-center space-x-3">
-        <span class="text-gray-700 hidden sm:block">Hola, {{ user.nombreUsuario }}</span>
-        <span v-if="empleado" class="text-gray-700 hidden sm:block">Tipo: {{ empleado.tipo }}</span>
-        <img
-          src="https://i.pravatar.cc/40"
-          alt="Avatar"
-          class="w-10 h-10 rounded-full cursor-pointer"
-          @click="goToUserPage"
-        />
-      </div>
-    </header>
 
     <!-- Contenido principal -->
     <main class="p-6 flex justify-center items-center">
@@ -33,7 +10,9 @@
         </template>
 
         <template v-else-if="error">
-          <p class="text-center text-red-600">Error al cargar los datos del empleado.</p>
+          <p class="text-center text-red-600">
+            Error al cargar los datos del empleado.
+          </p>
         </template>
 
         <template v-else>
@@ -46,14 +25,22 @@
             <button class="btn-option">Gestionar usuarios</button>
             <button class="btn-option">Ver reportes generales</button>
             <button class="btn-option">Configurar sistema</button>
-            <button class="btn-option" @click="goToVerEmpresasRegistradas">Ver empresas registradas</button>
+            <button class="btn-option" @click="goToVerEmpresasRegistradas">
+              Ver empresas registradas
+            </button>
           </div>
 
           <!-- Opciones para DuenoEmpresa -->
           <div v-else-if="user.tipo === 'DuenoEmpresa'" class="space-y-2">
-            <button class="btn-option" @click="goToEditarEmpresa" >Editar empresa</button>
-            <button class="btn-option" @click="goToAnadirEmpleado">Añadir nuevo empleado</button>
-            <button class="btn-option" @click="goToVerEmpresaIndv">Ver información empresa</button>
+            <button class="btn-option" @click="goToEditarEmpresa">
+              Editar empresa
+            </button>
+            <button class="btn-option" @click="goToAnadirEmpleado">
+              Añadir nuevo empleado
+            </button>
+            <button class="btn-option" @click="goToVerEmpresaIndv">
+              Ver información empresa
+            </button>
           </div>
 
           <!-- Opciones para Empleado -->
@@ -63,26 +50,40 @@
               <button class="btn-option">Seleccionar beneficios</button>
               <button class="btn-option">Desglose de pagos anteriores</button>
               <button class="btn-option">Historial de registros</button>
-              <button class="btn-option" @click="goToMatricularBeneficios">Matricular Beneficios</button>
-              <button class="btn-option" @click="goToVerBeneficiosMatriculados">Ver Beneficios Matriculados</button>
+              <button class="btn-option" @click="goToMatricularBeneficios">
+                Matricular Beneficios
+              </button>
+              <button class="btn-option" @click="goToVerBeneficiosMatriculados">
+                Ver Beneficios Matriculados
+              </button>
             </template>
 
             <template v-else-if="empleado?.tipo === 'Colaborador'">
               <button class="btn-option">Registrar horas</button>
               <button class="btn-option">Historial de registros</button>
-              <button class="btn-option" @click="goToMatricularBeneficios">Matricular Beneficios</button>
-              <button class="btn-option" @click="goToVerBeneficiosMatriculados">Ver Beneficios Matriculados</button>
+              <button class="btn-option" @click="goToMatricularBeneficios">
+                Matricular Beneficios
+              </button>
+              <button class="btn-option" @click="goToVerBeneficiosMatriculados">
+                Ver Beneficios Matriculados
+              </button>
             </template>
 
             <template v-else-if="empleado?.tipo === 'Payroll'">
               <button class="btn-option">Registrar horas</button>
               <button class="btn-option">Historial de registros</button>
-              <button class="btn-option" @click="goToMatricularBeneficios">Matricular Beneficios</button>
-              <button class="btn-option" @click="goToVerBeneficiosMatriculados">Ver Beneficios Matriculados</button>
+              <button class="btn-option" @click="goToMatricularBeneficios">
+                Matricular Beneficios
+              </button>
+              <button class="btn-option" @click="goToVerBeneficiosMatriculados">
+                Ver Beneficios Matriculados
+              </button>
             </template>
 
             <template v-else>
-              <p class="text-center text-gray-500">Tipo de empleado no reconocido.</p>
+              <p class="text-center text-gray-500">
+                Tipo de empleado no reconocido.
+              </p>
             </template>
           </div>
 
@@ -125,7 +126,7 @@ export default {
         loading.value = false;
       }
     };
-    
+
     onMounted(() => {
       if (!user || !user.cedulaPersona) {
         router.push("/"); // Redirige si no hay sesión
@@ -158,7 +159,18 @@ export default {
       router.push("/employeeBenefits");
     };
 
-    return { goToUserPage, goToVerEmpresaIndv, goToVerEmpresasRegistradas, goToAnadirEmpleado, goToMatricularBeneficios, goToVerBeneficiosMatriculados, user, empleado, loading, error };
+    return {
+      goToUserPage,
+      goToVerEmpresaIndv,
+      goToVerEmpresasRegistradas,
+      goToAnadirEmpleado,
+      goToMatricularBeneficios,
+      goToVerBeneficiosMatriculados,
+      user,
+      empleado,
+      loading,
+      error,
+    };
   },
 };
 </script>
@@ -166,6 +178,3 @@ export default {
 <style scoped>
 /* Ya no es necesario SCSS ni CSS adicionales, Tailwind lo maneja */
 </style>
-
-
-
