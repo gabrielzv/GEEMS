@@ -119,7 +119,7 @@ CREATE TABLE
 	Empleado (
 		Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
 		CedulaPersona INT UNIQUE NOT NULL,
-		Contrato VARCHAR(20) CHECK (
+		Contrato VARCHAR(30) CHECK (
 			Contrato IN (
 				'Tiempo Completo',
 				'Medio Tiempo',
