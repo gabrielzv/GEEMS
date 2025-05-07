@@ -1,453 +1,231 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <form @submit.prevent="registrarEmpleado" class="bg-white p-8 rounded-2xl shadow-md w-full max-w-2xl space-y-6">
-        <h2 class="text-2xl font-bold text-center">Registro de Empleado</h2>
-  
-        <!-- Datos Persona -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label>
-            <input
-              v-model="cedula"
-              type="number"
-              placeholder="Cédula"
-              :class="inputClass(cedulaError)"
-            />
-            <p v-if="cedulaError" class="text-sm text-red-500 mt-1">{{ cedulaError }}</p>
-          </div>
-  
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input
-              v-model="nombre"
-              type="text"
-              placeholder="Nombre"
-              :class="inputClass(nombreError)"
-            />
-            <p v-if="nombreError" class="text-sm text-red-500 mt-1">{{ nombreError }}</p>
-          </div>
-  
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Primer Apellido</label>
-            <input
-              v-model="apellido1"
-              type="text"
-              placeholder="Primer Apellido"
-              :class="inputClass(apellido1Error)"
-            />
-            <p v-if="apellido1Error" class="text-sm text-red-500 mt-1">{{ apellido1Error }}</p>
-          </div>
-  
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Segundo Apellido</label>
-            <input
-              v-model="apellido2"
-              type="text"
-              placeholder="Segundo Apellido"
-              :class="inputClass(apellido2Error)"
-            />
-            <p v-if="apellido2Error" class="text-sm text-red-500 mt-1">{{ apellido2Error }}</p>
-          </div>
-  
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
-            <input
-              v-model="direccion"
-              type="text"
-              placeholder="Dirección"
-              :class="inputClass(direccionError)"
-            />
-            <p v-if="direccionError" class="text-sm text-red-500 mt-1">{{ direccionError }}</p>
-          </div>
-  
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
-            <input
-              v-model="correo"
-              type="email"
-              placeholder="Correo"
-              :class="inputClass(correoError)"
-            />
-            <p v-if="correoError" class="text-sm text-red-500 mt-1">{{ correoError }}</p>
-          </div>
-  
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-            <input
-              v-model="telefono"
-              type="text"
-              placeholder="Teléfono"
-              :class="inputClass(telefonoError)"
-            />
-            <p v-if="telefonoError" class="text-sm text-red-500 mt-1">{{ telefonoError }}</p>
-          </div>
-  
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento</label>
-            <input
-              v-model="fechaNacimiento"
-              type="date"
-              placeholder="Fecha de nacimiento"
-              :class="inputClass(fechaNacimientoError)"
-            />
-            <p v-if="fechaNacimientoError" class="text-sm text-red-500 mt-1">{{ fechaNacimientoError }}</p>
-          </div>
-        </div>
-  
-        <!-- Usuario -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de usuario</label>
-            <input
-              v-model="username"
-              type="text"
-              placeholder="Nombre de usuario"
-              :class="inputClass(usernameError)"
-            />
-            <p v-if="usernameError" class="text-sm text-red-500 mt-1">{{ usernameError }}</p>
-          </div>
-        </div>
-  
-        <!-- Género -->
+  <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <form @submit.prevent="registrarEmpleado" class="bg-white p-8 rounded-2xl shadow-md w-full max-w-2xl space-y-6">
+      <h2 class="text-2xl font-bold text-center">Registro de Empleado</h2>
+
+      <!-- Datos Persona -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block font-semibold mb-2">Género:</label>
-          <div class="flex gap-4">
-            <label class="flex items-center">
-              <input type="radio" name="genero" value="M" v-model="genero" class="mr-2" /> Masculino
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="genero" value="F" v-model="genero" class="mr-2" /> Femenino
-            </label>
-          </div>
-          <p v-if="generoError" class="text-sm text-red-500 mt-1">{{ generoError }}</p>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label>
+          <input
+            v-model="cedula"
+            type="number"
+            placeholder="Cédula"
+            :class="inputClass(cedulaError)"
+            @blur="checkCedula"
+          />
+          <p v-if="cedulaError" class="text-sm text-red-500 mt-1">{{ cedulaError }}</p>
         </div>
-  
-        <!-- Contrato -->
+
         <div>
-          <label class="block font-semibold mb-2">Contrato:</label>
-          <div class="flex flex-wrap gap-4">
-            <label class="flex items-center">
-              <input type="radio" name="contrato" value="Por Horas" v-model="contrato" class="mr-2" /> Por Horas
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="contrato" value="Tiempo Completo" v-model="contrato" class="mr-2" /> Tiempo Completo
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="contrato" value="Medio Tiempo" v-model="contrato" class="mr-2" /> Medio Tiempo
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="contrato" value="Servicios Profesionales" v-model="contrato" class="mr-2" /> Servicios Profesionales
-            </label>
-          </div>
-          <p v-if="contratoError" class="text-sm text-red-500 mt-1">{{ contratoError }}</p>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+          <input
+            v-model="nombre"
+            type="text"
+            placeholder="Nombre"
+            :class="inputClass(nombreError)"
+          />
+          <p v-if="nombreError" class="text-sm text-red-500 mt-1">{{ nombreError }}</p>
         </div>
-  
-        <!-- Rol -->
+
         <div>
-          <label class="block font-semibold mb-2">Rol:</label>
-          <div class="flex gap-4">
-            <label class="flex items-center">
-              <input type="radio" name="rol" value="Colaborador" v-model="rol" class="mr-2" /> Colaborador
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="rol" value="Supervisor" v-model="rol" class="mr-2" /> Supervisor
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="rol" value="Payroll" v-model="rol" class="mr-2" /> Payroll
-            </label>
-          </div>
-          <p v-if="rolError" class="text-sm text-red-500 mt-1">{{ rolError }}</p>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Primer Apellido</label>
+          <input
+            v-model="apellido1"
+            type="text"
+            placeholder="Primer Apellido"
+            :class="inputClass(apellido1Error)"
+          />
+          <p v-if="apellido1Error" class="text-sm text-red-500 mt-1">{{ apellido1Error }}</p>
         </div>
-  
-        <!-- Empresa y Salario -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Salario Bruto</label>
-            <input
-              v-model="salarioBruto"
-              type="number"
-              placeholder="Salario Bruto"
-              :class="inputClass(salarioBrutoError)"
-            />
-            <p v-if="salarioBrutoError" class="text-sm text-red-500 mt-1">{{ salarioBrutoError }}</p>
-          </div>
-  
-          <!-- <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Empresa</label>
-            <input
-              v-model="nombreEmpresa"
-              type="text"
-              placeholder="Nombre Empresa"
-              :class="inputClass(nombreEmpresaError)"
-            />
-            <p v-if="nombreEmpresaError" class="text-sm text-red-500 mt-1">{{ nombreEmpresaError }}</p>
-          </div> -->
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Segundo Apellido</label>
+          <input
+            v-model="apellido2"
+            type="text"
+            placeholder="Segundo Apellido"
+            :class="inputClass(apellido2Error)"
+          />
+          <p v-if="apellido2Error" class="text-sm text-red-500 mt-1">{{ apellido2Error }}</p>
         </div>
-  
-        <!-- Botón -->
-        <button
-          type="submit"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl w-full"
-          :disabled="isSubmitting"
-        >
-          {{ isSubmitting ? "Registrando..." : "Registrar Empleado" }}
-        </button>
-      </form>
-    </div>
-  </template>
-  
-  <script setup>
-  import { v4 as uuidv4 } from "uuid";
-  import { ref, onMounted } from "vue";
-  import axios from "axios";
-  import { useRouter, useRoute } from "vue-router";
-  
-  const router = useRouter();
-  const route = useRoute();
 
-  const duenoCedula = ref(route.query.duenoCedula || null);
-  
-  // Función para obtener la fecha y hora formateada
-  function getFormattedDateTime() {
-    const now = new Date();
-    const day = String(now.getDate()).padStart(2, "0");
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const year = now.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
-  
-  // Variables reactivas para el formulario
-  const cedula = ref(null);
-  const direccion = ref("");
-  const nombre = ref("");
-  const apellido1 = ref("");
-  const apellido2 = ref("");
-  const correo = ref("");
-  const telefono = ref("");
-  const fechaNacimiento = ref("");
-  const username = ref("");
-  const genero = ref("");
-  const contrato = ref("");
-  const salarioBruto = ref("");
-  const rol = ref("");
-  const nombreEmpresa = ref("");
-  const isSubmitting = ref(false);
-  
-  // Variables de error
-  const cedulaError = ref("");
-  const direccionError = ref("");
-  const nombreError = ref("");
-  const apellido1Error = ref("");
-  const apellido2Error = ref("");
-  const correoError = ref("");
-  const telefonoError = ref("");
-  const fechaNacimientoError = ref("");
-  const usernameError = ref("");
-  const salarioBrutoError = ref("");
-  const nombreEmpresaError = ref("");
-  const generoError = ref("");
-  const contratoError = ref("");
-  const rolError = ref("");
-  
-  // Función para estilos de input
-  function inputClass(error) {
-    return [
-      "w-full px-4 py-2 rounded border focus:outline-none focus:ring-2",
-      error ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300",
-    ];
-  }
-  
-  // Función para validar email
-  function validateEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  }
-  
-  // Función para validar campos
-  function validateFields() {
-    let valid = true;
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+          <input
+            v-model="direccion"
+            type="text"
+            placeholder="Dirección"
+            :class="inputClass(direccionError)"
+          />
+          <p v-if="direccionError" class="text-sm text-red-500 mt-1">{{ direccionError }}</p>
+        </div>
 
-    // Reset errores
-    cedulaError.value = "";
-    direccionError.value = "";
-    nombreError.value = "";
-    apellido1Error.value = "";
-    apellido2Error.value = "";
-    correoError.value = "";
-    telefonoError.value = "";
-    fechaNacimientoError.value = "";
-    usernameError.value = "";
-    salarioBrutoError.value = "";
-    nombreEmpresaError.value = "";
-    generoError.value = "";
-    contratoError.value = "";
-    rolError.value = "";
-  
-    if (!cedula.value || !/^\d{3}$/.test(cedula.value)) {
-      cedulaError.value = "Cédula inválida, debe tener 3 dígitos.";
-      valid = false;
-    }
-  
-    if (!nombre.value) {
-      nombreError.value = "Nombre es obligatorio.";
-      valid = false;
-    }
-  
-    if (!apellido1.value) {
-      apellido1Error.value = "Primer apellido es obligatorio.";
-      valid = false;
-    }
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
+          <input
+            v-model="correo"
+            type="email"
+            placeholder="Correo"
+            :class="inputClass(correoError)"
+            @blur="checkCorreo"
+          />
+          <p v-if="correoError" class="text-sm text-red-500 mt-1">{{ correoError }}</p>
+        </div>
 
-    if (!apellido2.value) {
-      apellido2Error.value = "Segundo apellido es obligatorio.";
-      valid = false;
-    }
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+          <input
+            v-model="telefono"
+            type="text"
+            placeholder="Teléfono"
+            :class="inputClass(telefonoError)"
+          />
+          <p v-if="telefonoError" class="text-sm text-red-500 mt-1">{{ telefonoError }}</p>
+        </div>
 
-    if (!direccion.value) {
-      direccionError.value = "Dirección es obligatoria.";
-      valid = false;
-    }
-  
-    if (!correo.value || !validateEmail(correo.value)) {
-      correoError.value = "Formato de correo inválido.";
-      valid = false;
-    }
-  
-    if (!telefono.value || !/^\d{4}-\d{4}$/.test(telefono.value)) {
-      telefonoError.value = "Teléfono inválido. El formato debe ser 1234-5678.";
-      valid = false;
-    }
-  
-    if (!fechaNacimiento.value) {
-      fechaNacimientoError.value = "Fecha de nacimiento es obligatoria.";
-      valid = false;
-    }
-  
-    if (!username.value || username.value.length > 30) {
-      usernameError.value = "Nombre de usuario requerido y máximo 30 caracteres.";
-      valid = false;
-    }
-  
-    if (!salarioBruto.value || salarioBruto.value <= 0) {
-      salarioBrutoError.value = "Salario bruto debe ser mayor a 0.";
-      valid = false;
-    }
-  
-    if (!nombreEmpresa.value) {
-      nombreEmpresaError.value = "Nombre de la empresa es obligatorio.";
-      valid = false;
-    }
-  
-    // Validaciones para radio buttons
-    if (!genero.value) {
-      generoError.value = "Seleccione un género.";
-      valid = false;
-    }
-  
-    if (!contrato.value) {
-      contratoError.value = "Seleccione un tipo de contrato.";
-      valid = false;
-    }
-  
-    if (!rol.value) {
-      rolError.value = "Seleccione un rol.";
-      valid = false;
-    }
-  
-    return valid;
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento</label>
+          <input
+            v-model="fechaNacimiento"
+            type="date"
+            placeholder="Fecha de nacimiento"
+            :class="inputClass(fechaNacimientoError)"
+          />
+          <p v-if="fechaNacimientoError" class="text-sm text-red-500 mt-1">{{ fechaNacimientoError }}</p>
+        </div>
+      </div>
+
+      <!-- Usuario -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de usuario</label>
+          <input
+            v-model="username"
+            type="text"
+            placeholder="Nombre de usuario"
+            :class="inputClass(usernameError)"
+            @blur="checkUsername"
+          />
+          <p v-if="usernameError" class="text-sm text-red-500 mt-1">{{ usernameError }}</p>
+        </div>
+      </div>
+
+      <!-- Botón -->
+      <button
+        type="submit"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-xl w-full"
+        :disabled="isSubmitting || hasErrors"
+      >
+        {{ isSubmitting ? "Registrando..." : "Registrar Empleado" }}
+      </button>
+    </form>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from "vue";
+import axios from "axios";
+
+const cedula = ref(null);
+const correo = ref("");
+const username = ref("");
+const isSubmitting = ref(false);
+
+const cedulaError = ref("");
+const correoError = ref("");
+const usernameError = ref("");
+
+const hasErrors = computed(() => {
+  return !!cedulaError.value || !!correoError.value || !!usernameError.value;
+});
+
+function inputClass(error) {
+  return [
+    "w-full px-4 py-2 rounded border focus:outline-none focus:ring-2",
+    error ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300",
+  ];
+}
+
+async function checkCedula() {
+  if (!cedula.value) {
+    cedulaError.value = "La cédula es obligatoria.";
+    return false;
   }
-    // Función para obtener el nombre de la empresa
-  async function fetchNombreEmpresa(cedulaPersona) {
-    try {
-      const response = await axios.get(`https://localhost:7014/api/GetDuenoEmpresa/${cedulaPersona}`);
-      if (response.data && response.data.nombreEmpresa) {
-        nombreEmpresa.value = response.data.nombreEmpresa;
-        return response.data.nombreEmpresa; // Retornamos el nombre para usarlo después
-      }
-      return null;
-    } catch (error) {
-      console.error("Error al obtener nombre de empresa:", error);
-      return null;
-    }
+  try {
+    const response = await axios.get(`https://localhost:7014/api/CheckDupe/cedula/${cedula.value}`);
+    cedulaError.value = response.data ? "La cédula ya está en uso." : "";
+    return !response.data;
+  } catch (error) {
+    console.error("Error al verificar la cédula:", error);
+    cedulaError.value = "Error al verificar la cédula.";
+    return false;
+  }
+}
+
+async function checkCorreo() {
+  if (!correo.value) {
+    correoError.value = "El correo es obligatorio.";
+    return false;
+  }
+  try {
+    const response = await axios.get(`https://localhost:7014/api/CheckDupe/correo/${correo.value}`);
+    correoError.value = response.data ? "El correo electrónico ya está en uso." : "";
+    return !response.data;
+  } catch (error) {
+    console.error("Error al verificar el correo electrónico:", error);
+    correoError.value = "Error al verificar el correo.";
+    return false;
+  }
+}
+
+async function checkUsername() {
+  if (!username.value) {
+    usernameError.value = "El nombre de usuario es obligatorio.";
+    return false;
+  }
+  try {
+    const response = await axios.get(`https://localhost:7014/api/CheckDupe/username/${username.value}`);
+    usernameError.value = response.data ? "El nombre de usuario ya está en uso." : "";
+    return !response.data;
+  } catch (error) {
+    console.error("Error al verificar el nombre de usuario:", error);
+    usernameError.value = "Error al verificar el nombre de usuario.";
+    return false;
+  }
+}
+
+async function registrarEmpleado() {
+  isSubmitting.value = true;
+
+  // Validar campos antes de enviar
+  const isCedulaValid = await checkCedula();
+  const isCorreoValid = await checkCorreo();
+  const isUsernameValid = await checkUsername();
+
+  if (!isCedulaValid || !isCorreoValid || !isUsernameValid) {
+    isSubmitting.value = false;
+    return;
   }
 
-  // Al montar el componente, obtener el nombre de la empresa
-  onMounted(async () => {
-    if (duenoCedula.value) {
-      await fetchNombreEmpresa(duenoCedula.value);
-    }
-  });
-  // Función para registrar empleado
-  async function registrarEmpleado() {
-    isSubmitting.value = true;
-    
-    if (!validateFields()) {
-      isSubmitting.value = false;
-      return;
-    }
-  
-    const uniqueId = uuidv4();
-    const contraseña = `${apellido1.value.toLowerCase()}${new Date(fechaNacimiento.value).getFullYear()}`;
-    const fechaIngreso = getFormattedDateTime();
-  
-    try {
-      console.log("Enviando datos de Persona:");
-      const requestPersona = {
-        cedula: parseInt(cedula.value, 10),
-        direccion: direccion.value.trim(),
-        nombrePila: nombre.value.trim(),
-        apellido1: apellido1.value.trim(),
-        apellido2: apellido2.value.trim(),
-        correo: correo.value.trim(),
-        telefono: telefono.value.trim(),
-      };
-      
-      console.log("Request Persona:", requestPersona);
-      const responsePersona = await axios.post("https://localhost:7014/api/Register/persona", requestPersona);
-      console.log("Respuesta de Persona:", responsePersona.data);
-  
-      console.log("ID de Persona:", uniqueId);
-      console.log("Contraseña generada:", contraseña);
-  
-      const requestUsuario = {
-        id: uniqueId,
-        username: username.value,
-        contrasena: contraseña,
-        tipo: "Empleado",
-        cedulaPersona: cedula.value,
-        correoPersona: correo.value,
-      };
-      console.log("Request Usuario:", requestUsuario);
-      const responseUsuario = await axios.post("https://localhost:7014/api/Register/usuario", requestUsuario);
-      console.log("Respuesta de Usuario:", responseUsuario.data);
-  
-      const requestEmpleado = {
-        id: uniqueId,
-        cedulaPersona: cedula.value,
-        contrato: contrato.value,
-        numHorasTrabajadas: 0,
-        genero: genero.value,
-        estadoLaboral: "Activo",
-        salarioBruto: salarioBruto.value,
-        tipo: rol.value,
-        fechaIngreso: fechaIngreso,
-        nombreEmpresa: nombreEmpresa.value,
-      };
-      console.log("Request Empleado:", requestEmpleado);
-      const responseEmpleado = await axios.post("https://localhost:7014/api/Register/empleado", requestEmpleado);
-      console.log("Respuesta de Empleado:", responseEmpleado.data);
-  
-      alert("Empleado registrado exitosamente");
-      router.push("/home");
-    } catch (error) {
-      console.error(error);
-      alert("Error al registrar empleado");
-    } finally {
-      isSubmitting.value = false;
-    }
+  try {
+    // Lógica para registrar al empleado
+    const empleadoData = {
+      cedula: cedula.value,
+      correo: correo.value,
+      username: username.value,
+      // Agrega aquí los demás campos necesarios
+    };
+
+    const response = await axios.post("https://localhost:7014/api/Register/empleado", empleadoData);
+    console.log("Empleado registrado:", response.data);
+
+    alert("Empleado registrado exitosamente.");
+  } catch (error) {
+    console.error("Error al registrar empleado:", error);
+    alert("Error al registrar empleado.");
+  } finally {
+    isSubmitting.value = false;
   }
-  </script>
-  
-  <style scoped>
-  /* Estilos adicionales si son necesarios */
-  </style>
+}
+</script>

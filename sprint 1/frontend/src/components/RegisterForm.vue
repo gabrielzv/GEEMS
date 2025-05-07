@@ -134,7 +134,7 @@
             {{ isSubmitting ? "Registrando..." : "Registrar" }}
           </button>
         </div>
-        <p v-if="mensaje" :class="['text-center text-sm', isSubmitting ? 'text-gray-500' : 'text-green-600']">{{ mensaje }}</p>
+        <p v-if="mensaje" :class="['text-center text-sm', isSubmitting ? 'text-gray-500' : 'text-red-600']">{{ mensaje }}</p>
       </form>
     </div>
   </div>
@@ -190,6 +190,43 @@ export default {
       );
     },
   },
+  watch: {
+    nombre(value) {
+      this.nombreError = value ? "" : "El nombre es obligatorio.";
+    },
+    apellido1(value) {
+      this.apellido1Error = value ? "" : "El primer apellido es obligatorio.";
+    },
+    apellido2(value) {
+      this.apellido2Error = value ? "" : "El segundo apellido es obligatorio.";
+    },
+    nombreUsuario(value) {
+      this.usernameError = value ? "" : "El nombre de usuario es obligatorio.";
+    },
+    correo(value) {
+      this.emailError = value ? "" : "El correo electrónico es obligatorio.";
+    },
+    cedula(value) {
+      this.cedulaError = value ? "" : "La cédula es obligatoria.";
+    },
+    telefono(value) {
+      this.telefonoError = value ? "" : "El teléfono es obligatorio.";
+    },
+    direccion(value) {
+      this.direccionError = value ? "" : "La dirección es obligatoria.";
+    },
+    contrasena(value) {
+      this.passwordError = value ? "" : "La contraseña es obligatoria.";
+      if (this.confirmarContrasena) {
+        this.confirmPasswordError =
+          value === this.confirmarContrasena ? "" : "Las contraseñas no coinciden.";
+      }
+    },
+    confirmarContrasena(value) {
+      this.confirmPasswordError =
+        value === this.contrasena ? "" : "Las contraseñas no coinciden.";
+    },
+  },
   methods: {
     inputClass(error) {
       return [
@@ -240,76 +277,11 @@ export default {
       }
     },
 
-    validateFields() {
-      let isValid = true;
-
-      // Validar campos requeridos
-      if (!this.nombre) {
-        this.nombreError = "El nombre es obligatorio.";
-        isValid = false;
-      } else {
-        this.nombreError = "";
-      }
-
-      if (!this.apellido1) {
-        this.apellido1Error = "El primer apellido es obligatorio.";
-        isValid = false;
-      } else {
-        this.apellido1Error = "";
-      }
-
-      if (!this.apellido2) {
-        this.apellido2Error = "El segundo apellido es obligatorio.";
-        isValid = false;
-      } else {
-        this.apellido2Error = "";
-      }
-
-      if (!this.nombreUsuario) {
-        this.usernameError = "El nombre de usuario es obligatorio.";
-        isValid = false;
-      }
-
-      if (!this.correo) {
-        this.emailError = "El correo electrónico es obligatorio.";
-        isValid = false;
-      }
-
-      if (!this.cedula) {
-        this.cedulaError = "La cédula es obligatoria.";
-        isValid = false;
-      }
-
-      if (!this.telefono) {
-        this.telefonoError = "El teléfono es obligatorio.";
-        isValid = false;
-      }
-
-      if (!this.direccion) {
-        this.direccionError = "La dirección es obligatoria.";
-        isValid = false;
-      }
-
-      if (!this.contrasena) {
-        this.passwordError = "La contraseña es obligatoria.";
-        isValid = false;
-      }
-
-      if (this.contrasena !== this.confirmarContrasena) {
-        this.confirmPasswordError = "Las contraseñas no coinciden.";
-        isValid = false;
-      } else {
-        this.confirmPasswordError = "";
-      }
-
-      return isValid;
-    },
-
     async register() {
       this.isSubmitting = true;
 
       // Validar campos antes de registrar
-      if (!this.validateFields()) {
+      if (this.hasErrors) {
         this.isSubmitting = false;
         return;
       }
@@ -342,7 +314,7 @@ export default {
 
         console.log("Respuesta de Usuario:", responseUsuario.data);
 
-        this.mensaje = "Registro exitoso.";
+        this.mensaje = "";
         this.$router.push({
           path: "/registroEmpresa",
           query: {
@@ -352,7 +324,7 @@ export default {
         });
       } catch (error) {
         console.error("Error durante el registro:", error);
-        this.mensaje = "Error al registrarse.";
+        this.mensaje = "Campos obligatorios vacios";
       } finally {
         this.isSubmitting = false;
       }
