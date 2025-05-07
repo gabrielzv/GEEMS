@@ -137,8 +137,12 @@ export default {
     };
 
     const goToAnadirEmpleado = () => {
-      router.push("/anadirEmpleado");
-    };
+    // Asumiendo que user.cedulaPersona es la cédula del dueño
+    router.push({ 
+      path: '/anadirEmpleado',
+      query: { duenoCedula: user.cedulaPersona } 
+    });
+  };
 
     const goToVerEmpresasRegistradas = () => {
       router.push("/ConsulEmpresa");

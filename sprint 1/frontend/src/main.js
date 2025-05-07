@@ -25,7 +25,13 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: "/", redirect: "/login" }, // Redirige automáticamente a /login
-    { path: "/login", name: "Login", component: Login },
+    {path: "/login", name: "Login", component: Login},
+    {
+      path: '/anadirEmpleado',
+      name: 'anadirEmpleado',
+      component: AnadirEmpleado,
+      meta: { requiresAuth: true }
+    },
     { path: "/home", name: "Home", component: Home },
     { path: "/recuperar", name: "Recuperar", component: Recuperar },
     { path: "/user", name: "User", component: UserView },

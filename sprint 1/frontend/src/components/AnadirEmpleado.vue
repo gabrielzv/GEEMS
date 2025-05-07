@@ -172,7 +172,7 @@
             <p v-if="salarioBrutoError" class="text-sm text-red-500 mt-1">{{ salarioBrutoError }}</p>
           </div>
   
-          <div>
+          <!-- <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Empresa</label>
             <input
               v-model="nombreEmpresa"
@@ -181,7 +181,7 @@
               :class="inputClass(nombreEmpresaError)"
             />
             <p v-if="nombreEmpresaError" class="text-sm text-red-500 mt-1">{{ nombreEmpresaError }}</p>
-          </div>
+          </div> -->
         </div>
   
         <!-- Botón -->
@@ -198,11 +198,14 @@
   
   <script setup>
   import { v4 as uuidv4 } from "uuid";
-  import { ref } from "vue";
+  import { ref, onMounted } from "vue";
   import axios from "axios";
-  import { useRouter } from "vue-router";
+  import { useRouter, useRoute } from "vue-router";
   
   const router = useRouter();
+  const route = useRoute();
+
+  const duenoCedula = ref(route.query.duenoCedula || null);
   
   // Función para obtener la fecha y hora formateada
   function getFormattedDateTime() {
@@ -263,7 +266,7 @@
   // Función para validar campos
   function validateFields() {
     let valid = true;
-  
+
     // Reset errores
     cedulaError.value = "";
     direccionError.value = "";
@@ -353,7 +356,27 @@
   
     return valid;
   }
-  
+    // Función para obtener el nombre de la empresa
+  async function fetchNombreEmpresa(cedulaPersona) {
+    try {
+      const response = await axios.get(`https://localhost:7014/api/GetDuenoEmpresa/${cedulaPersona}`);
+      if (response.data && response.data.nombreEmpresa) {
+        nombreEmpresa.value = response.data.nombreEmpresa;
+        return response.data.nombreEmpresa; // Retornamos el nombre para usarlo después
+      }
+      return null;
+    } catch (error) {
+      console.error("Error al obtener nombre de empresa:", error);
+      return null;
+    }
+  }
+
+  // Al montar el componente, obtener el nombre de la empresa
+  onMounted(async () => {
+    if (duenoCedula.value) {
+      await fetchNombreEmpresa(duenoCedula.value);
+    }
+  });
   // Función para registrar empleado
   async function registrarEmpleado() {
     isSubmitting.value = true;
