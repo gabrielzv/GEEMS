@@ -324,7 +324,6 @@ export default {
           "https://localhost:7014/api/SetEmpresa/crearEmpresa",
           empresaPayload
         );
-        alert("Empresa registrada exitosamente.");
         console.log("Respuesta del servidor:", response.data);
 
         try {
@@ -334,7 +333,7 @@ export default {
             cedulaEmpresa: cedulaJuridica,
           });
           console.log("Respuesta de dueño de empresa:", responseDuenoEmpresa.data);
-          alert("Dueño de empresa registrado exitosamente.");
+          alert("Dueño de empresa y empresa registrados exitosamente.");
 
           this.$router.push("/login");
         } catch (error) {

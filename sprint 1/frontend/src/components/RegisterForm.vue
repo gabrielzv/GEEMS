@@ -47,6 +47,7 @@
             v-model="nombreUsuario"
             :class="inputClass(usernameError)"
             placeholder="Nombre de Usuario"
+            @blur="checkUsername"
           />
           <p v-if="usernameError" class="text-sm text-red-500 mt-1">{{ usernameError }}</p>
         </div>
@@ -59,6 +60,7 @@
             v-model="correo"
             :class="inputClass(emailError)"
             placeholder="Correo Electrónico"
+            @blur="checkCorreo"
           />
           <p v-if="emailError" class="text-sm text-red-500 mt-1">{{ emailError }}</p>
         </div>
@@ -71,6 +73,7 @@
             v-model="cedula"
             :class="inputClass(cedulaError)"
             placeholder="Cédula"
+            @blur="checkCedula"
           />
           <p v-if="cedulaError" class="text-sm text-red-500 mt-1">{{ cedulaError }}</p>
         </div>
@@ -125,7 +128,7 @@
 
         <div>
           <button
-            :disabled="isSubmitting"
+            :disabled="isSubmitting || hasErrors"
             class="w-full bg-blue-600 hover:bg-blue-700 transition-colors duration-200 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50"
           >
             {{ isSubmitting ? "Registrando..." : "Registrar" }}
@@ -171,6 +174,22 @@ export default {
       isSubmitting: false,
     };
   },
+  computed: {
+    hasErrors() {
+      return (
+        !!this.usernameError ||
+        !!this.emailError ||
+        !!this.cedulaError ||
+        !!this.nombreError ||
+        !!this.apellido1Error ||
+        !!this.apellido2Error ||
+        !!this.telefonoError ||
+        !!this.direccionError ||
+        !!this.passwordError ||
+        !!this.confirmPasswordError
+      );
+    },
+  },
   methods: {
     inputClass(error) {
       return [
@@ -179,77 +198,111 @@ export default {
       ];
     },
 
-    validateEmail(email) {
-      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return regex.test(email);
+    async checkUsername() {
+      if (!this.nombreUsuario) return;
+      try {
+        const response = await axios.get(`https://localhost:7014/api/CheckDupe/username/${this.nombreUsuario}`);
+        if (response.data) {
+          this.usernameError = "El nombre de usuario ya está en uso.";
+        } else {
+          this.usernameError = "";
+        }
+      } catch (error) {
+        console.error("Error al verificar el nombre de usuario:", error);
+      }
+    },
+
+    async checkCorreo() {
+      if (!this.correo) return;
+      try {
+        const response = await axios.get(`https://localhost:7014/api/CheckDupe/correo/${this.correo}`);
+        if (response.data) {
+          this.emailError = "El correo electrónico ya está en uso.";
+        } else {
+          this.emailError = "";
+        }
+      } catch (error) {
+        console.error("Error al verificar el correo electrónico:", error);
+      }
+    },
+
+    async checkCedula() {
+      if (!this.cedula) return;
+      try {
+        const response = await axios.get(`https://localhost:7014/api/CheckDupe/cedula/${this.cedula}`);
+        if (response.data) {
+          this.cedulaError = "La cédula ya está en uso.";
+        } else {
+          this.cedulaError = "";
+        }
+      } catch (error) {
+        console.error("Error al verificar la cédula:", error);
+      }
     },
 
     validateFields() {
-      let valid = true;
+      let isValid = true;
 
-      // Reset errores
-      this.nombreError = "";
-      this.apellido1Error = "";
-      this.apellido2Error = "";
-      this.usernameError = "";
-      this.emailError = "";
-      this.cedulaError = "";
-      this.telefonoError = "";
-      this.direccionError = "";
-      this.passwordError = "";
-      this.confirmPasswordError = "";
-
+      // Validar campos requeridos
       if (!this.nombre) {
-        this.nombreError = "Nombre es obligatorio.";
-        valid = false;
+        this.nombreError = "El nombre es obligatorio.";
+        isValid = false;
+      } else {
+        this.nombreError = "";
       }
 
       if (!this.apellido1) {
-        this.apellido1Error = "Primer apellido es obligatorio.";
-        valid = false;
+        this.apellido1Error = "El primer apellido es obligatorio.";
+        isValid = false;
+      } else {
+        this.apellido1Error = "";
       }
 
       if (!this.apellido2) {
-        this.apellido2Error = "Segundo apellido es obligatorio.";
-        valid = false;
+        this.apellido2Error = "El segundo apellido es obligatorio.";
+        isValid = false;
+      } else {
+        this.apellido2Error = "";
       }
 
-      if (!this.nombreUsuario || this.nombreUsuario.length > 30) {
-        this.usernameError = "Nombre de usuario requerido y máximo 30 caracteres.";
-        valid = false;
+      if (!this.nombreUsuario) {
+        this.usernameError = "El nombre de usuario es obligatorio.";
+        isValid = false;
       }
 
-      if (!this.correo || !this.validateEmail(this.correo)) {
-        this.emailError = "Formato de correo inválido.";
-        valid = false;
+      if (!this.correo) {
+        this.emailError = "El correo electrónico es obligatorio.";
+        isValid = false;
       }
 
-      if (!/^\d{3}$/.test(this.cedula)) {
-        this.cedulaError = "Cédula inválida, debe tener 3 dígitos.";
-        valid = false;
+      if (!this.cedula) {
+        this.cedulaError = "La cédula es obligatoria.";
+        isValid = false;
       }
 
-      if (!this.telefono || !/^\d{4}-\d{4}$/.test(this.telefono)) {
-        this.telefonoError = "Teléfono inválido. El formato debe ser 1234-5678.";
-        valid = false;
+      if (!this.telefono) {
+        this.telefonoError = "El teléfono es obligatorio.";
+        isValid = false;
       }
 
       if (!this.direccion) {
-        this.direccionError = "Dirección requerida.";
-        valid = false;
+        this.direccionError = "La dirección es obligatoria.";
+        isValid = false;
       }
 
       if (!this.contrasena) {
-        this.passwordError = "Contraseña requerida.";
-        valid = false;
+        this.passwordError = "La contraseña es obligatoria.";
+        isValid = false;
       }
 
       if (this.contrasena !== this.confirmarContrasena) {
         this.confirmPasswordError = "Las contraseñas no coinciden.";
-        valid = false;
+        isValid = false;
+      } else {
+        this.confirmPasswordError = "";
       }
 
-      return valid;
+      return isValid;
     },
 
     async register() {
@@ -262,10 +315,10 @@ export default {
       }
 
       // Generar UUID único
-      const uniqueId = uuidv4(); // Este ID será el mismo para Persona y DuenoEmpresa
+      const uniqueId = uuidv4();
 
       try {
-        // Hacer las tres solicitudes POST por separado
+        // Hacer las solicitudes POST
         const responsePersona = await axios.post("https://localhost:7014/api/Register/persona", {
           cedula: this.cedula,
           direccion: this.direccion,
@@ -276,7 +329,6 @@ export default {
           correo: this.correo,
         });
 
-        // imprimir respuesta de persona
         console.log("Respuesta de Persona:", responsePersona.data);
 
         const responseUsuario = await axios.post("https://localhost:7014/api/Register/usuario", {
@@ -288,10 +340,8 @@ export default {
           correoPersona: this.correo,
         });
 
-        // imprimir respuesta de usuario
         console.log("Respuesta de Usuario:", responseUsuario.data);
 
-        // Manejo de la respuesta final
         this.mensaje = "Registro exitoso.";
         this.$router.push({
           path: "/registroEmpresa",
@@ -300,7 +350,6 @@ export default {
             cedulaPersona: this.cedula,
           },
         });
-
       } catch (error) {
         console.error("Error durante el registro:", error);
         this.mensaje = "Error al registrarse.";

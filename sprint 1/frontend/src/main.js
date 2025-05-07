@@ -27,7 +27,13 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: "/", redirect: "/login" },
-    { path: "/login", name: "Login", component: Login },
+    {path: "/login", name: "Login", component: Login},
+    {
+      path: '/anadirEmpleado',
+      name: 'anadirEmpleado',
+      component: AnadirEmpleado,
+      meta: { requiresAuth: true }
+    },
     { path: "/register", name: "Register", component: Register },
     { path: "/recuperar", name: "Recuperar", component: Recuperar },
     { path: "/prueba", name: "Prueba", component: Prueba },

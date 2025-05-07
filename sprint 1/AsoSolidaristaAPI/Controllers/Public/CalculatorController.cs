@@ -18,6 +18,21 @@ namespace AsoSolidaristaAPI.Controllers.Public
         [HttpPost("calculate")]
         public IActionResult Calculate([FromBody] CalculationRequest request)
         {
+            if (request == null)
+            {
+                return BadRequest(new ErrorResponse("El cuerpo de la solicitud no puede estar vacío"));
+            }
+
+            if (string.IsNullOrWhiteSpace(request.AssociationName))
+            {
+                return BadRequest(new ErrorResponse("El nombre de la asociación es requerido"));
+            }
+
+            if (request.EmployeeSalary <= 0)
+            {
+                return BadRequest(new ErrorResponse("El salario debe ser un número positivo mayor a cero"));
+            }
+
             try
             {
                 var (amount, _) = _calculator.CalculateFee(request);
@@ -25,8 +40,18 @@ namespace AsoSolidaristaAPI.Controllers.Public
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ErrorResponse(ex.Message));
             }
+        }
+    }
+
+    public class ErrorResponse
+    {
+        public string Message { get; set; }
+
+        public ErrorResponse(string message)
+        {
+            Message = message;
         }
     }
 }
