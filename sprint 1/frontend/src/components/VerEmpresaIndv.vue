@@ -101,6 +101,20 @@
           Eliminar
         </button>
       </div>
+
+      <!-- Botones para los beneficios -->
+      <div class="flex justify-between mt-6">
+        <button @click="goToCrearBeneficios"
+          class="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700"
+        >
+          Crear beneficios
+        </button>
+        <button @click="goToVerListaBeneficios"
+          class="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700"
+        >
+          Ver lista de beneficios
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -108,9 +122,11 @@
 <script>
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
+    const router = useRouter();
     const userStore = useUserStore();
     const empresa = ref(null);
     const empleadosEmpresa = ref([]);
@@ -137,10 +153,17 @@ export default {
       }
     });
 
-    return { empresa, empleadosEmpresa, pagosPendientes };
+    const goToCrearBeneficios = () => {
+      router.push("/benefitCreation");
+    };
+
+    const goToVerListaBeneficios = () => {
+      router.push("/companyBenefits");
+    };
+
+    return { empresa, empleadosEmpresa, pagosPendientes, goToCrearBeneficios, goToVerListaBeneficios };
   },
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
