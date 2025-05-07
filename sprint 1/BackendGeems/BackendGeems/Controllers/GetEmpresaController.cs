@@ -185,4 +185,40 @@ public class EmpresaController : ControllerBase
         }
     }
 
+    [HttpGet("cedula-juridica/{nombreEmpresa}")]
+    public IActionResult GetCedulaJuridicaPorNombreEmpresa(string nombreEmpresa)
+    {
+        Console.WriteLine($"Nombre de la empresa recibido: {nombreEmpresa}");
+
+        try
+        {
+            using SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            conn.Open();
+
+            // Se obtiene la cédula jurídica de la empresa por su nombre
+            string query = @"
+                SELECT CedulaJuridica
+                FROM Empresa
+                WHERE Nombre = @NombreEmpresa;";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+            if (!reader.Read())
+            {
+                return NotFound(new { message = "No se encontró una empresa con el nombre proporcionado." });
+            }
+
+            var cedulaJuridica = reader["CedulaJuridica"].ToString();
+
+            return Ok(new { cedulaJuridica });
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error al obtener la cédula jurídica: {ex.Message}");
+            return StatusCode(500, new { message = "Error interno del servidor", error = ex.Message });
+        }
+    }
+
 }
