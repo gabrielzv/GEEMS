@@ -283,8 +283,8 @@ function validateFields() {
   contratoError.value = "";
   rolError.value = "";
 
-  if (!cedula.value || !/^\d{3}$/.test(cedula.value)) {
-    cedulaError.value = "Cédula inválida, debe tener 3 dígitos.";
+  if (!cedula.value || !/^\d{9}$/.test(cedula.value)) {
+    cedulaError.value = "Cédula inválida, debe tener 9 dígitos.";
     valid = false;
   }
 

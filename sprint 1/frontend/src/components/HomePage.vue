@@ -45,7 +45,7 @@
               <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToMatricularBeneficios">
                 Matricular Beneficios
               </button>
-              <button class="btn-option" @click="goToVerBeneficiosMatriculados">
+              <button class="btn-option bg-blue-500 text-white py-2 my-2 px-4 rounded hover:bg-blue-600" @click="goToVerBeneficiosMatriculados">
                 Ver Beneficios Matriculados
               </button>
             </template>

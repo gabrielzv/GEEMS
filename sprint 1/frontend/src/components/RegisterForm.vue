@@ -127,12 +127,13 @@
         </div>
 
         <div>
-          <button
-            :disabled="isSubmitting || hasErrors"
-            class="w-full bg-blue-600 hover:bg-blue-700 transition-colors duration-200 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50"
-          >
-            {{ isSubmitting ? "Registrando..." : "Registrar" }}
-          </button>
+          <button 
+          @click="register"
+          :disabled="isSubmitting"
+          class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          {{ isSubmitting ? 'Registrando...' : 'Registrar' }}
+        </button>
         </div>
         <p v-if="mensaje" :class="['text-center text-sm', isSubmitting ? 'text-gray-500' : 'text-red-600']">{{ mensaje }}</p>
       </form>
@@ -190,43 +191,6 @@ export default {
       );
     },
   },
-  watch: {
-    nombre(value) {
-      this.nombreError = value ? "" : "El nombre es obligatorio.";
-    },
-    apellido1(value) {
-      this.apellido1Error = value ? "" : "El primer apellido es obligatorio.";
-    },
-    apellido2(value) {
-      this.apellido2Error = value ? "" : "El segundo apellido es obligatorio.";
-    },
-    nombreUsuario(value) {
-      this.usernameError = value ? "" : "El nombre de usuario es obligatorio.";
-    },
-    correo(value) {
-      this.emailError = value ? "" : "El correo electrónico es obligatorio.";
-    },
-    cedula(value) {
-      this.cedulaError = value ? "" : "La cédula es obligatoria.";
-    },
-    telefono(value) {
-      this.telefonoError = value ? "" : "El teléfono es obligatorio.";
-    },
-    direccion(value) {
-      this.direccionError = value ? "" : "La dirección es obligatoria.";
-    },
-    contrasena(value) {
-      this.passwordError = value ? "" : "La contraseña es obligatoria.";
-      if (this.confirmarContrasena) {
-        this.confirmPasswordError =
-          value === this.confirmarContrasena ? "" : "Las contraseñas no coinciden.";
-      }
-    },
-    confirmarContrasena(value) {
-      this.confirmPasswordError =
-        value === this.contrasena ? "" : "Las contraseñas no coinciden.";
-    },
-  },
   methods: {
     inputClass(error) {
       return [
@@ -235,61 +199,82 @@ export default {
       ];
     },
 
-    async checkUsername() {
-      if (!this.nombreUsuario) return;
-      try {
-        const response = await axios.get(`https://localhost:7014/api/CheckDupe/username/${this.nombreUsuario}`);
-        if (response.data) {
-          this.usernameError = "El nombre de usuario ya está en uso.";
-        } else {
-          this.usernameError = "";
-        }
-      } catch (error) {
-        console.error("Error al verificar el nombre de usuario:", error);
-      }
-    },
+    validateFields() {
+      let valid = true;
 
-    async checkCorreo() {
-      if (!this.correo) return;
-      try {
-        const response = await axios.get(`https://localhost:7014/api/CheckDupe/correo/${this.correo}`);
-        if (response.data) {
-          this.emailError = "El correo electrónico ya está en uso.";
-        } else {
-          this.emailError = "";
-        }
-      } catch (error) {
-        console.error("Error al verificar el correo electrónico:", error);
-      }
-    },
+      // Validar nombre
+      this.nombreError = this.nombre.trim() ? "" : "El nombre es obligatorio.";
+      if (this.nombreError) valid = false;
 
-    async checkCedula() {
-      if (!this.cedula) return;
-      try {
-        const response = await axios.get(`https://localhost:7014/api/CheckDupe/cedula/${this.cedula}`);
-        if (response.data) {
-          this.cedulaError = "La cédula ya está en uso.";
-        } else {
-          this.cedulaError = "";
-        }
-      } catch (error) {
-        console.error("Error al verificar la cédula:", error);
-      }
+      // Validar primer apellido
+      this.apellido1Error = this.apellido1.trim() ? "" : "El primer apellido es obligatorio.";
+      if (this.apellido1Error) valid = false;
+
+      // Validar segundo apellido
+      this.apellido2Error = this.apellido2.trim() ? "" : "El segundo apellido es obligatorio.";
+      if (this.apellido2Error) valid = false;
+
+      // Validar nombre de usuario
+      this.usernameError =
+        this.nombreUsuario.trim() && this.nombreUsuario.length <= 30
+          ? ""
+          : "El nombre de usuario es obligatorio y debe tener máximo 30 caracteres.";
+      if (this.usernameError) valid = false;
+
+      // Validar correo
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      this.emailError = emailRegex.test(this.correo)
+        ? ""
+        : "Formato de correo inválido.";
+      if (this.emailError) valid = false;
+
+      // Validar cédula
+      const cedulaRegex = /^\d{9}$/;
+      this.cedulaError = cedulaRegex.test(this.cedula)
+        ? ""
+        : "Cédula inválida, debe tener 9 dígitos.";
+      if (this.cedulaError) valid = false;
+
+      // Validar teléfono
+      const telefonoRegex = /^\d{4}-\d{4}$/;
+      this.telefonoError = telefonoRegex.test(this.telefono)
+        ? ""
+        : "Teléfono inválido. El formato debe ser 1234-5678.";
+      if (this.telefonoError) valid = false;
+
+      // Validar dirección
+      this.direccionError = this.direccion.trim() ? "" : "La dirección es obligatoria.";
+      if (this.direccionError) valid = false;
+
+      // Validar contraseña
+      this.passwordError = this.contrasena.trim() ? "" : "La contraseña es obligatoria.";
+      if (this.passwordError) valid = false;
+
+      // Validar confirmación de contraseña
+      this.confirmPasswordError =
+        this.contrasena === this.confirmarContrasena
+          ? ""
+          : "Las contraseñas no coinciden.";
+      if (this.confirmPasswordError) valid = false;
+
+      return valid;
     },
 
     async register() {
       this.isSubmitting = true;
+      this.mensaje = ""; // Limpiar mensajes anteriores
 
       // Validar campos antes de registrar
-      if (this.hasErrors) {
-        this.isSubmitting = false;
+      if (!this.validateFields()) {
+        this.isSubmitting = false; // <-- Añade esta línea
+        this.mensaje = "Por favor, corrija los errores en el formulario.";
         return;
       }
 
-      // Generar UUID único
-      const uniqueId = uuidv4();
-
       try {
+        // Generar UUID único
+        const uniqueId = uuidv4();
+
         // Hacer las solicitudes POST
         const responsePersona = await axios.post("https://localhost:7014/api/Register/persona", {
           cedula: this.cedula,
@@ -314,7 +299,6 @@ export default {
 
         console.log("Respuesta de Usuario:", responseUsuario.data);
 
-        this.mensaje = "";
         this.$router.push({
           path: "/registroEmpresa",
           query: {
@@ -324,9 +308,9 @@ export default {
         });
       } catch (error) {
         console.error("Error durante el registro:", error);
-        this.mensaje = "Campos obligatorios vacios";
+        this.mensaje = "Ocurrió un error al registrar el usuario.";
       } finally {
-        this.isSubmitting = false;
+        this.isSubmitting = false; // Asegurarse de que siempre se restablezca
       }
     },
   },
