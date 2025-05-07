@@ -1,17 +1,3 @@
-USE master;
-GO
-
-ALTER DATABASE GEEMSDB
-SET SINGLE_USER
-WITH ROLLBACK IMMEDIATE;
-GO
-
-DROP DATABASE GEEMSDB;
-GO
-
-
-Create DATABASE GEEMSDB;
-GO
 use GEEMSDB;
 
 CREATE TABLE
@@ -91,17 +77,19 @@ CREATE TABLE
 		--Formula NVARCHAR (20) NOT NULL,
 		TiempoMinimoEnEmpresa int NOT NULL,
 		Descripcion NVARCHAR (200) NOT NULL,
-		Nombre NVARCHAR (32) NOT NULL
+		Nombre NVARCHAR (32) NOT NULL,
+		CedulaJuridica NVARCHAR(20) NOT NULL,
+		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE
 	);
 
-CREATE TABLE
-	BeneficiosDisponibles (
-		IdBeneficio UNIQUEIDENTIFIER NOT NULL,
-		CedulaJuridicaEmpresa NVARCHAR(20) NOT NULL,
-		PRIMARY KEY (IdBeneficio, CedulaJuridicaEmpresa),
-		FOREIGN KEY (CedulaJuridicaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
-		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE CASCADE
-	);
+--CREATE TABLE
+--	BeneficiosDisponibles (
+--		IdBeneficio UNIQUEIDENTIFIER NOT NULL,
+--		CedulaJuridicaEmpresa NVARCHAR(20) NOT NULL,
+--		PRIMARY KEY (IdBeneficio, CedulaJuridicaEmpresa),
+--		FOREIGN KEY (CedulaJuridicaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
+--		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE CASCADE
+--	);
 
 CREATE TABLE
 	BeneficioContratoElegible (
@@ -174,10 +162,11 @@ CREATE TABLE
 
 CREATE TABLE
 	BeneficiosEmpleado (
-		IdEmpleado UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+		IdEmpleado UNIQUEIDENTIFIER NOT NULL,
 		IdBeneficio UNIQUEIDENTIFIER NOT NULL,
-		FOREIGN KEY (IdEmpleado) REFERENCES Empleado (Id) ON UPDATE CASCADE,
-		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE CASCADE
+		PRIMARY KEY (IdEmpleado, IdBeneficio),
+		FOREIGN KEY (IdEmpleado) REFERENCES Empleado (Id) ON UPDATE NO ACTION,
+		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE NO ACTION
 	);
 
 CREATE TABLE
@@ -217,11 +206,6 @@ FROM
 	Usuario;
 
 SELECT
-*
-FROM
-	Empleado;
-
-SELECT
 	*
 FROM
 	SuperAdmin;
@@ -251,17 +235,20 @@ SELECT
 FROM
 	Beneficio;
 
-SELECT
-	*
-FROM
-	BeneficiosDisponibles;
+--SELECT
+--	*
+--FROM
+--	BeneficiosDisponibles;
 
 SELECT
 	*
 FROM
 	BeneficioContratoElegible;
 
-
+SELECT
+	*
+FROM
+	Empleado;
 
 SELECT
 	*
