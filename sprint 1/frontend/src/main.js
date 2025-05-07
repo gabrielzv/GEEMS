@@ -15,7 +15,7 @@ import VerEmpresaIndv from "./components/VerEmpresaIndv.vue";
 import VerEmpresaIndvSuperAdmin from "./components/VerEmpresaIndvSuperAdmin.vue";
 import ConsultaEmpresa from "./components/ConsultaEmpresas.vue";
 import AnadirEmpleado from "./components/AnadirEmpleado.vue";
-// import MatricularBeneficio from "./components/MatricularBeneficio.vue";
+import MatricularBeneficio from "./components/MatricularBeneficio.vue";
 import EmployeeBenefits from "./components/EmployeeBenefits.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
@@ -73,7 +73,11 @@ const router = createRouter({
       name: "VerEmpresaIndvSuperAdmin",
       component: VerEmpresaIndvSuperAdmin,
     },
-    // { path: "/matricularBeneficio", name: "MatricularBeneficio", component: MatricularBeneficio },
+    {
+      path: "/matricularBeneficio",
+      name: "MatricularBeneficio",
+      component: MatricularBeneficio,
+    },
     {
       path: "/employeeBenefits",
       name: "EmployeeBenefits",

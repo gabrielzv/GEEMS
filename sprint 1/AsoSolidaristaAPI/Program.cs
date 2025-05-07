@@ -12,16 +12,16 @@ app.UseHttpsRedirection();
 app.Use(async (context, next) =>
 {
     const string staticApiKey = "Tralalerotralala";
-    
+
     // Verificar la clave en el header
-    if (!context.Request.Headers.TryGetValue("X-API-KEY", out var receivedApiKey) || 
+    if (!context.Request.Headers.TryGetValue("API-KEY", out var receivedApiKey) ||
         receivedApiKey != staticApiKey)
     {
         context.Response.StatusCode = 401; // Unauthorized
         await context.Response.WriteAsync("Clave API no válida");
         return;
     }
-    
+
     await next();
 });
 
