@@ -48,12 +48,7 @@ const router = createRouter({
         { path: "/VerEmpresaIndvSuperAdmin/:empresaId", name: "VerEmpresaIndvSuperAdmin", component: VerEmpresaIndvSuperAdmin },
         { path: "/matricularBeneficio", name: "MatricularBeneficio", component: MatricularBeneficio },
         { path: "/employeeBenefits", name: "EmployeeBenefits", component: EmployeeBenefits },
-        {
-      path: '/anadirEmpleado',
-      name: 'anadirEmpleado',
-      component: AnadirEmpleado,
-      meta: { requiresAuth: true }
-    },
+        { path: '/anadirEmpleado', name: 'anadirEmpleado', component: AnadirEmpleado, meta: { requiresAuth: true }},
       ]
     }
   ],
