@@ -45,13 +45,6 @@
         >
           Editar perfil
         </router-link>
-
-        <router-link
-          to="/employee"
-          class="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700"
-        >
-          empleadoView
-        </router-link>
       </div>
     </div>
   </div>
@@ -80,29 +73,38 @@ const fetchUserView = async () => {
     );
     const data = personaRes.data;
 
-    await userStore.fetchEmpleado(usuario.cedulaPersona);
-
-    const dataEmpleado = userStore.empleado || {};
-
     userView.value = {
       fullName: data.fullName || "Dato no disponible",
       email: data.email || "Dato no disponible",
       phone: data.phone || "Dato no disponible",
       role: usuario.tipo || "Dato no disponible",
       address: data.address || "Dato no disponible",
-      contract: dataEmpleado.contrato || "Dato no disponible",
-      genre: dataEmpleado.genero || "Dato no disponible",
-      state: dataEmpleado.estadoLaboral || "Dato no disponible",
-      type: dataEmpleado.tipo || "Dato no disponible",
-      dateIn: dataEmpleado.fechaIngreso || "Dato no disponible",
-      company: dataEmpleado.nombreEmpresa || "Dato no disponible",
+      contract: "Dato no disponible",
+      genre: "Dato no disponible",
+      state: "Dato no disponible",
+      type: "Dato no disponible",
+      dateIn: "Dato no disponible",
+      company: "Dato no disponible",
       cedulaPersona: usuario.cedulaPersona || "Dato no disponible",
     };
 
-    if (dataEmpleado.genero == "F") {
-      userView.value.genre = "Femenino";
+    if (usuario.tipo === "DuenoEmpresa") {
+      await userStore.fetchEmpresa(usuario.cedulaPersona);
+      const dataEmpresa = userStore.empresa || {};
+      userView.value.company = `${
+        dataEmpresa.nombre || "Empresa sin nombre"
+      } (Dueño)`;
     } else {
-      userView.value.genre = "Masculino";
+      await userStore.fetchEmpleado(usuario.cedulaPersona);
+      const dataEmpleado = userStore.empleado || {};
+      userView.value.contract = dataEmpleado.contrato || "Dato no disponible";
+      userView.value.genre =
+        dataEmpleado.genero === "F" ? "Femenino" : "Masculino";
+      userView.value.state = dataEmpleado.estadoLaboral || "Dato no disponible";
+      userView.value.type = dataEmpleado.tipo || "Dato no disponible";
+      userView.value.dateIn = dataEmpleado.fechaIngreso || "Dato no disponible";
+      userView.value.company =
+        dataEmpleado.nombreEmpresa || "Dato no disponible";
     }
   } catch (err) {
     console.error("Error al obtener los datos de la persona", err);
