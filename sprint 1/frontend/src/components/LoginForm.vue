@@ -81,7 +81,6 @@
       </form>
     </div>
   </div>
-  </div>
 </template>
 
 <script>

@@ -1,17 +1,3 @@
-USE master;
-GO
-
-ALTER DATABASE GEEMSDB
-SET SINGLE_USER
-WITH ROLLBACK IMMEDIATE;
-GO
-
-DROP DATABASE GEEMSDB;
-GO
-
-
-Create DATABASE GEEMSDB;
-GO
 use GEEMSDB;
 
 CREATE TABLE
@@ -29,17 +15,11 @@ CREATE TABLE
 	Usuario (
 		Id UNIQUEIDENTIFIER NOT NULL,
 		Username NVARCHAR (32) UNIQUE NOT NULL,
-		Username NVARCHAR (32) UNIQUE NOT NULL,
 		Contrasena VARCHAR(32) NOT NULL,
 		Tipo VARCHAR(20) CHECK (
 			Tipo IN ('DuenoEmpresa', 'Empleado', 'SuperAdmin')
 		),
-		Tipo VARCHAR(20) CHECK (
-			Tipo IN ('DuenoEmpresa', 'Empleado', 'SuperAdmin')
-		),
 		CedulaPersona INT UNIQUE NOT NULL,
-		CorreoPersona VARCHAR(100) NOT NULL,
-		FOREIGN KEY (CorreoPersona) REFERENCES Persona (Correo),
 		CorreoPersona VARCHAR(100) NOT NULL,
 		FOREIGN KEY (CorreoPersona) REFERENCES Persona (Correo),
 		FOREIGN KEY (CedulaPersona) REFERENCES Persona (Cedula) ON UPDATE CASCADE
@@ -55,7 +35,6 @@ CREATE TABLE
 CREATE TABLE
 	Empresa (
 		CedulaJuridica NVARCHAR (20) NOT NULL PRIMARY KEY, -- Cambiado a NVARCHAR para permitir tamano estandar
-		CedulaJuridica NVARCHAR (20) NOT NULL PRIMARY KEY, -- Cambiado a NVARCHAR para permitir tamano estandar
 		Nombre NVARCHAR (100) UNIQUE NOT NULL,
 		Descripcion NVARCHAR (420) NOT NULL,
 		Telefono VARCHAR(30) NOT NULL,
@@ -70,7 +49,6 @@ CREATE TABLE
 	SuperAdminAdministraEmpresa (
 		IdAdministrador UNIQUEIDENTIFIER NOT NULL,
 		CedulaJuridicaEmpresa NVARCHAR(20) NOT NULL,
-		CedulaJuridicaEmpresa NVARCHAR(20) NOT NULL,
 		PRIMARY KEY (IdAdministrador, CedulaJuridicaEmpresa),
 		FOREIGN KEY (IdAdministrador) REFERENCES SuperAdmin (Id) ON UPDATE CASCADE,
 		FOREIGN KEY (CedulaJuridicaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE
@@ -79,7 +57,6 @@ CREATE TABLE
 	DuenoEmpresa (
 		Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
 		CedulaEmpresa NVARCHAR(20) UNIQUE NOT NULL,
-		CedulaEmpresa NVARCHAR(20) UNIQUE NOT NULL,
 		CedulaPersona INT UNIQUE NOT NULL,
 		FOREIGN KEY (CedulaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
 		FOREIGN KEY (CedulaPersona) REFERENCES Persona (Cedula) ON UPDATE CASCADE
@@ -87,7 +64,6 @@ CREATE TABLE
 
 CREATE TABLE
 	DatosPrivadosEmpresa (
-		CedulaJuridica NVARCHAR(20) NOT NULL PRIMARY KEY,
 		CedulaJuridica NVARCHAR(20) NOT NULL PRIMARY KEY,
 		PlazoPago VARCHAR(20) NOT NULL,
 		CantidadBeneficiosXEmpleado INT NOT NULL,
