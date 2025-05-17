@@ -1,0 +1,6 @@
+@AsoSolidaristaAPI_HostAddress = http://localhost:5096
+
+GET {{AsoSolidaristaAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
