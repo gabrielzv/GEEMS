@@ -10,7 +10,6 @@
       </p>
 
       <div class="grid grid-cols-2 gap-4">
-        <!-- Nombre de la compañía -->
         <div>
           <label for="nombre" class="block text-sm font-medium text-gray-700">
             Nombre de la compañía
@@ -20,65 +19,42 @@
             id="nombre"
             v-model="empresa.nombre"
             maxlength="90"
-            placeholder=""
-            class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            placeholder="GEEMS Solutions"
+            :class="inputClass(errores.nombreVacio || errores.nombreDuplicado)"
           />
+          <p v-if="errores.nombreVacio" class="text-sm text-red-500 mt-1">{{ errores.nombreVacio }}</p>
+          <p v-if="errores.nombreDuplicado" class="text-sm text-red-500 mt-1">{{ errores.nombreDuplicado }}</p>
         </div>
-
-        <!-- Teléfono -->
         <div>
           <label class="block text-sm font-medium text-gray-700">
             Teléfono
           </label>
-          <div class="flex space-x-2">
-            <input
-              type="text"
-              v-model="telefonoParte1"
-              maxlength="4"
-              placeholder=""
-              class="w-1/2 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-            <input
-              type="text"
-              v-model="telefonoParte2"
-              maxlength="4"
-              placeholder=""
-              class="w-1/2 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-          </div>
+          <input
+            type="text"
+            v-model="telefono"
+            maxlength="9"
+            placeholder="8888-8888"
+            :class="inputClass(errores.telefonoFormatoInvalido || errores.telefono)"
+          />
+          <p v-if="errores.telefonoVacio" class="text-sm text-red-500 mt-1">{{ errores.telefonoVacio }}</p>
+          <p v-if="errores.telefonoFormatoInvalido && !errores.telefonoVacio" class="text-sm text-red-500 mt-1">{{ errores.telefonoFormatoInvalido }}</p>
+          
         </div>
-
-        <!-- Cédula jurídica -->
         <div>
           <label class="block text-sm font-medium text-gray-700">
             Cédula jurídica
           </label>
-          <div class="flex space-x-2">
-            <input
-              type="text"
-              v-model="cedulaParte1"
-              maxlength="1"
-              placeholder=""
-              class="w-1/4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-            <input
-              type="text"
-              v-model="cedulaParte2"
-              maxlength="3"
-              placeholder=""
-              class="w-1/4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-            <input
-              type="text"
-              v-model="cedulaParte3"
-              maxlength="7"
-              placeholder=""
-              class="w-1/2 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-            />
-          </div>
+          <input
+            type="text"
+            v-model="cedula"
+            maxlength="13"
+            placeholder="1-333-7777777"
+            :class="inputClass(errores.cedulaFormatoInvalido || errores.cedulaVacio || errores.cedulaDuplicada)"
+          />
+          <p v-if="errores.cedulaVacio" class="text-sm text-red-500 mt-1">{{ errores.cedulaVacio }}</p>
+          <p v-if="errores.cedulaFormatoInvalido && !errores.cedulaVacio" class="text-sm text-red-500 mt-1">{{ errores.cedulaFormatoInvalido }}</p>
+          <p v-if="errores.cedulaDuplicada" class="text-sm text-red-500 mt-1">{{ errores.cedulaDuplicada }}</p>
         </div>
-
-        <!-- Correo -->
         <div>
           <label for="correo" class="block text-sm font-medium text-gray-700">
             Correo
@@ -86,13 +62,13 @@
           <input
             type="email"
             id="correo"
+            :class="inputClass(errores.correoVacio || errores.correoFormatoInvalido)"
             v-model="empresa.correo"
-            placeholder=""
-            class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            placeholder="empresario@empresa.com"
           />
+          <p v-if="errores.correoVacio" class="text-sm text-red-500 mt-1">{{ errores.correoVacio }}</p>
+          <p v-if="errores.correoFormatoInvalido && !errores.correoVacio" class="text-sm text-red-500 mt-1">{{ errores.correoFormatoInvalido }}</p>
         </div>
-
-        <!-- Descripción -->
         <div class="col-span-2">
           <label
             for="descripcion"
@@ -103,13 +79,12 @@
           <textarea
             id="descripcion"
             v-model="empresa.descripcion"
-            placeholder=""
+            placeholder="La empresa GEEMS Solutions se dedica a..."
             rows="3"
+            maxlength="297"
             class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
           ></textarea>
         </div>
-
-        <!-- Dirección -->
         <div>
           <label for="provincia" class="block text-sm font-medium text-gray-700">
             Provincia
@@ -117,10 +92,12 @@
           <input
             type="text"
             id="provincia"
+            maxlength="30"
             v-model="empresa.direccion.provincia"
-            placeholder=""
-            class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            placeholder="San José"
+            :class="inputClass(errores.provinciaVacio)"
           />
+          <p v-if="errores.provinciaVacio" class="text-sm text-red-500 mt-1">{{ errores.provinciaVacio }}</p>
         </div>
 
         <div>
@@ -130,10 +107,12 @@
           <input
             type="text"
             id="canton"
+            maxlength="30"
             v-model="empresa.direccion.canton"
-            placeholder=""
-            class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            placeholder="Montes de Oca"
+            :class="inputClass(errores.cantonVacio)"
           />
+          <p v-if="errores.cantonVacio" class="text-sm text-red-500 mt-1">{{ errores.cantonVacio }}</p>
         </div>
 
         <div>
@@ -143,10 +122,12 @@
           <input
             type="text"
             id="distrito"
+            maxlength="30"
             v-model="empresa.direccion.distrito"
-            placeholder=""
-            class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+            placeholder="San Pedro"
+            :class="inputClass(errores.distritoVacio)"
           />
+          <p v-if="errores.distritoVacio" class="text-sm text-red-500 mt-1">{{ errores.distritoVacio }}</p>
         </div>
 
         <div>
@@ -156,8 +137,9 @@
           <input
             type="text"
             id="senas"
+            maxlength="30"
             v-model="empresa.direccion.senas"
-            placeholder=""
+            placeholder="Frente a Universidad de Costa Rica"
             class="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
         </div>
@@ -165,8 +147,7 @@
 
       <button
         type="submit"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors"
-      >
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors">
         Registrar
       </button>
     </form>
@@ -189,13 +170,24 @@ export default {
           senas: "",
         },
       },
-      cedulaParte1: "",
-      cedulaParte2: "",
-      cedulaParte3: "",
-      telefonoParte1: "",
-      telefonoParte2: "",
+      cedula: "",
+      telefono: "",
       idUsuario: null,
       cedulaPersona: null,
+      errores:{
+        nombreVacio: "",
+        telefonoVacio: "",
+        cedulaVacio: "",
+        correoVacio: "",
+        provinciaVacio: "",
+        cantonVacio: "",
+        distritoVacio: "",
+        nombreDuplicado: "",
+        cedulaDuplicada: "",
+        telefonoFormatoInvalido: "",
+        cedulaFormatoInvalido: "",
+        correoFormatoInvalido: "",
+      }
     };
   },
   created() {
@@ -212,6 +204,9 @@ export default {
   methods: {
     async validarDuplicados(nombre, cedulaJuridica) {
       try {
+        this.errores.nombreDuplicado = "";
+        this.errores.cedulaDuplicada = "";
+
         const response = await axios.get("https://localhost:7014/api/Empresa");
         const empresas = response.data;
 
@@ -224,128 +219,103 @@ export default {
         );
 
         if (nombreDuplicado) {
-          alert("El nombre de la empresa ya está registrado.");
-          return false;
+          this.errores.nombreDuplicado = "El nombre de la empresa ya está registrado.";
         }
 
         if (cedulaDuplicada) {
-          alert("La cédula jurídica ya está registrada.");
-          return false;
+          this.errores.cedulaDuplicada = "La cédula jurídica ya está registrada.";
         }
 
-        return true;
       } catch (error) {
-        console.error("Error al validar duplicados:", error);
-        alert("Ocurrió un error al validar los datos. Intente nuevamente.");
-        return false;
+        alert("Error al validar duplicados.");
       }
     },
 
+    inputClass(error) {
+      return [
+        "w-full px-4 py-2 rounded border focus:outline-none focus:ring-2",
+        error ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300",
+      ];
+    },
+
     async registrarEmpresa() {
-      if (
-        !this.empresa.nombre ||
-        !this.telefonoParte1 ||
-        !this.telefonoParte2 ||
-        !this.cedulaParte1 ||
-        !this.cedulaParte2 ||
-        !this.cedulaParte3 ||
-        !this.empresa.correo ||
-        !this.empresa.direccion.provincia ||
-        !this.empresa.direccion.canton ||
-        !this.empresa.direccion.distrito
-      ) {
-        alert("Por favor, complete todos los campos obligatorios.");
-        return;
+
+      this.errores.nombreVacio = this.empresa.nombre.trim() ? "" : "El nombre es obligatorio.";
+      this.errores.telefonoVacio = this.telefono.trim() ? "" : "El teléfono es obligatorio.";
+      this.errores.cedulaVacio = this.cedula.trim() ? "" : "La cédula es obligatoria.";
+      this.errores.correoVacio = this.empresa.correo.trim() ? "" : "El correo es obligatorio.";
+      this.errores.provinciaVacio = this.empresa.direccion.provincia.trim() ? "" : "La provincia es obligatoria.";
+      this.errores.cantonVacio = this.empresa.direccion.canton.trim() ? "" : "El cantón es obligatorio.";
+      this.errores.distritoVacio = this.empresa.direccion.distrito.trim() ? "" : "El distrito es obligatorio.";
+      
+
+      this.errores.cedulaFormatoInvalido = "";
+      if (!/^\d{1}-\d{3}-\d{7}$/.test(this.cedula)) {
+        this.errores.cedulaFormatoInvalido = "La cédula jurídica debe tener el formato X-XXX-XXXXXXX.";
       }
 
-      const cedulaJuridica = `${this.cedulaParte1}-${this.cedulaParte2}-${this.cedulaParte3}`;
-      const telefono = `${this.telefonoParte1}-${this.telefonoParte2}`;
-
-      // Validar formato de cédula jurídica
-      if (!/^\d{1}-\d{3}-\d{7}$/.test(cedulaJuridica)) {
-        alert("La cédula jurídica debe tener el formato X-XXX-XXXXXXX.");
-        console.error(
-          "Error: La cédula jurídica no tiene el formato correcto:",
-          cedulaJuridica
-        );
-        return;
+      this.errores.telefonoFormatoInvalido = "";
+      if (!/^\d{4}-\d{4}$/.test(this.telefono)) {
+        this.errores.telefonoFormatoInvalido = "El teléfono debe tener el formato XXXX-XXXX y contener solo números.";
       }
 
-      // Validar formato de teléfono
-      if (!/^\d{4}-\d{4}$/.test(telefono)) {
-        alert("El teléfono debe tener el formato XXXX-XXXX y contener solo números.");
-        console.error("Error: El teléfono no tiene el formato correcto:", telefono);
-        return;
+      this.errores.correoFormatoInvalido = "";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.empresa.correo)) {
+        this.errores.correoFormatoInvalido = "Por favor, ingrese un correo electrónico válido como ejemplo@correo.com";
       }
 
-      // Validar formato de correo electrónico
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.empresa.correo)) {
-        alert("Por favor, ingrese un correo electrónico válido.");
-        console.error("Error: El correo no tiene el formato correcto:", this.empresa.correo);
-        return;
-      }
-
-      // Validar duplicados antes de enviar los datos
-      const esValido = await this.validarDuplicados(
+      await this.validarDuplicados(
         this.empresa.nombre,
-        cedulaJuridica
+        this.cedula
       );
-      if (!esValido) {
+      
+      let not_valid = (this.errores.nombreVacio ||
+        this.errores.telefonoVacio ||
+        this.errores.cedulaVacio ||
+        this.errores.correoVacio ||
+        this.errores.provinciaVacio ||
+        this.errores.cantonVacio ||
+        this.errores.distritoVacio ||
+        this.errores.nombreDuplicado ||
+        this.errores.cedulaDuplicada ||
+        this.errores.telefonoFormatoInvalido ||
+        this.errores.cedulaFormatoInvalido ||
+        this.errores.correoFormatoInvalido);
+
+      if (not_valid) {
         return;
       }
-
-      // Si los campos opcionales están vacíos, enviar un string vacío
-      const descripcion = this.empresa.descripcion || "";
-      const senas = this.empresa.direccion.senas || "";
 
       const empresaPayload = {
-        cedulaJuridica: cedulaJuridica,
+        cedulaJuridica: this.cedula,
         nombre: this.empresa.nombre,
-        descripcion: descripcion,
-        telefono: telefono,
+        descripcion: this.empresa.descripcion,
+        telefono: this.telefono,
         correo: this.empresa.correo,
         provincia: this.empresa.direccion.provincia,
         canton: this.empresa.direccion.canton,
         distrito: this.empresa.direccion.distrito,
-        senas: senas,
-      };
-
-      console.log("Datos enviados al backend:", empresaPayload);
-      
-      // imprimir los datos que llegaron por query
-      console.log("Datos del dueno:", {
-        id: this.idUsuario,
-        cedulaPersona: this.cedulaPersona,
-        cedulaEmpresa: cedulaJuridica,
-      });
+        senas: this.empresa.direccion.senas,
+      };      
 
       try {
-        const response = await axios.post(
+        await axios.post(
           "https://localhost:7014/api/SetEmpresa/crearEmpresa",
           empresaPayload
         );
-        console.log("Respuesta del servidor:", response.data);
-
         try {
-          const responseDuenoEmpresa = await axios.post("https://localhost:7014/api/Register/duenoempresa", {
+          await axios.post("https://localhost:7014/api/Register/duenoempresa", {
             id: this.idUsuario,
             cedulaPersona: this.cedulaPersona,
-            cedulaEmpresa: cedulaJuridica,
+            cedulaEmpresa: this.cedula,
           });
-          console.log("Respuesta de dueño de empresa:", responseDuenoEmpresa.data);
           alert("Dueño de empresa y empresa registrados exitosamente.");
 
           this.$router.push("/login");
         } catch (error) {
-          console.error("Error al registrar al dueño de la empresa:", error.response?.data || error.message);
           alert("Ocurrió un error al registrar al dueño de la empresa.");
         }
       } catch (error) {
-        console.error(
-          "Error al registrar la empresa:",
-          error.response?.data || error.message
-        );
         alert("Ocurrió un error al registrar la empresa.");
       }
     },
@@ -354,4 +324,8 @@ export default {
 </script>
 
 <style scoped>
+  /* Quita el resize de la descripción */
+  textarea {
+    resize: none;
+  }
 </style>
