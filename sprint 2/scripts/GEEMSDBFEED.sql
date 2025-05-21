@@ -1,5 +1,22 @@
 USE GEEMSDB;
 
+DROP TABLE IF EXISTS Deduccion;
+DROP TABLE IF EXISTS Pago;
+DROP TABLE IF EXISTS SupervisorSupervisaEmpleado;
+DROP TABLE IF EXISTS BeneficiosEmpleado;
+DROP TABLE IF EXISTS Registro;
+DROP TABLE IF EXISTS Empleado;
+DROP TABLE IF EXISTS BeneficioContratoElegible;
+DROP TABLE IF EXISTS Beneficio;
+DROP TABLE IF EXISTS DatosPrivadosEmpresa;
+DROP TABLE IF EXISTS DuenoEmpresa;
+DROP TABLE IF EXISTS SuperAdminAdministraEmpresa;
+DROP TABLE IF EXISTS Planilla;
+DROP TABLE IF EXISTS SuperAdmin;
+DROP TABLE IF EXISTS Usuario;
+DROP TABLE IF EXISTS Empresa;
+DROP TABLE IF EXISTS Persona;
+GO
 -- Declaración de IDs
 DECLARE @uid1 UNIQUEIDENTIFIER = NEWID(); -- Libre
 DECLARE @uid2 UNIQUEIDENTIFIER = NEWID(); -- DuenoEmpresa
@@ -10,6 +27,7 @@ DECLARE @uid6 UNIQUEIDENTIFIER = NEWID(); -- Payroll
 DECLARE @uid7 UNIQUEIDENTIFIER = NEWID(); -- Pago
 DECLARE @uid8 UNIQUEIDENTIFIER = NEWID(); -- Registro
 DECLARE @uid9 UNIQUEIDENTIFIER = NEWID(); -- SuperAdmin
+DECLARE @uid10 UNIQUEIDENTIFIER = NEWID(); -- Planilla
 
 -- Personas
 INSERT INTO Persona VALUES (101010101, 'Av Central', 'Carlos', 'Perez', 'Mora', 'cperez@geems.com', '8888-8888');
@@ -56,9 +74,10 @@ INSERT INTO Empleado VALUES (@uid6, 505050505, 'Tiempo Completo', 160, 'M', 'Act
 -- Supervisor supervisa a colaborador
 INSERT INTO SupervisorSupervisaEmpleado VALUES (@uid5, 303030303);
 
+INSERT INTO Planilla VALUES (@uid10, 200000, 0, GETDATE(), GETDATE());
 -- Pago a colaborador
-INSERT INTO Pago VALUES (@uid7, GETDATE(), 'Seguro Social', 850000, 75000, 'Abril 2025', @uid3, @uid6);
-
+INSERT INTO Pago VALUES (@uid7, GETDATE(), 75000, 'Abril 2025', @uid3, @uid6,@uid10);
+INSERT INTO Deduccion VALUEs(@uid7,'Renta',2000000);
 -- Registro de horas del colaborador
 INSERT INTO Registro VALUES (@uid8, 40, GETDATE(), 'Aprobado', @uid3);
 
@@ -66,6 +85,5 @@ INSERT INTO Registro VALUES (@uid8, 40, GETDATE(), 'Aprobado', @uid3);
 INSERT INTO BeneficiosEmpleado VALUES (@uid3, @uid4);
 
 -- Historial de pagos
-INSERT INTO HistorialDePagos VALUES (@uid3, @uid7, 'Abril', 1, GETDATE());
 
 
