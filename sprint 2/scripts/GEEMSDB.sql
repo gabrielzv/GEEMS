@@ -12,8 +12,7 @@ DROP DATABASE GEEMSDB;
 
 Create DATABASE GEEMSDB;
 
-
-use GEEMSDB;
+GO use GEEMSDB;
 
 CREATE TABLE
 	Persona (
@@ -97,6 +96,14 @@ CREATE TABLE
 		FOREIGN KEY (CedulaJuridica) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE
 	);
 
+--CREATE TABLE
+--	BeneficiosDisponibles (
+--		IdBeneficio UNIQUEIDENTIFIER NOT NULL,
+--		CedulaJuridicaEmpresa NVARCHAR(20) NOT NULL,
+--		PRIMARY KEY (IdBeneficio, CedulaJuridicaEmpresa),
+--		FOREIGN KEY (CedulaJuridicaEmpresa) REFERENCES Empresa (CedulaJuridica) ON UPDATE CASCADE,
+--		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE CASCADE
+--	);
 CREATE TABLE
 	BeneficioContratoElegible (
 		IdBeneficio UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
@@ -143,35 +150,19 @@ CREATE TABLE
 	);
 
 CREATE TABLE
-	Planilla (
-		Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-		Monto INT,
-		Pagado BIT,
-		FechadeInicio DATETIME,
-		FechadeFin DATETIME,
-	);
-
-CREATE TABLE
 	Pago (
 		Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
 		FechaRealizada DATETIME,
+		TipoDeduccion VARCHAR(100) NOT NULL,
 		MontoPago INT,
+		MontoDeduccion INT,
 		Periodo VARCHAR(100) NOT NULL,
 		IdEmpleado UNIQUEIDENTIFIER NOT NULL,
 		IdPayroll UNIQUEIDENTIFIER NOT NULL,
-		IdPlanilla UNIQUEIDENTIFIER NOT NULL,
 		FOREIGN KEY (IdEmpleado) REFERENCES Empleado (Id) ON UPDATE CASCADE,
-		FOREIGN KEY (IdPayroll) REFERENCES Empleado (Id),
-		FOREIGN KEY (IdPlanilla) REFERENCES Planilla (Id)
+		FOREIGN KEY (IdPayroll) REFERENCES Empleado (Id)
 	);
 
-CREATE TABLE
-	Deduccion (
-		IdPago UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
-		NombreDeduccion VARCHAR(100) NOT NULL,
-		Monto INT,
-		FOREIGN KEY (IdPago) REFERENCES Pago (Id)
-	)
 CREATE TABLE
 	Registro (
 		Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
@@ -189,6 +180,32 @@ CREATE TABLE
 		PRIMARY KEY (IdEmpleado, IdBeneficio),
 		FOREIGN KEY (IdEmpleado) REFERENCES Empleado (Id) ON UPDATE NO ACTION,
 		FOREIGN KEY (IdBeneficio) REFERENCES Beneficio (Id) ON UPDATE NO ACTION
+	);
+
+CREATE TABLE
+	HistorialDePagos (
+		IdEmpleado UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+		IdPago UNIQUEIDENTIFIER NOT NULL,
+		Mes VARCHAR(11) CHECK (
+			Mes IN (
+				'Enero',
+				'Febrero',
+				'Marzo',
+				'Abril',
+				'Mayo',
+				'Junio',
+				'Julio',
+				'Agosto',
+				'Septiembre',
+				'Octubre',
+				'Noviembre',
+				'Diciembre'
+			)
+		),
+		Pagado BIT,
+		FechadePago DATETIME,
+		FOREIGN KEY (IdEmpleado) REFERENCES Empleado (Id) ON UPDATE CASCADE,
+		FOREIGN KEY (IdPago) REFERENCES Pago (Id)
 	);
 
 SELECT
@@ -231,6 +248,10 @@ SELECT
 FROM
 	Beneficio;
 
+--SELECT
+--	*
+--FROM
+--	BeneficiosDisponibles;
 SELECT
 	*
 FROM
@@ -264,4 +285,4 @@ FROM
 SELECT
 	*
 FROM
-	Planilla;
+	HistorialDePagos;
