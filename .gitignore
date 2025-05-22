@@ -1,0 +1,68 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Visual Studio
+.vs/
+.vscode/
+*.code-workspace
+
+## Build results
+build/
+[Bb]uild/
+[Bb]in/
+[Oo]bj/
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Runtime
+*.log
+*.tlog
+*.tmp
+*.vspscc
+*.vssscc
+
+## Entity Framework
+Migrations/
+
+## Configuration
+appsettings.Development.json
+appsettings.*.local.json
+secrets.json
+
+## Others
+.env
+*.db
+*.db-shm
+*.db-wal
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Rider (JetBrains)
+.idea/
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
