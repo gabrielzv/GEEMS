@@ -1,5 +1,6 @@
 
-
+using BackendGeems.Application;
+using BackendGeems.Infraestructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,12 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IGEEMSRepo, GEEMSRepo>();
+builder.Services.AddScoped<IQueryPago,QueryPago>();
+builder.Services.AddScoped<ISalarioBruto, SalarioBruto>();
 
 var app = builder.Build();
 
