@@ -1,4 +1,4 @@
-﻿namespace BackendGeems.Models
+﻿namespace BackendGeems.Domain
 {
     public class Persona
     {
