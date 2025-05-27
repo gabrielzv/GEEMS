@@ -1,6 +1,4 @@
-﻿using BackendGeems.Infraestructure;
-
-namespace BackendGeems.Application
+﻿namespace BackendGeems.Application
 {
     public class SalarioBruto : ISalarioBruto
     {

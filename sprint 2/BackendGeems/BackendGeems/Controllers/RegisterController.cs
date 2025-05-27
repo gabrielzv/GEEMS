@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using BackendGeems.Models;
+using BackendGeems.Domain;
 
 namespace BackendGeems.Controllers
 {
@@ -131,7 +131,6 @@ namespace BackendGeems.Controllers
             {
                 return BadRequest(new { message = "El objeto Empleado es nulo." });
             }
-
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             try

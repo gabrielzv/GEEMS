@@ -1,10 +1,8 @@
-
 using BackendGeems.Application;
 using BackendGeems.Infraestructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Agregar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -29,7 +27,6 @@ builder.Services.AddScoped<ISalarioBruto, SalarioBruto>();
 
 var app = builder.Build();
 
-// Usar Swagger en desarrollo
 app.UseSwagger();
 app.UseSwaggerUI();
 

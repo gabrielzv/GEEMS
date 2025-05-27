@@ -1,5 +1,4 @@
 ﻿using BackendGeems.Domain;
-using BackendGeems.Infraestructure;
 
 namespace BackendGeems.Application
 {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using BackendGeems.Models;
+using BackendGeems.Domain;
 
 namespace BackendGeems.Controllers 
 {
