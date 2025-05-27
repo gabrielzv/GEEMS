@@ -1,7 +1,6 @@
-﻿using BackendGeems.Application;
-using BackendGeems.Domain;
+﻿using BackendGeems.Domain;
 
-namespace BackendGeems.Infraestructure
+namespace BackendGeems.Application
 {
     public class QueryPago : IQueryPago
     {

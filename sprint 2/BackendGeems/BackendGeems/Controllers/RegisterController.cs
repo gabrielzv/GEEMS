@@ -131,7 +131,6 @@ namespace BackendGeems.Controllers
             {
                 return BadRequest(new { message = "El objeto Empleado es nulo." });
             }
-
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             try
