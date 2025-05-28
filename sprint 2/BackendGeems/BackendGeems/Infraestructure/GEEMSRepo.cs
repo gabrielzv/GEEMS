@@ -112,7 +112,77 @@ namespace BackendGeems.Infraestructure
             return salarioBruto;
         }
 
+        public void GenerarPagoEmpleado(Guid idEmpleado,Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        {
 
+            int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
 
+            // Calcular deducciones obligatorias
+            int impuestoRenta = (int)(salarioBruto * 0.10); // 10%
+            int seguro = (int)(salarioBruto * 0.05); // 5%
+            int totalDeducciones = impuestoRenta + seguro;
+
+            // Crear nuevo ID para el pago
+            Guid idPago = Guid.NewGuid();
+
+            // Insertar pago
+            string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
+                               VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
+            using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@Id", idPago);
+                cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
+                cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
+                cmd.Parameters.AddWithValue("@MontoBruto", salarioBruto);
+                cmd.Parameters.AddWithValue("@MontoPago", salarioBruto - totalDeducciones);
+                cmd.Parameters.AddWithValue("@FechaRealizada", DateTime.Now);
+
+                _conexion.Open();
+                cmd.ExecuteNonQuery();
+                _conexion.Close();
+            }
+
+            // Insertar deducciones obligatorias
+            InsertDeduccion(idPago, "Obligatoria", null, impuestoRenta);
+            InsertDeduccion(idPago, "Obligatoria", null, seguro);
+
+            // Deducciones por beneficios voluntarios
+            string queryBeneficios = @"SELECT be.Id, be.MontoMensual 
+                               FROM BeneficiosEmpleado be
+                               WHERE be.IdEmpleado = @IdEmpleado";
+
+            using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                DataTable dt = CrearTablaConsulta(cmd);
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    Guid idBeneficio = Guid.Parse(row["Id"].ToString());
+                    int monto = Convert.ToInt32(row["MontoMensual"]);
+                    InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
+                    totalDeducciones += monto;
+                }
+            }
+        }
+        public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, int monto)
+        {
+            string insertQuery = @"INSERT INTO Deducciones (Id, IdPago, TipoDeduccion, IdBeneficio, Monto)
+                           VALUES (@Id, @IdPago, @TipoDeduccion, @IdBeneficio, @Monto)";
+            using (SqlCommand cmd = new SqlCommand(insertQuery, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@Id", Guid.NewGuid());
+                cmd.Parameters.AddWithValue("@IdPago", idPago);
+                cmd.Parameters.AddWithValue("@TipoDeduccion", tipo);
+                cmd.Parameters.AddWithValue("@IdBeneficio", (object?)idBeneficio ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@Monto", monto);
+
+                _conexion.Open();
+                cmd.ExecuteNonQuery();
+                _conexion.Close();
+            }
+        }
     }
 }

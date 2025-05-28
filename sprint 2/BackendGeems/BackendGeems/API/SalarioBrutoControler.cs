@@ -23,5 +23,6 @@ namespace BackendGeems.API
             var salarioBruto = _salarioBruto.ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFin);
             return salarioBruto;
         }
+      
     }
 }
