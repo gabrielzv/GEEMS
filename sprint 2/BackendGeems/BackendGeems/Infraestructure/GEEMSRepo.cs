@@ -117,15 +117,15 @@ namespace BackendGeems.Infraestructure
 
             int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
             Console.WriteLine("aca1");
-            // Calcular deducciones obligatorias
+            
             int impuestoRenta = (int)(salarioBruto * 0.10); // 10%
             int seguro = (int)(salarioBruto * 0.05); // 5%
             int totalDeducciones = impuestoRenta + seguro;
 
-            // Crear nuevo ID para el pago
+           
             Guid idPago = Guid.NewGuid();
 
-            // Insertar pago
+     
             string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
                                VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
             using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
@@ -144,11 +144,10 @@ namespace BackendGeems.Infraestructure
                 _conexion.Close();
             }
 
-            // Insertar deducciones obligatorias
             InsertDeduccion(idPago, "Obligatoria", null, impuestoRenta);
             InsertDeduccion(idPago, "Obligatoria", null, seguro);
 
-            // Deducciones por beneficios voluntarios
+            
             string queryBeneficios = @"
                 SELECT b.Id, b.Costo
                 FROM BeneficiosEmpleado be
