@@ -156,39 +156,18 @@ namespace BackendGeems.Infraestructure
             int impuestoRenta = esQuincenal ? impuestoRentaMensual / 2 : impuestoRentaMensual;
 
             //TODO: Deducciones APIs
-            
+
             int seguro = (int)(salarioBruto * 0.1067); // 10.67%
             int totalDeducciones = impuestoRenta + seguro;
 
-            Guid idPago = Guid.NewGuid();
+            // Inicializar lista de deducciones voluntarias
+            List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
 
-            string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
-                       VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
-            using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
-            {
-                cmd.Parameters.AddWithValue("@Id", idPago);
-                cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
-                cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
-                cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
-                cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
-                cmd.Parameters.AddWithValue("@MontoBruto", salarioBruto);
-                cmd.Parameters.AddWithValue("@MontoPago", salarioBruto - totalDeducciones);
-                cmd.Parameters.AddWithValue("@FechaRealizada", DateTime.Now);
-
-                _conexion.Open();
-                cmd.ExecuteNonQuery();
-                _conexion.Close();
-            }
-
-            InsertDeduccion(idPago, "Obligatoria", null, impuestoRenta);
-            InsertDeduccion(idPago, "Obligatoria", null, seguro);
-
-          
             string queryBeneficios = @"
-        SELECT b.Id, b.Costo
-        FROM BeneficiosEmpleado be
-        JOIN Beneficio b ON be.IdBeneficio = b.Id
-        WHERE be.IdEmpleado = @IdEmpleado";
+SELECT b.Id, b.Costo
+FROM BeneficiosEmpleado be
+JOIN Beneficio b ON be.IdBeneficio = b.Id
+WHERE be.IdEmpleado = @IdEmpleado";
 
             using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
             {
@@ -199,9 +178,40 @@ namespace BackendGeems.Infraestructure
                 {
                     Guid idBeneficio = Guid.Parse(row["Id"].ToString());
                     int monto = Convert.ToInt32(row["Costo"]);
-                    InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
+                    deduccionesVoluntarias.Add((idBeneficio, monto));
                     totalDeducciones += monto;
                 }
+            }
+
+            // Ahora sí puedes calcular el MontoPago correctamente
+            Guid idPago = Guid.NewGuid();
+
+            string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
+               VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
+            using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@Id", idPago);
+                cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
+                cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
+                cmd.Parameters.AddWithValue("@MontoBruto", salarioBruto);
+                cmd.Parameters.AddWithValue("@MontoPago", salarioBruto - totalDeducciones); // ahora sí
+                cmd.Parameters.AddWithValue("@FechaRealizada", DateTime.Now);
+
+                _conexion.Open();
+                cmd.ExecuteNonQuery();
+                _conexion.Close();
+            }
+
+            // Insertar deducciones obligatorias
+            InsertDeduccion(idPago, "Obligatoria", null, impuestoRenta);
+            InsertDeduccion(idPago, "Obligatoria", null, seguro);
+
+            // Insertar deducciones voluntarias
+            foreach (var (idBeneficio, monto) in deduccionesVoluntarias)
+            {
+                InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
             }
 
             Console.WriteLine("aca2");
