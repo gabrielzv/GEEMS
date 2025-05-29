@@ -1,35 +1,186 @@
 <template>
-  <header class="bg-white shadow flex justify-between items-center px-6 py-4">
+  <header
+    class="bg-header shadow flex justify-between items-center px-6 py-4"
+    style="background-color: #fbf7ec"
+  >
     <router-link to="/home">
       <img src="@/assets/GEEMSLogo.jpg" class="h-20 w-auto" alt="GEEMS Logo" />
     </router-link>
 
-    <!-- Navegación -->
-    <nav v-if="isAuthenticated" class="space-x-6 text-gray-700 hidden md:flex">
-      <router-link
-        to="/home"
-        class="hover:text-blue-600"
-        active-class="text-blue-600 font-medium"
-        >Inicio</router-link
-      >
-      <router-link
-        to="/services"
-        class="hover:text-blue-600"
-        active-class="text-blue-600 font-medium"
-        >Servicios</router-link
-      >
-      <router-link
-        to="/contact"
-        class="hover:text-blue-600"
-        active-class="text-blue-600 font-medium"
-        >Contacto</router-link
-      >
-      <router-link
-        to="/about"
-        class="hover:text-blue-600"
-        active-class="text-blue-600 font-medium"
-        >Acerca</router-link
-      >
+    <!-- Navegación principal -->
+    <nav
+      v-if="isAuthenticated"
+      class="flex items-center space-x-6 text-gray-700"
+    >
+      <!-- Opciones para SuperAdmin -->
+      <template v-if="user?.tipo === 'SuperAdmin'">
+        <router-link
+          to="/gestionarUsuarios"
+          class="hover:text-blue-600 text-blue-600"
+          active-class="text-blue-600 font-medium"
+          >Gestionar usuarios</router-link
+        >
+        <router-link
+          to="/reportesGenerales"
+          class="hover:text-blue-600 text-blue-600"
+          active-class="text-blue-600 font-medium"
+          >Reportes</router-link
+        >
+        <router-link
+          to="/configuracion"
+          class="hover:text-blue-600 text-blue-600"
+          active-class="text-blue-600 font-medium"
+          >Configuración</router-link
+        >
+        <router-link
+          to="/ConsulEmpresa"
+          class="hover:text-blue-600 text-blue-600"
+          active-class="text-blue-600 font-medium"
+          >Empresas</router-link
+        >
+      </template>
+
+      <!-- Opciones para DuenoEmpresa -->
+      <template v-else-if="user?.tipo === 'DuenoEmpresa'">
+        <!-- Dropdown para DueñoEmpresa (Empresa) -->
+        <div class="relative group">
+          <button class="hover:text-blue-600 text-blue-600 flex items-center">
+            Empresa
+            <svg
+              class="w-4 h-4 ml-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div
+            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10"
+            style="background-color: #fbf7ec"
+          >
+            <router-link
+              to="/editarEmpresa"
+              class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
+              active-class="text-blue-600 font-medium"
+              >Editar empresa</router-link
+            >
+            <router-link
+              to="/verEmpresaIndv"
+              class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
+              active-class="text-blue-600 font-medium"
+              >Ver mi empresa</router-link
+            >
+          </div>
+        </div>
+
+        <router-link
+          to="/anadirEmpleado"
+          class="hover:text-blue-600 text-blue-600"
+          active-class="text-blue-600 font-medium"
+          >Añadir empleado</router-link
+        >
+      </template>
+
+      <!-- Opciones para Empleado -->
+      <template v-else-if="user?.tipo === 'Empleado'">
+        <!-- Dropdowns para Empleado (Registros y Beneficios) -->
+        <div class="relative group">
+          <button class="hover:text-blue-600 text-blue-600 flex items-center">
+            Registros
+            <svg
+              class="w-4 h-4 ml-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div
+            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10"
+            style="background-color: #fbf7ec"
+          >
+            <router-link
+              to="/registrarHoras"
+              class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
+              active-class="text-blue-600 font-medium"
+              >Registrar horas</router-link
+            >
+            <router-link
+              to="/historialRegistros"
+              class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
+              active-class="text-blue-600 font-medium"
+              >Historial</router-link
+            >
+          </div>
+        </div>
+        <div class="relative group">
+          <button class="hover:text-blue-600 text-blue-600 flex items-center">
+            Beneficios
+            <svg
+              class="w-4 h-4 ml-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div
+            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10"
+            style="background-color: #fbf7ec"
+          >
+            <router-link
+              to="/matricularBeneficio"
+              class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
+              active-class="text-blue-600 font-medium"
+              >Matricular Beneficios</router-link
+            >
+            <router-link
+              to="/employeeBenefits"
+              class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
+              active-class="text-blue-600 font-medium"
+              >Mis beneficios</router-link
+            >
+          </div>
+        </div>
+
+        <!-- Opciones adicionales para Supervisor -->
+        <template v-if="empleado?.tipo === 'Supervisor'">
+          <router-link
+            to="/desglosePagos"
+            class="hover:text-blue-600 text-blue-600"
+            active-class="text-blue-600 font-medium"
+            >Desglose de pagos</router-link
+          >
+        </template>
+
+        <!-- Opciones adicionales para Payroll -->
+        <template v-if="empleado?.tipo === 'Payroll'">
+          <router-link
+            to="/realizarPago"
+            class="hover:text-blue-600 text-blue-600"
+            active-class="text-blue-600 font-medium"
+            >Realizar Pago</router-link
+          >
+        </template>
+      </template>
     </nav>
 
     <!-- Usuario + Logout -->
@@ -81,7 +232,7 @@
 <script>
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
-import { computed } from "vue";
+import { computed, ref, onMounted } from "vue";
 
 export default {
   name: "AppHeader",
@@ -91,7 +242,22 @@ export default {
 
     const isAuthenticated = computed(() => !!userStore.usuario);
     const user = computed(() => userStore.usuario);
-    const empleado = computed(() => userStore.empleado);
+    const empleado = ref(null);
+
+    const fetchEmpleado = async () => {
+      if (user.value?.tipo === "Empleado" && user.value?.cedulaPersona) {
+        try {
+          await userStore.fetchEmpleado(user.value.cedulaPersona);
+          empleado.value = userStore.empleado;
+        } catch (err) {
+          console.error("Error al obtener datos del empleado:", err);
+        }
+      }
+    };
+
+    onMounted(() => {
+      fetchEmpleado();
+    });
 
     const goToUserPage = () => {
       router.push("/user");
