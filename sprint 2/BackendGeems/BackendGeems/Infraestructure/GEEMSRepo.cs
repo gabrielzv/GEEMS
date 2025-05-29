@@ -111,23 +111,59 @@ namespace BackendGeems.Infraestructure
 
             return salarioBruto;
         }
-
-        public void GenerarPagoEmpleado(Guid idEmpleado,Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        public int CalcularImpuestoRenta(int ingresoMensual)
         {
+            int impuesto = 0;
 
+            if (ingresoMensual <= 922000)
+            {
+                impuesto = 0;
+            }
+            else if (ingresoMensual <= 1352000)
+            {
+                impuesto = (int)((ingresoMensual - 922000) * 0.10);
+            }
+            else if (ingresoMensual <= 2373000)
+            {
+                impuesto = (int)((1352000 - 922000) * 0.10 + (ingresoMensual - 1352000) * 0.15);
+            }
+            else if (ingresoMensual <= 4745000)
+            {
+                impuesto = (int)((1352000 - 922000) * 0.10 + (2373000 - 1352000) * 0.15 + (ingresoMensual - 2373000) * 0.20);
+            }
+            else
+            {
+                impuesto = (int)((1352000 - 922000) * 0.10 + (2373000 - 1352000) * 0.15 + (4745000 - 2373000) * 0.20 + (ingresoMensual - 4745000) * 0.25);
+            }
+
+            return impuesto;
+        }
+        public void GenerarPagoEmpleado(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        {
             int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
             Console.WriteLine("aca1");
-            
-            int impuestoRenta = (int)(salarioBruto * 0.10); // 10%
-            int seguro = (int)(salarioBruto * 0.05); // 5%
-            int totalDeducciones = impuestoRenta + seguro;
 
            
+            TimeSpan duracion = fechaFinal - fechaInicio;
+            bool esQuincenal = duracion.TotalDays <= 16;
+
+            int salarioMensualEstimado = esQuincenal ? salarioBruto * 2 : salarioBruto;
+
+            
+            int impuestoRentaMensual = CalcularImpuestoRenta(salarioMensualEstimado);
+
+            
+            int impuestoRenta = esQuincenal ? impuestoRentaMensual / 2 : impuestoRentaMensual;
+
+            //TODO: Deducciones APIs
+            
+            int seguro = (int)(salarioBruto * 0.1067); // 10.67%
+            int totalDeducciones = impuestoRenta + seguro;
+
             Guid idPago = Guid.NewGuid();
 
-     
             string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
-                               VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
+                       VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
             using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
             {
                 cmd.Parameters.AddWithValue("@Id", idPago);
@@ -147,12 +183,12 @@ namespace BackendGeems.Infraestructure
             InsertDeduccion(idPago, "Obligatoria", null, impuestoRenta);
             InsertDeduccion(idPago, "Obligatoria", null, seguro);
 
-            
+          
             string queryBeneficios = @"
-                SELECT b.Id, b.Costo
-                FROM BeneficiosEmpleado be
-                JOIN Beneficio b ON be.IdBeneficio = b.Id
-                WHERE be.IdEmpleado = @IdEmpleado";
+        SELECT b.Id, b.Costo
+        FROM BeneficiosEmpleado be
+        JOIN Beneficio b ON be.IdBeneficio = b.Id
+        WHERE be.IdEmpleado = @IdEmpleado";
 
             using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
             {
@@ -167,8 +203,10 @@ namespace BackendGeems.Infraestructure
                     totalDeducciones += monto;
                 }
             }
+
             Console.WriteLine("aca2");
         }
+
         public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, int monto)
         {
             string insertQuery = @"INSERT INTO Deducciones (Id, IdPago, TipoDeduccion, IdBeneficio, Monto)

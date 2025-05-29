@@ -8,5 +8,7 @@ namespace BackendGeems.Application
         int ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal);
         void GenerarPagoEmpleado(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal);
         void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, int monto);
+
+        int CalcularImpuestoRenta(int salarioBruto);
     }
 }
