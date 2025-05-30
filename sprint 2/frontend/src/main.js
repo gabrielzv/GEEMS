@@ -48,7 +48,7 @@ const router = createRouter({
         { path: "/matricularBeneficio", name: "MatricularBeneficio", component: MatricularBeneficio },
         { path: "/employeeBenefits", name: "EmployeeBenefits", component: EmployeeBenefits },
         { path: '/anadirEmpleado', name: 'anadirEmpleado', component: AnadirEmpleado, meta: { requiresAuth: true }},
-        { path: '/registroHoras', name: 'registroHoras', component: RegistroHoras, meta: {requiresAuth: true}},
+        { path: '/registrarHoras', name: 'registrarHoras', component: RegistroHoras, meta: {requiresAuth: true}},
       ]
     }
   ],

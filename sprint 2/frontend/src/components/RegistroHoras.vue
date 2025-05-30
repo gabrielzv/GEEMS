@@ -20,8 +20,7 @@
                         v-model="diaRegistrado"
                         :class="inputClass(errores.diaInvalido || errores.diaRepetido)"
                     />
-                    <p v-if="errores.diaInvalido" class="text-sm text-red-500 mt-1">{{ errores.diaInvalido }}</p>
-                    <p v-if="errores.diaRepetido && !errores.diaInvalido" class="text-sm text-red-500 mt-1">{{ errores.diaRepetido }}</p>
+                    <p v-if="errores.diaRepetido" class="text-sm text-red-500 mt-1">{{ errores.diaRepetido }}</p>
                 </div>
                 <div>
                     <label for="nombre" class="block text-sm font-medium text-gray-700">
@@ -52,23 +51,38 @@
 
 <script>
 import axios from "axios";
+import { useUserStore } from "../store/user";
 
 export default {
     data() {
         return {
             horasRegistradas: null,
             diaRegistrado: null,
-            guidEmpleado: "123e4567-e89b-12d3-a456-426614174000",
+            guidEmpleado: null,
+            cedulaPersona: null,
             errores: {
                 horasVacias: "",
                 horasInvalidas: "",
                 diaRepetido: "",
-                diaInvalido: "",
             }
         };
     },
     created() {
-        
+        const userStore = useUserStore();
+
+        if (userStore.usuario && userStore.usuario.cedulaPersona) {
+            this.cedulaPersona = userStore.usuario.cedulaPersona;
+
+            // Llamar al backend para obtener el guidEmpleado
+            axios.get(`https://localhost:7014/api/GetEmpleado/${this.cedulaPersona}`)
+                .then(response => {
+                    this.guidEmpleado = response.data.id;
+                })
+                .catch(error => {
+                    console.error("Error al obtener el empleado:", error);
+                    alert("No se pudo obtener el ID del empleado.");
+                });
+        }
     },
     methods: {
         inputClass(error) {
@@ -77,54 +91,57 @@ export default {
                 error ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300",
             ];
         },
-        diaRepetido(){
-            // TODO: Comprobar con backend que no este repetido
-            return true;
+        async fechaValida(){
+            try {
+            const response = await axios.get("https://localhost:7014/api/Horas", {
+                params: {
+                    date: this.diaRegistrado,
+                    employeeId: this.guidEmpleado,
+                },
+            });
+                return response.data; 
+            } catch (error) {
+                console.error("Error al validar la fecha:", error);
+                return false;
+            }
         },
-        diaInvalido(){
-            // TODO: Comprobar con backend que no sea valido
-            return true;
-        },
-        registroValido(){
+        async registroValido(){
             this.errores.horasVacias = this.horasRegistradas != null ? "" : "Las horas a registrar son obligatorias.";
             this.errores.horasInvalidas = "";
-            if(this.horasRegistradas < 1 || this.horasRegistradas > 8){
-                this.errores.horasInvalidas = "Las horas a registrar deben estar en el rango de 1 a 8 horas.";
+            const horas = Number(this.horasRegistradas);
+            if (
+                isNaN(horas) ||
+                !Number.isFinite(horas) ||
+                horas < 1 ||
+                horas > 8
+            ) {
+                this.errores.horasInvalidas = "Las horas a registrar deben ser un número entre 1 y 8.";
             }
             this.errores.diaRepetido = "";
-            if(this.diaRepetido()){
+            let fechaEsValida = await this.fechaValida();
+            if(!fechaEsValida){
                 this.errores.diaRepetido = "El registro de horas para este día ya se realizó.";
             }
-            this.errores.diaInvalido = "";
-            if(this.diaInvalido()){
-                this.errores.diaInvalido = "El día seleccionado no es válido, ya se realizó el pago de este día.";
-            }
-
             let registroValido =  !(this.errores.horasVacias    ||
                             this.errores.horasInvalidas ||
-                            this.errores.diaRepetido    ||
-                            this.errores.diaInvalido);
-            
+                            this.errores.diaRepetido);
             return registroValido;
         },
         async registroHoras() {
-            if(this.registroValido()){
+            if(await this.registroValido()){
                 const registroPayload = {
-                    horasRegistradas: this.horasRegistradas,
-                    diaRegistrado: this.diaRegistrado,
-                    guidEmpleado: this.guidEmpleado,
+                    NumHoras: this.horasRegistradas,
+                    Fecha: this.diaRegistrado,
+                    IdEmpleado: this.guidEmpleado,
+                    Estado: "NoRevisado",
                 };
 
                 try {
-                    // TODO: Quitar este if que desactiva el linter
-                    let linter = false;
-                    if(linter){
-                        console.log(this.guidEmpleado); // TODO: Quitar este log
-                        await axios.post( // TODO: Colocar el link al API correcto
-                        "https://localhost:7014/api/RegistroHoras",
-                        registroPayload
-                        );
-                    }
+                    await axios.post(
+                    "https://localhost:7014/api/Horas",
+                    registroPayload
+                    );
+                    
                     alert("Registro de horas realizado correctamente.");
                     this.$router.push("/home");
                 }
