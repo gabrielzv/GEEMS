@@ -198,9 +198,9 @@ export default {
       return;
     }
 
-  this.idUsuario = id;
-  this.cedulaPersona = cedulaPersona;
-},
+    this.idUsuario = id;
+    this.cedulaPersona = cedulaPersona;
+  },
   methods: {
     async validarDuplicados(nombre, cedulaJuridica) {
       try {
