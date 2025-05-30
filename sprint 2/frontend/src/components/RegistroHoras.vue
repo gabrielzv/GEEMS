@@ -18,7 +18,7 @@
                         type="date"
                         id="dia"
                         v-model="diaRegistrado"
-                        :class="inputClass(errores.diaInvalido || errores.diaRepetido)"
+                        :class="getInputClass(errores.diaInvalido || errores.diaRepetido)"
                     />
                     <p v-if="errores.diaInvalido" class="text-sm text-red-500 mt-1">{{ errores.diaInvalido }}</p>
                     <p v-if="errores.diaRepetido && !errores.diaInvalido" class="text-sm text-red-500 mt-1">{{ errores.diaRepetido }}</p>
@@ -33,7 +33,7 @@
                         v-model="horasRegistradas"
                         maxlength="2"
                         placeholder="8"
-                        :class="inputClass(errores.horasVacias || errores.horasInvalidas)"
+                        :class="getInputClass(errores.horasVacias || errores.horasInvalidas)"
                     />
                     <p v-if="errores.horasVacias" class="text-sm text-red-500 mt-1">{{ errores.horasVacias }}</p>
                     <p v-if="errores.horasInvalidas && !errores.horasVacias" class="text-sm text-red-500 mt-1">{{ errores.horasInvalidas }}</p>
@@ -71,29 +71,27 @@ export default {
     },
     created() {
         const userStore = useUserStore();
-
         if (userStore.usuario && userStore.usuario.cedulaPersona) {
             this.cedulaPersona = userStore.usuario.cedulaPersona;
-
-            // Llamar al backend para obtener el guidEmpleado
-            axios.get(`https://localhost:7014/api/GetEmpleado/${this.cedulaPersona}`)
-                .then(response => {
-                    this.guidEmpleado = response.data.id;
-                })
-                .catch(error => {
-                    console.error("Error al obtener el empleado:", error);
-                    alert("No se pudo obtener el ID del empleado.");
-                });
+            this.getEmpleadoId();
         }
     },
     methods: {
-        inputClass(error) {
+        async getEmpleadoId() {
+            try {
+                const response = await axios.get(`https://localhost:7014/api/GetEmpleado/${this.cedulaPersona}`);
+                this.guidEmpleado = response.data.id;
+            } catch (error) {
+                alert("No se pudo obtener el ID del empleado.");
+            }
+        },
+        getInputClass(error) {
             return [
                 "w-full px-4 py-2 rounded border focus:outline-none focus:ring-2",
                 error ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300",
             ];
         },
-        async fechaValida(){
+        async fechaRepetida(){
             try {
             const response = await axios.get("https://localhost:7014/api/Horas", {
                 params: {
@@ -101,13 +99,15 @@ export default {
                     employeeId: this.guidEmpleado,
                 },
             });
-                return response.data; 
+                this.errores.diaRepetido = "";
+                if(!response.data){
+                    this.errores.diaRepetido = "El registro de horas para este día ya se realizó.";
+                }
             } catch (error) {
                 console.error("Error al validar la fecha:", error);
-                return false;
             }
         },
-        async registroValido(){
+        async horasValidas(){
             this.errores.horasVacias = this.horasRegistradas != null ? "" : "Las horas a registrar son obligatorias.";
             this.errores.horasInvalidas = "";
             const horas = Number(this.horasRegistradas);
@@ -119,45 +119,39 @@ export default {
             ) {
                 this.errores.horasInvalidas = "Las horas a registrar deben ser un número entre 1 y 24.";
             }
-
+        },
+        async fechaValida() {
             this.errores.diaInvalido = "";
             if (!this.diaRegistrado) {
                 this.errores.diaInvalido = "Debe seleccionar una fecha válida.";
-            } else {
-                const fechaSeleccionada = new Date(this.diaRegistrado);
-                if (
-                    isNaN(fechaSeleccionada.getTime()) ||
-                    this.diaRegistrado.length !== 10 // formato 'YYYY-MM-DD'
-                ) {
-                    this.errores.diaInvalido = "Debe seleccionar una fecha válida.";
-                }
+                return;
             }
-
-            if (!this.errores.diaInvalido && this.diaRegistrado) {
-                const hoy = new Date();
-                hoy.setHours(0,0,0,0);
-                const fechaSeleccionada = new Date(this.diaRegistrado);
-                if (fechaSeleccionada > hoy) {
-                    this.errores.diaInvalido = "No se puede registrar horas en una fecha futura.";
-                }
-                else{
-                    const fechaMinima = new Date("2000-01-01");
-                    if (fechaSeleccionada < fechaMinima) {
-                        this.errores.diaInvalido = "No se puede registrar horas en fechas anteriores al año 2000.";
-                    }
-                }
+            const fechaSeleccionada = new Date(this.diaRegistrado);
+            if (
+                isNaN(fechaSeleccionada.getTime()) ||
+                this.diaRegistrado.length !== 10
+            ) {
+                this.errores.diaInvalido = "Debe seleccionar una fecha válida.";
+                return;
             }
-
-            this.errores.diaRepetido = "";
-            let fechaEsValida = await this.fechaValida();
-            if(!fechaEsValida){
-                this.errores.diaRepetido = "El registro de horas para este día ya se realizó.";
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            if (fechaSeleccionada > hoy) {
+                this.errores.diaInvalido = "No se puede registrar horas en una fecha futura.";
+                return;
             }
-            let registroValido =  !(this.errores.horasVacias    ||
-                            this.errores.horasInvalidas ||
-                            this.errores.diaRepetido    ||
-                            this.errores.diaInvalido);
-            return registroValido;
+            const fechaMinima = new Date("2000-01-01");
+            if (fechaSeleccionada < fechaMinima) {
+                this.errores.diaInvalido = "No se puede registrar horas en fechas anteriores al año 2000.";
+                return;
+            }
+        },
+        async registroValido(){
+            this.fechaValida();
+            this.fechaRepetida();
+            this.horasValidas();
+            return !(this.errores.horasVacias || this.errores.horasInvalidas || 
+                     this.errores.diaRepetido || this.errores.diaInvalido);
         },
         async registroHoras() {
             if(await this.registroValido()){
@@ -167,13 +161,11 @@ export default {
                     IdEmpleado: this.guidEmpleado,
                     Estado: "NoRevisado",
                 };
-
                 try {
                     await axios.post(
                     "https://localhost:7014/api/Horas",
                     registroPayload
                     );
-                    
                     alert("Registro de horas realizado correctamente.");
                     this.$router.push("/home");
                 }
