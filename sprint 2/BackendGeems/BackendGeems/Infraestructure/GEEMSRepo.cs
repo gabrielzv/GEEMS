@@ -112,6 +112,65 @@ namespace BackendGeems.Infraestructure
             return salarioBruto;
         }
 
+        public List<Registro> ObtenerRegistros(Guid idEmpleado)
+        {
+            List<Registro> registros = new List<Registro>();
+
+            string query = @"SELECT Id, NumHoras, Fecha, Estado, IdEmpleado 
+                     FROM Registro 
+                     WHERE IdEmpleado = @IdEmpleado";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
+                DataTable tablaConsulta = CrearTablaConsulta(comando);
+
+                foreach (DataRow fila in tablaConsulta.Rows)
+                {
+                    Registro registro = new Registro
+                    {
+                        Id = fila["Id"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["Id"].ToString()),
+                        NumHoras = fila["NumHoras"] == DBNull.Value ? 0 : Convert.ToInt32(fila["NumHoras"]),
+                        Fecha = fila["Fecha"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(fila["Fecha"]),
+                        Estado = fila["Estado"]?.ToString(),
+                        IdEmpleado = fila["IdEmpleado"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["IdEmpleado"].ToString())
+                    };
+
+                    registros.Add(registro);
+                }
+            }
+            return registros;
+        }
+        public void InsertRegister(Registro inserting)
+        {
+            string query = @"INSERT INTO Registro (Id, NumHoras, Fecha, Estado, IdEmpleado)
+                     VALUES (@Id, @NumHoras, @Fecha, @Estado, @IdEmpleado)";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@Id", inserting.Id);
+                comando.Parameters.AddWithValue("@NumHoras", inserting.NumHoras);
+                comando.Parameters.AddWithValue("@Fecha", inserting.Fecha);
+                comando.Parameters.AddWithValue("@Estado", inserting.Estado ?? (object)DBNull.Value);
+                comando.Parameters.AddWithValue("@IdEmpleado", inserting.IdEmpleado);
+
+                try
+                {
+                    _conexion.Open();
+                    comando.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al insertar el registro: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+        }
+
 
 
     }
