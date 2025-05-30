@@ -20,7 +20,8 @@
                         v-model="diaRegistrado"
                         :class="inputClass(errores.diaInvalido || errores.diaRepetido)"
                     />
-                    <p v-if="errores.diaRepetido" class="text-sm text-red-500 mt-1">{{ errores.diaRepetido }}</p>
+                    <p v-if="errores.diaInvalido" class="text-sm text-red-500 mt-1">{{ errores.diaInvalido }}</p>
+                    <p v-if="errores.diaRepetido && !errores.diaInvalido" class="text-sm text-red-500 mt-1">{{ errores.diaRepetido }}</p>
                 </div>
                 <div>
                     <label for="nombre" class="block text-sm font-medium text-gray-700">
@@ -30,7 +31,7 @@
                         type="text"
                         id="nombre"
                         v-model="horasRegistradas"
-                        maxlength="1"
+                        maxlength="2"
                         placeholder="8"
                         :class="inputClass(errores.horasVacias || errores.horasInvalidas)"
                     />
@@ -64,6 +65,7 @@ export default {
                 horasVacias: "",
                 horasInvalidas: "",
                 diaRepetido: "",
+                diaInvalido: "",
             }
         };
     },
@@ -113,10 +115,39 @@ export default {
                 isNaN(horas) ||
                 !Number.isFinite(horas) ||
                 horas < 1 ||
-                horas > 8
+                horas > 24
             ) {
-                this.errores.horasInvalidas = "Las horas a registrar deben ser un número entre 1 y 8.";
+                this.errores.horasInvalidas = "Las horas a registrar deben ser un número entre 1 y 24.";
             }
+
+            this.errores.diaInvalido = "";
+            if (!this.diaRegistrado) {
+                this.errores.diaInvalido = "Debe seleccionar una fecha válida.";
+            } else {
+                const fechaSeleccionada = new Date(this.diaRegistrado);
+                if (
+                    isNaN(fechaSeleccionada.getTime()) ||
+                    this.diaRegistrado.length !== 10 // formato 'YYYY-MM-DD'
+                ) {
+                    this.errores.diaInvalido = "Debe seleccionar una fecha válida.";
+                }
+            }
+
+            if (!this.errores.diaInvalido && this.diaRegistrado) {
+                const hoy = new Date();
+                hoy.setHours(0,0,0,0);
+                const fechaSeleccionada = new Date(this.diaRegistrado);
+                if (fechaSeleccionada > hoy) {
+                    this.errores.diaInvalido = "No se puede registrar horas en una fecha futura.";
+                }
+                else{
+                    const fechaMinima = new Date("2000-01-01");
+                    if (fechaSeleccionada < fechaMinima) {
+                        this.errores.diaInvalido = "No se puede registrar horas en fechas anteriores al año 2000.";
+                    }
+                }
+            }
+
             this.errores.diaRepetido = "";
             let fechaEsValida = await this.fechaValida();
             if(!fechaEsValida){
@@ -124,7 +155,8 @@ export default {
             }
             let registroValido =  !(this.errores.horasVacias    ||
                             this.errores.horasInvalidas ||
-                            this.errores.diaRepetido);
+                            this.errores.diaRepetido    ||
+                            this.errores.diaInvalido);
             return registroValido;
         },
         async registroHoras() {
