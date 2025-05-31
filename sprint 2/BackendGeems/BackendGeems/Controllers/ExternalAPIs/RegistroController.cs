@@ -30,7 +30,7 @@ namespace BackendGeems.Controllers
                         nombre_key_header, 
                         valor_key_header 
                     FROM API_guardadas 
-                    WHERE nombre_api = 'Registro Nacional Blitz'";
+                    WHERE nombre_api = 'Registro Nacional'";
 
                 using SqlCommand cmd = new(query, conn);
                 using SqlDataReader reader = cmd.ExecuteReader();

@@ -30,7 +30,7 @@ namespace BackendGeems.Controllers
                         nombre_key_header, 
                         valor_key_header 
                     FROM API_guardadas 
-                    WHERE nombre_api = 'Poliza Friends Seguros'";
+                    WHERE nombre_api = 'Poliza Seguros'";
 
                 using SqlCommand cmd = new(query, conn);
                 using SqlDataReader reader = cmd.ExecuteReader();
