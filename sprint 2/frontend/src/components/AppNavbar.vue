@@ -80,11 +80,15 @@
         </div>
 
         <router-link
-          to="/anadirEmpleado"
+          :to="{
+            path: '/anadirEmpleado',
+            query: { duenoCedula: user?.cedulaPersona }
+          }"
           class="hover:text-blue-600 text-blue-600"
           active-class="text-blue-600 font-medium"
-          >Añadir empleado</router-link
         >
+          Añadir empleado
+        </router-link>
       </template>
 
       <!-- Opciones para Empleado -->

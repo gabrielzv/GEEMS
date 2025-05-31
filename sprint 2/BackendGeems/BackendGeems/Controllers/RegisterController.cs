@@ -49,7 +49,7 @@ namespace BackendGeems.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error al registrar la persona: " + ex.Message });
+                return StatusCode(500, new { message = "Error al registrar la persona", error = ex.ToString() });
             }
         }
 
@@ -132,6 +132,7 @@ namespace BackendGeems.Controllers
                 return BadRequest(new { message = "El objeto Empleado es nulo." });
             }
             string connectionString = _configuration.GetConnectionString("DefaultConnection");
+
 
             try
             {

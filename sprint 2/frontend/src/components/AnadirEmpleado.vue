@@ -322,11 +322,6 @@ function validateFields() {
     valid = false;
   }
 
-  if (!nombreEmpresa.value) {
-    nombreEmpresaError.value = "Nombre de la empresa es obligatorio.";
-    valid = false;
-  }
-
   // Validaciones para radio buttons
   if (!genero.value) {
     generoError.value = "Seleccione un género.";
@@ -347,12 +342,15 @@ function validateFields() {
 }
   // Función para obtener el nombre de la empresa
 async function fetchNombreEmpresa(cedulaPersona) {
+  console.log("Se entra al fetchNombreEmoresa");
   try {
     const response = await axios.get(`https://localhost:7014/api/GetDuenoEmpresa/${cedulaPersona}`);
     if (response.data && response.data.nombreEmpresa) {
       nombreEmpresa.value = response.data.nombreEmpresa;
+      console.log("Se retorna el nombre de la empresa");
       return response.data.nombreEmpresa; // Retornamos el nombre para usarlo después
     }
+    console.log("Se retorna el nombre de la empresa como nulo");
     return null;
   } catch (error) {
     console.error("Error al obtener nombre de empresa:", error);
@@ -365,11 +363,14 @@ onMounted(async () => {
   if (duenoCedula.value) {
     await fetchNombreEmpresa(duenoCedula.value);
   }
+  else{
+    console.log("No se tiene cedula para el dueno");
+  }
 });
 // Función para registrar empleado
 async function registrarEmpleado() {
   isSubmitting.value = true;
-  
+
   if (!validateFields()) {
     isSubmitting.value = false;
     return;
@@ -382,13 +383,13 @@ async function registrarEmpleado() {
   try {
     console.log("Enviando datos de Persona:");
     const requestPersona = {
-      cedula: parseInt(cedula.value, 10),
-      direccion: direccion.value.trim(),
-      nombrePila: nombre.value.trim(),
-      apellido1: apellido1.value.trim(),
-      apellido2: apellido2.value.trim(),
-      correo: correo.value.trim(),
-      telefono: telefono.value.trim(),
+      Cedula: parseInt(cedula.value, 10),
+      Direccion: direccion.value.trim(),
+      NombrePila: nombre.value.trim(),
+      Apellido1: apellido1.value.trim(),
+      Apellido2: apellido2.value.trim(),
+      Correo: correo.value.trim(),
+      Telefono: telefono.value.trim(),
     };
     
     console.log("Request Persona:", requestPersona);
@@ -409,18 +410,18 @@ async function registrarEmpleado() {
     console.log("Request Usuario:", requestUsuario);
     const responseUsuario = await axios.post("https://localhost:7014/api/Register/usuario", requestUsuario);
     console.log("Respuesta de Usuario:", responseUsuario.data);
-
+    console.log("Se tiene el nombre de empresa en: ", nombreEmpresa.value);
     const requestEmpleado = {
-      id: uniqueId,
-      cedulaPersona: cedula.value,
-      contrato: contrato.value,
-      numHorasTrabajadas: 0,
-      genero: genero.value,
-      estadoLaboral: "Activo",
-      salarioBruto: salarioBruto.value,
-      tipo: rol.value,
-      fechaIngreso: fechaIngreso,
-      nombreEmpresa: nombreEmpresa.value,
+      Id: uniqueId,
+      CedulaPersona: cedula.value,
+      Contrato: contrato.value,
+      NumHorasTrabajadas: 0,
+      Genero: genero.value,
+      EstadoLaboral: "Activo",
+      SalarioBruto: salarioBruto.value,
+      Tipo: rol.value,
+      FechaIngreso: fechaIngreso,
+      NombreEmpresa: nombreEmpresa.value,
     };
     console.log("Request Empleado:", requestEmpleado);
     const responseEmpleado = await axios.post("https://localhost:7014/api/Register/empleado", requestEmpleado);
