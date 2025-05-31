@@ -27,5 +27,7 @@ namespace BackendGeems.Application
             inserting.Id = Guid.NewGuid();
             _repoInfrastructure.InsertRegister(inserting);
         }
+
+
     }
 }

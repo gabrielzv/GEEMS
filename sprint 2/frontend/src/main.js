@@ -19,6 +19,7 @@ import MatricularBeneficio from "./components/MatricularBeneficio.vue";
 import EmployeeBenefits from "./components/EmployeeBenefits.vue";
 import AuthenticatedLayout from "./layouts/AuthenticatedLayout.vue";
 import RegistroHoras from "./components/RegistroHoras.vue";
+import EmployeeRegHistory from "./components/EmployeeRegHistory.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -49,6 +50,7 @@ const router = createRouter({
         { path: "/employeeBenefits", name: "EmployeeBenefits", component: EmployeeBenefits },
         { path: '/anadirEmpleado', name: 'anadirEmpleado', component: AnadirEmpleado, meta: { requiresAuth: true }},
         { path: '/registrarHoras', name: 'registrarHoras', component: RegistroHoras, meta: {requiresAuth: true}},
+        { path: '/employeeRegHistory', name: 'employeeRegHistory', component: EmployeeRegHistory, meta: {requiresAuth: true} },
       ]
     }
   ],
