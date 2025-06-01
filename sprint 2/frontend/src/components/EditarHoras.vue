@@ -88,37 +88,26 @@ export default {
             await this.getEmpleadoId();
         }
         this.registroAnterior.Id = this.$route.params.registroId;
-        console.log("Se tiene el Id del registro anterior en: ", this.registroAnterior.Id);
         await this.getRegistroAnterior();
     },
     computed: {
         fechaAnteriorFormateada() {
             if (this.registroAnterior.Fecha) {
-                // Extrae solo la parte de la fecha (YYYY-MM-DD)
                 const [year, month, day] = this.registroAnterior.Fecha.split('T')[0].split('-');
                 return `${day}-${month}-${year}`;
             }
             return '';
-        },
-        estadoAnteriorFormateado() {
-            if (this.registroAnterior.Estado === "NoRevisado") {
-                return "No Revisado";
-            }
-            return this.registroAnterior.Estado || '';
         }
     },
     methods: {
         async getRegistroAnterior() {
             try {
-                console.log("Id anterior registro: ", this.registroAnterior.Id);
                 const response = await axios.get("https://localhost:7014/api/Horas/Register", {
                     params: {
                         Id: this.registroAnterior.Id,
                     },
                 });
-                console.log("Respuesta completa del backend:", response);
 
-                // Si no se encontró el registro
                 if (!response.data || Object.keys(response.data).length === 0) {
                     alert("No se encontró este registro.");
                     this.$router.push("/home");
@@ -130,7 +119,6 @@ export default {
                 this.registroAnterior.Estado = response.data.estado;
                 this.registroAnterior.IdEmpleado = response.data.idEmpleado;
 
-                // Si el IdEmpleado no coincide con el guidEmpleado actual
                 if (this.registroAnterior.IdEmpleado !== this.guidEmpleado) {
                     alert("No puede editar este registro porque no le pertenece.");
                     this.$router.push("/home");
@@ -170,7 +158,7 @@ export default {
                     this.errores.diaRepetido = "El registro de horas para este día ya se realizó.";
                 }
             } catch (error) {
-                console.error("Error al validar la fecha:", error);
+                alert("Error al validar la fecha:", error);
             }
         },
         async horasValidas(){
@@ -228,10 +216,10 @@ export default {
                     Estado: "NoRevisado",
                 };
                 try {
+                    console.log("SE ENVIA AL BACKEND EL GUID OLD ID: "+this.registroAnterior.Id);
                     await axios.post(
-                    "https://localhost:7014/api/Horas/Editar",
-                    registroPayload,
-                    this.registroAnterior.Id,
+                        `https://localhost:7014/api/Horas/Editar?oldId=${this.registroAnterior.Id}`,
+                        registroPayload
                     );
                     alert("Edición de horas realizada correctamente.");
                     this.$router.push("/home");

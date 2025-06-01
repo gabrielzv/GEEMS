@@ -31,25 +31,12 @@ namespace BackendGeems.API
         public Registro GetRegister(Guid id)
         {
             var registro = _queryHoras.GetRegister(id);
-            // Imprime el objeto registro antes de retornarlo
-            Console.WriteLine("Registro retornado por el API:");
-            if (registro != null)
-            {
-                Console.WriteLine($"Id: {registro.Id}");
-                Console.WriteLine($"NumHoras: {registro.NumHoras}");
-                Console.WriteLine($"Fecha: {registro.Fecha}");
-                Console.WriteLine($"Estado: {registro.Estado}");
-                Console.WriteLine($"IdEmpleado: {registro.IdEmpleado}");
-            }
-            else
-            {
-                Console.WriteLine("registro es null");
-            }
             return registro;
         }
         [HttpPost("Editar")]
         public void EditRegister([FromBody] Registro editing, Guid oldId)
         {
+            Console.WriteLine("Se entra a EditRegister");
             _queryHoras.EditRegister(editing, oldId);
         }
     }

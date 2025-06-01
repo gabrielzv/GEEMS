@@ -205,6 +205,13 @@ namespace BackendGeems.Infraestructure
         }
         public void EditRegister(Registro editing, Guid oldId)
         {
+            Console.WriteLine("Se entra a EditRegister");
+            Console.WriteLine(editing.NumHoras);
+            Console.WriteLine(editing.Fecha);
+            Console.WriteLine(editing.Estado);
+            Console.WriteLine(editing.IdEmpleado);
+            Console.WriteLine(oldId);
+
             string query = @"UPDATE Registro
                      SET NumHoras = @NumHoras,
                          Fecha = @Fecha,
