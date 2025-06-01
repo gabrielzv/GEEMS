@@ -149,6 +149,11 @@ namespace BackendGeems.Infraestructure
 
             using (SqlCommand comando = new SqlCommand(query, _conexion))
             {
+                comando.Parameters.AddWithValue("@Id", inserting.Id);
+                comando.Parameters.AddWithValue("@NumHoras", inserting.NumHoras);
+                comando.Parameters.AddWithValue("@Fecha", inserting.Fecha);
+                comando.Parameters.AddWithValue("@Estado", inserting.Estado ?? (object)DBNull.Value);
+                comando.Parameters.AddWithValue("@IdEmpleado", inserting.IdEmpleado);
 
                 try
                 {
