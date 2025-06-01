@@ -80,11 +80,15 @@
         </div>
 
         <router-link
-          to="/anadirEmpleado"
+          :to="{
+            path: '/anadirEmpleado',
+            query: { duenoCedula: user?.cedulaPersona }
+          }"
           class="hover:text-blue-600 text-blue-600"
           active-class="text-blue-600 font-medium"
-          >Añadir empleado</router-link
         >
+          Añadir empleado
+        </router-link>
       </template>
 
       <!-- Opciones para Empleado -->
@@ -118,7 +122,7 @@
               >Registrar horas</router-link
             >
             <router-link
-              to="/historialRegistros"
+              to="/employeeRegHistory"
               class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
               active-class="text-blue-600 font-medium"
               >Historial</router-link
