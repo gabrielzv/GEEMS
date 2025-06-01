@@ -89,8 +89,7 @@ export default {
       return d.toLocaleDateString();
     },
     editarRegistro(registro) {
-    // Aquí puedes abrir un modal, navegar a otra vista, etc.
-    alert(`Editar registro con ID: ${registro.id}`);
+      this.$router.push({ path: `/editarHoras/${registro.id}` });
     }
   },
 };

@@ -26,7 +26,7 @@
                         :class="getInputClass(errores.diaInvalido || errores.diaRepetido)"
                     />
                     <p v-if="errores.diaInvalido" class="text-sm text-red-500 mt-1">{{ errores.diaInvalido }}</p>
-                    <p v-if="errores.diaRepetido && !errores.diaInvalido" class="text-sm text-red-500 mt-1">{{ errores.diaRepetido }}</p>
+                    <p v-if="errores.diaRepetido" class="text-sm text-red-500 mt-1">{{ errores.diaRepetido }}</p>
                 </div>
                 <div>
                     <label for="nombre" class="block text-sm font-medium text-gray-700">
@@ -124,6 +124,12 @@ export default {
                     this.$router.push("/home");
                     return;
                 }
+
+                if(!(this.registroAnterior.Estado === "NoRevisado")){
+                    alert("No puede editar este registro ya que fue "+this.registroAnterior.Estado+".");
+                    this.$router.push("/home");
+                    return;
+                }
             } catch {
                 alert("No se pudieron obtener los datos anteriores del registro.");
                 this.$router.push("/home");
@@ -143,7 +149,7 @@ export default {
                 error ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300",
             ];
         },
-        async fechaRepetida(){
+        async fechaRepetida() {
             try {
                 const response = await axios.get("https://localhost:7014/api/Horas", {
                     params: {
@@ -152,9 +158,11 @@ export default {
                     },
                 });
                 this.errores.diaRepetido = "";
-                const fechaSeleccionada = new Date(this.diaRegistrado);
-                const fechaSeleccionadaAnterior = new Date(this.registroAnterior.Fecha)
-                if(!response.data && fechaSeleccionada != fechaSeleccionadaAnterior){
+
+                const fechaSeleccionada = this.diaRegistrado;
+                const fechaAnterior = this.registroAnterior.Fecha ? this.registroAnterior.Fecha.split('T')[0] : null;
+                // Si la fecha YA existe (response.data === false) y NO es la misma que la anterior, marca error
+                if (response.data === false && fechaSeleccionada !== fechaAnterior) {
                     this.errores.diaRepetido = "El registro de horas para este día ya se realizó.";
                 }
             } catch (error) {
@@ -201,11 +209,11 @@ export default {
             }
         },
         async registroValido(){
-            this.fechaValida();
-            this.fechaRepetida();
-            this.horasValidas();
+            await this.fechaValida();
+            await this.fechaRepetida();
+            await this.horasValidas();
             return !(this.errores.horasVacias || this.errores.horasInvalidas || 
-                     this.errores.diaRepetido || this.errores.diaInvalido);
+                    this.errores.diaRepetido || this.errores.diaInvalido);
         },
         async editarHoras() {
             if(await this.registroValido()){
@@ -216,7 +224,6 @@ export default {
                     Estado: "NoRevisado",
                 };
                 try {
-                    console.log("SE ENVIA AL BACKEND EL GUID OLD ID: "+this.registroAnterior.Id);
                     await axios.post(
                         `https://localhost:7014/api/Horas/Editar?oldId=${this.registroAnterior.Id}`,
                         registroPayload
