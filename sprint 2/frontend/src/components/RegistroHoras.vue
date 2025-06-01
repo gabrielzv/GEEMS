@@ -100,7 +100,7 @@ export default {
                 },
             });
                 this.errores.diaRepetido = "";
-                if(!response.data){
+                if(response.data == false){
                     this.errores.diaRepetido = "El registro de horas para este día ya se realizó.";
                 }
             } catch (error) {
@@ -147,11 +147,11 @@ export default {
             }
         },
         async registroValido(){
-            this.fechaValida();
-            this.fechaRepetida();
-            this.horasValidas();
+            await this.fechaValida();
+            await this.fechaRepetida();
+            await this.horasValidas();
             return !(this.errores.horasVacias || this.errores.horasInvalidas || 
-                     this.errores.diaRepetido || this.errores.diaInvalido);
+                    this.errores.diaRepetido || this.errores.diaInvalido);
         },
         async registroHoras() {
             if(await this.registroValido()){

@@ -40,7 +40,6 @@ namespace BackendGeems.API
         [HttpPost("Editar")]
         public void EditRegister([FromBody] Registro editing, Guid oldId)
         {
-            Console.WriteLine("Se entra a EditRegister");
             _queryHoras.EditRegister(editing, oldId);
         }
         // GET: api/Horas/getRegister/{IdEmpleado}

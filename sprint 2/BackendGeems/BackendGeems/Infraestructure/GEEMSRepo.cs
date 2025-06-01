@@ -149,11 +149,6 @@ namespace BackendGeems.Infraestructure
 
             using (SqlCommand comando = new SqlCommand(query, _conexion))
             {
-                comando.Parameters.AddWithValue("@Id", inserting.Id);
-                comando.Parameters.AddWithValue("@NumHoras", inserting.NumHoras);
-                comando.Parameters.AddWithValue("@Fecha", inserting.Fecha);
-                comando.Parameters.AddWithValue("@Estado", inserting.Estado ?? (object)DBNull.Value);
-                comando.Parameters.AddWithValue("@IdEmpleado", inserting.IdEmpleado);
 
                 try
                 {
@@ -205,12 +200,6 @@ namespace BackendGeems.Infraestructure
         }
         public void EditRegister(Registro editing, Guid oldId)
         {
-            Console.WriteLine("Se entra a EditRegister");
-            Console.WriteLine(editing.NumHoras);
-            Console.WriteLine(editing.Fecha);
-            Console.WriteLine(editing.Estado);
-            Console.WriteLine(editing.IdEmpleado);
-            Console.WriteLine(oldId);
 
             string query = @"UPDATE Registro
                      SET NumHoras = @NumHoras,
