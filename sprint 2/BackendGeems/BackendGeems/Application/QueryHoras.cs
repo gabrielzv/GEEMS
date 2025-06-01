@@ -27,5 +27,13 @@ namespace BackendGeems.Application
             inserting.Id = Guid.NewGuid();
             _repoInfrastructure.InsertRegister(inserting);
         }
+        public Registro GetRegister(Guid Id)
+        {
+            return _repoInfrastructure.GetRegister(Id);
+        }
+        public void EditRegister(Registro editing, Guid oldId)
+        {
+            _repoInfrastructure.EditRegister(editing, oldId);
+        }
     }
 }
