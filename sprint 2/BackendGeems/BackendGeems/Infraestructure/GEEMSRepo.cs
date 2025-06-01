@@ -170,10 +170,77 @@ namespace BackendGeems.Infraestructure
                 }
             }
         }
+        public Registro GetRegister(Guid id)
+        {
+            Registro registro = null;
 
+            Console.WriteLine("Se recibe en GetRegister el Guid " + id);
 
+            string query = @"SELECT Id, NumHoras, Fecha, Estado, IdEmpleado 
+                     FROM Registro 
+                     WHERE Id = @Id";
 
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@Id", id);
 
+                DataTable tablaConsulta = CrearTablaConsulta(comando);
 
+                if (tablaConsulta.Rows.Count > 0)
+                {
+                    DataRow fila = tablaConsulta.Rows[0];
+
+                    registro = new Registro
+                    {
+                        Id = fila["Id"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["Id"].ToString()),
+                        NumHoras = fila["NumHoras"] == DBNull.Value ? 0 : Convert.ToInt32(fila["NumHoras"]),
+                        Fecha = fila["Fecha"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(fila["Fecha"]),
+                        Estado = fila["Estado"]?.ToString(),
+                        IdEmpleado = fila["IdEmpleado"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["IdEmpleado"].ToString())
+                    };
+                }
+            }
+
+            return registro;
+        }
+        public void EditRegister(Registro editing, Guid oldId)
+        {
+            Console.WriteLine("Se entra a EditRegister");
+            Console.WriteLine(editing.NumHoras);
+            Console.WriteLine(editing.Fecha);
+            Console.WriteLine(editing.Estado);
+            Console.WriteLine(editing.IdEmpleado);
+            Console.WriteLine(oldId);
+
+            string query = @"UPDATE Registro
+                     SET NumHoras = @NumHoras,
+                         Fecha = @Fecha,
+                         Estado = @Estado,
+                         IdEmpleado = @IdEmpleado
+                     WHERE Id = @OldId";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@NumHoras", editing.NumHoras);
+                comando.Parameters.AddWithValue("@Fecha", editing.Fecha);
+                comando.Parameters.AddWithValue("@Estado", editing.Estado ?? (object)DBNull.Value);
+                comando.Parameters.AddWithValue("@IdEmpleado", editing.IdEmpleado);
+                comando.Parameters.AddWithValue("@OldId", oldId);
+
+                try
+                {
+                    _conexion.Open();
+                    comando.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al editar el registro: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+        }
     }
 }

@@ -8,5 +8,7 @@ namespace BackendGeems.Application
         int ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal);
         List<Registro> ObtenerRegistros(Guid idEmpleado);
         void InsertRegister(Registro registro);
+        Registro GetRegister(Guid Id);
+        void EditRegister(Registro editing, Guid oldId);
     }
 }

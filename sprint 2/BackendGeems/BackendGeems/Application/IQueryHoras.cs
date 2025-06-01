@@ -5,5 +5,7 @@ namespace BackendGeems.Application
     {
         bool ValidDate(DateTime date, Guid employeeId);
         void InsertRegister(Registro inserting);
+        Registro GetRegister(Guid Id);
+        void EditRegister(Registro editing, Guid oldId);
     }
 }

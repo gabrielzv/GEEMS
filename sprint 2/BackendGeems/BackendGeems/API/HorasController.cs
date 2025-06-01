@@ -31,7 +31,18 @@ namespace BackendGeems.API
         {
             _queryHoras.InsertRegister(inserting);
         }
-
+        [HttpGet("Register")]
+        public Registro GetRegister(Guid id)
+        {
+            var registro = _queryHoras.GetRegister(id);
+            return registro;
+        }
+        [HttpPost("Editar")]
+        public void EditRegister([FromBody] Registro editing, Guid oldId)
+        {
+            Console.WriteLine("Se entra a EditRegister");
+            _queryHoras.EditRegister(editing, oldId);
+        }
         // GET: api/Horas/getRegister/{IdEmpleado}
         [HttpGet("getRegister/{IdEmpleado}")]
         public ActionResult<List<Registro>> GetRegisterByEmpleado(Guid IdEmpleado)
