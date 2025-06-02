@@ -1,10 +1,10 @@
 <template>
   <header
     class="bg-header shadow flex justify-between items-center px-6 py-4"
-    style="background-color: #fbf7ec"
+    style="background-color: #ffffff"
   >
     <router-link to="/home">
-      <img src="@/assets/GEEMSLogo.jpg" class="h-20 w-auto" alt="GEEMS Logo" />
+      <img src="@/assets/GEEMSLogo.png" class="h-20 w-auto" alt="GEEMS Logo" />
     </router-link>
 
     <!-- Navegación principal -->
@@ -44,7 +44,7 @@
       <template v-else-if="user?.tipo === 'DuenoEmpresa'">
         <!-- Dropdown para DueñoEmpresa (Empresa) -->
         <div class="relative group">
-          <button class="hover:text-blue-600 text-blue-600 flex items-center">
+          <button class="text-blue-600 flex items-center bg-transparent border-none shadow-none p-0 m-0 focus:outline-none">
             Empresa
             <svg
               class="w-4 h-4 ml-1"
@@ -61,8 +61,8 @@
             </svg>
           </button>
           <div
-            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10"
-            style="background-color: #fbf7ec"
+            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10 border border-black"
+            style="background-color: #ffffff"
           >
             <router-link
               to="/editarEmpresa"
@@ -95,7 +95,7 @@
       <template v-else-if="user?.tipo === 'Empleado'">
         <!-- Dropdowns para Empleado (Registros y Beneficios) -->
         <div class="relative group">
-          <button class="hover:text-blue-600 text-blue-600 flex items-center">
+          <button class="text-blue-600 flex items-center bg-transparent border-none shadow-none p-0 m-0 focus:outline-none">
             Registros
             <svg
               class="w-4 h-4 ml-1"
@@ -112,8 +112,8 @@
             </svg>
           </button>
           <div
-            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10"
-            style="background-color: #fbf7ec"
+            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10 border border-black"
+            style="background-color: #ffffff"
           >
             <router-link
               to="/registrarHoras"
@@ -130,7 +130,7 @@
           </div>
         </div>
         <div class="relative group">
-          <button class="hover:text-blue-600 text-blue-600 flex items-center">
+          <button class="text-blue-600 flex items-center bg-transparent border-none shadow-none p-0 m-0 focus:outline-none">
             Beneficios
             <svg
               class="w-4 h-4 ml-1"
@@ -147,8 +147,8 @@
             </svg>
           </button>
           <div
-            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10"
-            style="background-color: #fbf7ec"
+            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10 border border-black"
+            style="background-color: #ffffff"
           >
             <router-link
               to="/matricularBeneficio"
