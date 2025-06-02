@@ -56,6 +56,11 @@
           <p class="text-gray-700 mb-4">
             {{ empresa?.correo || "Dato no disponible" }}
           </p>
+
+          <p class="text-lg font-bold text-gray-800">Modalidad de pago:</p>
+          <p class="text-gray-700 mb-4">
+            {{ empresa?.modalidadPago || "Dato no disponible" }}
+          </p>
         </div>
       </div>
 
