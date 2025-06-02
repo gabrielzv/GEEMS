@@ -1,34 +1,71 @@
 <template>
-  <div class="flex justify-center items-center min-h-screen bg-gray-100">
-    <div class="bg-white shadow rounded p-6 max-w-md w-full">
-      <h1 class="text-2xl font-bold mb-4 text-center">
-        Beneficios matriculados:
-      </h1>
+  <div class="container mx-auto px-4 py-8 max-w-[1200px]">
+    <!-- Encabezado -->
+    <div class="flex justify-between items-center mb-8 border-b pb-4">
+      <h1 class="text-2xl font-bold">Beneficios matriculados</h1>
+    </div>
 
-      <!-- Mensaje de error -->
-      <p v-if="error" class="text-red-500 mt-4 text-center">{{ error }}</p>
-
-      <!-- Lista de beneficios -->
-      <div v-if="beneficios.length" class="mt-6">
-        <ul class="space-y-4">
-          <li
+    <!-- Tabla -->
+    <div
+      v-if="beneficios.length"
+      class="bg-white rounded-lg shadow overflow-hidden"
+    >
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Nombre
+            </th>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Descripción
+            </th>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Costo
+            </th>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Frecuencia de cobro
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200 text-center">
+          <tr
             v-for="beneficio in beneficios"
             :key="beneficio.id"
-            class="p-4 border rounded shadow"
+            class="hover:bg-gray-50 transition"
           >
-            <p><strong>Nombre:</strong> {{ beneficio.nombre }}</p>
-            <p><strong>Descripción:</strong> {{ beneficio.descripcion }}</p>
-            <p><strong>Costo:</strong> ₡{{ beneficio.costo }}</p>
-            <!-- ATRIBUTOS POR AGREGAR A LA BASE DE DATOS EN BENEFICIO -->
-            <!--<p><strong>Frecuencia de pago:</strong> {{ beneficio.frecuencia }}</p>
-            <p><strong>Estado:</strong> {{ beneficio.estado }}</p> -->
-          </li>
-        </ul>
-      </div>
+            <td class="px-6 py-4 text-sm text-gray-900">
+              {{ beneficio.nombre }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              {{ beneficio.descripcion }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              {{ beneficio.costo }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              {{ beneficio.frecuencia }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Mensaje si no hay beneficios matriculados -->
-      <p v-else class="text-center text-gray-500 mt-4">
-        No se han matriculado beneficios.
+    <!-- Mensaje si no hay beneficios matriculados -->
+    <div v-else class="text-center text-red-500 mt-4">
+      Todavía no se han matriculado beneficios.
+      <br />
+      <br />
+      <p class="text-gray-500">
+        Puedes matricular beneficios desde la sección de "Beneficios" en la
+        barra superior de navegación, en la opción "Matricular Beneficios".
       </p>
     </div>
   </div>
