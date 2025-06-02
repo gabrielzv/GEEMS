@@ -33,7 +33,8 @@ public class EmpresaController : ControllerBase
                     e.Canton,
                     e.Distrito,
                     e.Senas,
-                    e.Correo
+                    e.Correo,
+                    e.ModalidadPago
                 FROM Persona p
                 JOIN DuenoEmpresa d ON p.Cedula = d.CedulaPersona
                 JOIN Empresa e ON d.CedulaEmpresa = e.CedulaJuridica
@@ -57,7 +58,8 @@ public class EmpresaController : ControllerBase
                 canton = readerEmpresa["Canton"],
                 distrito = readerEmpresa["Distrito"],
                 senas = readerEmpresa["Senas"],
-                correo = readerEmpresa["Correo"]
+                correo = readerEmpresa["Correo"],
+                modalidadPago = readerEmpresa["ModalidadPago"]
             };
 
             string nombreEmpresa = empresa.nombre;
@@ -122,7 +124,8 @@ public class EmpresaController : ControllerBase
                 e.Canton,
                 e.Distrito,
                 e.Senas,
-                e.Correo
+                e.Correo,
+                e.ModalidadPago
             FROM Empresa e
             WHERE e.CedulaJuridica = @CedulaJuridica;";
 
@@ -143,7 +146,8 @@ public class EmpresaController : ControllerBase
                 canton = readerEmpresa["Canton"],
                 distrito = readerEmpresa["Distrito"],
                 senas = readerEmpresa["Senas"],
-                correo = readerEmpresa["Correo"]
+                correo = readerEmpresa["Correo"],
+                modalidadPago = readerEmpresa["ModalidadPago"]
             };
 
             string nombreEmpresa = empresa.nombre;
