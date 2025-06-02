@@ -126,6 +126,7 @@ export default {
 
         if (userStore.empleado && userStore.empleado.nombreEmpresa) {
           const nombreEmpresa = userStore.empleado.nombreEmpresa;
+          const idEmpleado = userStore.empleado.id;
 
           // Se obtiene la cédula jurídica de la empresa usando el nombre
           const cedulaResponse = await axios.get(
@@ -133,14 +134,13 @@ export default {
           );
           const cedulaJuridica = cedulaResponse.data.cedulaJuridica;
 
-          // Se hace el get para obtener los beneficios creados de la empresa
+          // Se hace el get para obtener los beneficios filtrados según el contrato del empleado
           const beneficiosResponse = await axios.get(
-            `https://localhost:7014/api/GetCompanyBenefits/${cedulaJuridica}`
+            `https://localhost:7014/api/GetCompanyBenefits/BenefitsEmployeeContract/${cedulaJuridica}/${idEmpleado}`
           );
           beneficios.value = beneficiosResponse.data;
 
           // Se hace el get para obtener los beneficios matriculados por empleado
-          const idEmpleado = userStore.empleado.id;
           const beneficiosPorEmpleadoResponse = await axios.get(
             `https://localhost:7014/api/GetEmployeeBenefits/${idEmpleado}`
           );
