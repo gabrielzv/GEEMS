@@ -50,7 +50,7 @@ INSERT INTO DatosPrivadosEmpresa VALUES
 ('1-555-9876543', 'Trimestral', 2);
 
 -- Beneficio
-INSERT INTO Beneficio VALUES (@uid4, 10000, 6, 'Membresía en gimnasio premium', 'Gimnasio Premium', '3-101-1234567');
+INSERT INTO Beneficio VALUES (@uid4, 10000, 6, 'Membresía en gimnasio premium', 'Gimnasio Premium', '3-101-1234567', 'Mensual');
 
 -- Elegibilidad del beneficio
 INSERT INTO BeneficioContratoElegible VALUES (@uid4, 'Tiempo Completo');
@@ -93,6 +93,3 @@ INSERT INTO Registro VALUES (@uid8, 160, '2025-04-20', 'Aprobado', @uid3);
 -- INSERT INTO Registro VALUES (NEWID(), 160, '2025-04-20', 'Aprobado', @uid23);
 -- INSERT INTO Registro VALUES (NEWID(), 80, '2025-04-20', 'Aprobado', @uid23);
 -- INSERT INTO Registro VALUES (NEWID(), 80, '2025-04-20', 'NoRevisado', @uid23);
-
-SELECT * FROM Usuario
-
