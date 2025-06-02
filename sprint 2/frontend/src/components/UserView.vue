@@ -45,6 +45,17 @@
         >
           Editar perfil
         </router-link>
+        <!-- <button> -->
+        <router-link
+          v-if="
+            userView.role !== 'DuenoEmpresa' && userView.role !== 'SuperAdmin'
+          "
+          to="/employeeBenefits"
+          class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 text-center"
+        >
+          Mis beneficios
+        </router-link>
+        <!-- </button> -->
       </div>
     </div>
   </div>

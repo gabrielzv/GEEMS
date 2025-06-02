@@ -6,6 +6,8 @@ namespace BackendGeems.Domain
         public required string Descripcion { get; set; }
         public int Costo { get; set; }
         public int TiempoMinimo { get; set; }
+        public required string Frecuencia { get; set; }
         public required string CedulaJuridica { get; set; }
+        public List<string>? ContratosElegibles { get; set; }
     }
 }

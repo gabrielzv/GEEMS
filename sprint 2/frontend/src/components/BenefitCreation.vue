@@ -13,8 +13,14 @@
           v-model="form.nombre"
           type="text"
           placeholder="Ej: Gimnasio de la empresa"
-          class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          @blur="validateNombre"
+          @input="validateNombre"
+          :class="inputClass(nombreError)"
+          maxlength="32"
         />
+        <p v-if="nombreError" class="text-sm text-red-500 mt-1">
+          {{ nombreError }}
+        </p>
       </div>
       <!-- Descripción -->
       <div>
@@ -25,26 +31,15 @@
           v-model="form.descripcion"
           rows="2"
           placeholder="Ej: Este beneficio incluye acceso a un gimnasio local, clases de yoga y pilates."
-          class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          @blur="validateDescripcion"
+          @input="validateDescripcion"
+          :class="inputClass(descripcionError)"
+          maxlength="200"
         ></textarea>
+        <p v-if="descripcionError" class="text-sm text-red-500 mt-1">
+          {{ descripcionError }}
+        </p>
       </div>
-      <!-- Tipo de Beneficio -->
-      <!-- <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1"
-          >Tipo de Beneficio</label
-        >
-        <select
-          v-model="form.tipoBeneficio"
-          class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <option disabled value="">Selecciona una opción</option>
-          <option value="Salud">Salud</option>
-          <option value="Financiero">Financiero</option>
-          <option value="Nutricional">Nutricional</option>
-          <option value="Maternidad/Paternidad">Maternidad/Paternidad</option>
-          <option value="Legal">Legal</option>
-        </select>
-      </div> -->
       <!-- Costo -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -55,40 +50,13 @@
           type="number"
           min="0"
           placeholder="Ej: 12000"
-          class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          @blur="validateCosto"
+          :class="inputClass(costoError)"
         />
+        <p v-if="costoError" class="text-sm text-red-500 mt-1">
+          {{ costoError }}
+        </p>
       </div>
-      <!-- Tipo de Empleado Elegible -->
-      <!-- <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2"
-          >Tipo de Empleado Elegible</label
-        >
-        <ul
-          class="w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg"
-        >
-          <li
-            v-for="tipo in tiposDeEmpleado"
-            :key="tipo"
-            class="w-full border-b border-gray-200 last:border-b-0"
-          >
-            <div class="flex items-center ps-3">
-              <input
-                :id="'checkbox-' + tipo"
-                type="checkbox"
-                :value="tipo"
-                v-model="form.tipoEmpleado"
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 focus:ring-2"
-              />
-              <label
-                :for="'checkbox-' + tipo"
-                class="w-full py-3 ms-2 text-sm font-medium text-gray-900"
-              >
-                {{ tipo }}
-              </label>
-            </div>
-          </li>
-        </ul>
-      </div> -->
       <!-- Tiempo Mínimo en Empresa -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -99,34 +67,142 @@
           type="number"
           min="0"
           placeholder="Ej: 6"
-          class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          @blur="validateTiempoMinimo"
+          :class="inputClass(tiempoMinimoError)"
         />
+        <p v-if="tiempoMinimoError" class="text-sm text-red-500 mt-1">
+          {{ tiempoMinimoError }}
+        </p>
       </div>
-      <!-- Cédula Jurídica -->
-      <!-- <div>
+      <!-- Frecuencia -->
+      <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
-          >Cédula Jurídica de la Empresa</label
+          >Frecuencia:</label
         >
-        <input
-          v-model="form.cedulaJuridica"
-          type="number"
-          min="0"
-          placeholder="Ej: 987123"
-          class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-          readonly
-        />
-      </div> -->
+        <div class="flex gap-4 text-sm">
+          <label class="flex items-center">
+            <input
+              type="radio"
+              name="contrato"
+              value="Mensual"
+              v-model="form.frecuencia"
+              class="mr-2"
+              @change="validateFrecuencia"
+            />
+            Mensual
+          </label>
+          <label class="flex items-center">
+            <input
+              type="radio"
+              name="contrato"
+              value="Semanal"
+              v-model="form.frecuencia"
+              class="mr-2"
+              @change="validateFrecuencia"
+            />
+            Semanal
+          </label>
+          <label class="flex items-center">
+            <input
+              type="radio"
+              name="contrato"
+              value="Trimestral"
+              v-model="form.frecuencia"
+              class="mr-2"
+              @change="validateFrecuencia"
+            />
+            Trimestral
+          </label>
+          <label class="flex items-center">
+            <input
+              type="radio"
+              name="contrato"
+              value="Único"
+              v-model="form.frecuencia"
+              class="mr-2"
+              @change="validateFrecuencia"
+            />
+            Único
+          </label>
+        </div>
+        <p v-if="frecuenciaError" class="text-sm text-red-500 mt-1">
+          {{ frecuenciaError }}
+        </p>
+      </div>
+      <!-- Contratos Elegibles -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Contratos elegibles:</label
+        >
+        <div
+          class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm place-items-center"
+        >
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              value="Tiempo Completo"
+              v-model="form.contratosElegibles"
+              class="mr-2"
+              @change="validateContratosElegibles"
+            />
+            Tiempo completo
+          </label>
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              value="Medio Tiempo"
+              v-model="form.contratosElegibles"
+              class="mr-2"
+              @change="validateContratosElegibles"
+            />
+            Medio tiempo
+          </label>
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              value="Servicios Profesionales"
+              v-model="form.contratosElegibles"
+              class="mr-2"
+              @change="validateContratosElegibles"
+            />
+            Servicios profesionales
+          </label>
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              value="Por Horas"
+              v-model="form.contratosElegibles"
+              class="mr-2"
+              @change="validateContratosElegibles"
+            />
+            Por horas
+          </label>
+        </div>
+        <p v-if="contratosElegiblesError" class="text-sm text-red-500 mt-1">
+          {{ contratosElegiblesError }}
+        </p>
+      </div>
 
       <!-- Botón -->
       <div class="flex justify-center pt-2">
         <button
-          @click="crearBeneficio"
-          class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-1.5 px-4 rounded transition duration-200"
+          @click.prevent="crearBeneficio"
+          :disabled="isSubmitting"
+          class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-1.5 px-4 rounded transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
           type="button"
         >
-          Crear beneficio
+          {{ isSubmitting ? "Creando..." : "Crear Beneficio" }}
         </button>
       </div>
+      <p
+        v-if="mensaje"
+        :class="[
+          'text-center text-sm',
+          isSubmitting ? 'text-gray-500' : 'text-red-600',
+        ]"
+      >
+        {{ mensaje }}
+      </p>
     </form>
   </div>
 </template>
@@ -139,55 +215,153 @@ import { useRouter } from "vue-router";
 
 export default {
   setup() {
-    const router = useRouter(); // Mover aquí la inicialización de router
+    const router = useRouter();
     const userStore = useUserStore();
     const form = ref({
       nombre: "",
       descripcion: "",
       costo: "",
       tiempoMinimo: "",
-      cedulaJuridica: "", // Se llena automáticamente por el fetch de la empresa
+      frecuencia: "",
+      cedulaJuridica: "",
+      contratosElegibles: [],
     });
 
-    // Método para validar el formulario
-    const validarFormulario = () => {
-      const { nombre, descripcion, costo, tiempoMinimo, cedulaJuridica } =
-        form.value;
+    // Estados para errores
+    const nombreError = ref("");
+    const descripcionError = ref("");
+    const costoError = ref("");
+    const tiempoMinimoError = ref("");
+    const frecuenciaError = ref("");
+    const contratosElegiblesError = ref("");
+    const mensaje = ref("");
+    const isSubmitting = ref(false);
 
-      if (
-        !nombre.trim() ||
-        !descripcion.trim() ||
-        !costo ||
-        !tiempoMinimo ||
-        !cedulaJuridica
-      ) {
-        alert(
-          "Complete todos los espacios para la creación correcta del beneficio."
-        );
+    // Método para clases de input, para revisar errores
+    const inputClass = (error) => {
+      return [
+        "w-full border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2",
+        error
+          ? "border-red-500 focus:ring-red-300"
+          : "border-gray-300 focus:ring-blue-400",
+      ];
+    };
+
+    // Métodos de validación para cada uno de los campos del formulario
+    const validateNombre = () => {
+      if (!form.value.nombre.trim()) {
+        nombreError.value = "El nombre del beneficio es obligatorio.";
         return false;
       }
-
+      if (form.value.nombre.length > 32) {
+        nombreError.value = "El nombre no puede exceder los 32 caracteres.";
+        return false;
+      }
+      nombreError.value = "";
       return true;
+    };
+
+    const validateDescripcion = () => {
+      if (!form.value.descripcion.trim()) {
+        descripcionError.value = "La descripción es obligatoria.";
+        return false;
+      }
+      if (form.value.descripcion.length > 200) {
+        descripcionError.value =
+          "La descripción no puede exceder los 200 caracteres.";
+        return false;
+      }
+      descripcionError.value = "";
+      return true;
+    };
+
+    const validateCosto = () => {
+      if (!form.value.costo) {
+        costoError.value = "El costo es obligatorio.";
+        return false;
+      }
+      if (form.value.costo < 0) {
+        costoError.value = "El costo no puede ser negativo.";
+        return false;
+      }
+      costoError.value = "";
+      return true;
+    };
+
+    const validateTiempoMinimo = () => {
+      if (form.value.tiempoMinimo === "" || form.value.tiempoMinimo === null || form.value.tiempoMinimo === undefined) {
+        tiempoMinimoError.value = "El tiempo mínimo es obligatorio.";
+        return false;
+      }
+      if (form.value.tiempoMinimo < 0) {
+        tiempoMinimoError.value = "El tiempo mínimo no puede ser negativo.";
+        return false;
+      }
+      tiempoMinimoError.value = "";
+      return true;
+    };
+
+    const validateFrecuencia = () => {
+      frecuenciaError.value = form.value.frecuencia
+        ? ""
+        : "Debe seleccionar una frecuencia.";
+      return !frecuenciaError.value;
+    };
+
+    const validateContratosElegibles = () => {
+      contratosElegiblesError.value =
+        form.value.contratosElegibles.length > 0
+          ? ""
+          : "Debe seleccionar al menos un tipo de contrato.";
+      return !contratosElegiblesError.value;
+    };
+
+    // Método para validar el formulario, usa todos los métodos de validación de los dintintos campos
+    const validateForm = () => {
+      const isNombreValid = validateNombre();
+      const isDescripcionValid = validateDescripcion();
+      const isCostoValid = validateCosto();
+      const isTiempoMinimoValid = validateTiempoMinimo();
+      const isFrecuenciaValid = validateFrecuencia();
+      const isContratosValid = validateContratosElegibles();
+
+      return (
+        isNombreValid &&
+        isDescripcionValid &&
+        isCostoValid &&
+        isTiempoMinimoValid &&
+        isFrecuenciaValid &&
+        isContratosValid
+      );
     };
 
     // Método para crear el beneficio
     const crearBeneficio = async () => {
-      if (!validarFormulario()) return;
+      if (!validateForm()) {
+        mensaje.value =
+          "Por favor, corrija los errores antes de enviar el formulario.";
+        return;
+      }
+
+      isSubmitting.value = true;
+      mensaje.value = "";
 
       try {
         const response = await axios.post(
           "https://localhost:7014/api/Beneficio/crearBeneficio",
           form.value
         );
+        mensaje.value = response.data;
         alert(response.data);
         // Redirigir al usuario a la página de inicio después de crear el beneficio
-        router.push("/home"); // Ahora router está correctamente inicializado
+        router.push("/home");
       } catch (error) {
         console.error("Error al crear el beneficio:", error);
-        alert(
+        mensaje.value =
           error.response?.data ||
-            "Ocurrió un error al intentar crear el beneficio."
-        );
+          "Ocurrió un error al intentar crear el beneficio.";
+      } finally {
+        isSubmitting.value = false;
       }
     };
 
@@ -199,11 +373,12 @@ export default {
           // Asigna la cédula jurídica automáticamente
           form.value.cedulaJuridica = userStore.empresa.cedulaJuridica;
         } else {
-          alert("No se pudo obtener la información de la empresa.");
+          mensaje.value = "No se pudo obtener la información de la empresa.";
         }
       } catch (error) {
         console.error("Error al obtener los datos de la empresa:", error);
-        alert("Ocurrió un error al cargar la información de la empresa.");
+        mensaje.value =
+          "Ocurrió un error al cargar la información de la empresa.";
       }
     };
 
@@ -218,6 +393,21 @@ export default {
 
     return {
       form,
+      nombreError,
+      descripcionError,
+      costoError,
+      tiempoMinimoError,
+      frecuenciaError,
+      contratosElegiblesError,
+      mensaje,
+      isSubmitting,
+      inputClass,
+      validateNombre,
+      validateDescripcion,
+      validateCosto,
+      validateTiempoMinimo,
+      validateFrecuencia,
+      validateContratosElegibles,
       crearBeneficio,
     };
   },
