@@ -35,5 +35,15 @@ namespace BackendGeems.Application
         {
             _repoInfrastructure.EditRegister(editing, oldId);
         }
+        public bool ValidHours(DateTime date, Guid employeeId, int hours)
+        {
+            int workedHours = _repoInfrastructure.GetMonthHours(employeeId, date);
+            bool valid = true;
+            if(workedHours + hours > 160)
+            {
+                valid = false;
+            }
+            return valid;
+        }
     }
 }

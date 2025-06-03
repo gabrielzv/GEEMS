@@ -107,9 +107,10 @@ export default {
                 console.error("Error al validar la fecha:", error);
             }
         },
-        async horasValidas(){
+        async horasValidas() {
             this.errores.horasVacias = this.horasRegistradas != null ? "" : "Las horas a registrar son obligatorias.";
             this.errores.horasInvalidas = "";
+
             const horas = Number(this.horasRegistradas);
             if (
                 isNaN(horas) ||
@@ -118,6 +119,24 @@ export default {
                 horas > 24
             ) {
                 this.errores.horasInvalidas = "Las horas a registrar deben ser un número entre 1 y 24.";
+                return;
+            }
+
+            // Validar con el API si las horas mensuales superan 160
+            try {
+                const response = await axios.get("https://localhost:7014/api/Horas/ValidHours", {
+                    params: {
+                        date: this.diaRegistrado,
+                        employeeId: this.guidEmpleado,
+                        hours: horas
+                    }
+                });
+                console.log("Se tiene que la validacion de horas superiores a 160 es: ", response.data);
+                if (response.data == false) {
+                    this.errores.horasInvalidas = "No se pueden registrar más de 160 horas en el mes.";
+                }
+            } catch (error) {
+                console.error("Error al validar las horas mensuales:", error);
             }
         },
         async fechaValida() {

@@ -59,5 +59,10 @@ namespace BackendGeems.API
                 return StatusCode(500, new { message = "Error al obtener los registros: " + ex.Message });
             }
         }
+        [HttpGet("ValidHours")]
+        public bool ValidHours(DateTime date, Guid employeeId, int hours)
+        {
+            return _queryHoras.ValidHours(date, employeeId, hours);
+        }
     }
 }
