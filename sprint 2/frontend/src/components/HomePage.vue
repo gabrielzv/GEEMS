@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg" style="background-color: #5fc176"></div>
+  <div class="min-h-screen bg" style="background-color: #ffffff"></div>
   <!-- <div class="min-h-screen bg-gray-100">
     //Header
 

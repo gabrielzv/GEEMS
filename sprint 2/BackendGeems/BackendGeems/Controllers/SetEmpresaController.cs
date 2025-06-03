@@ -25,6 +25,7 @@ public class SetEmpresaController : ControllerBase
         public string Canton { get; set; }
         public string Distrito { get; set; }
         public string Senas { get; set; }
+        public string ModalidadPago { get; set; }
     }
 
     [HttpPost("crearEmpresa")]
@@ -50,7 +51,8 @@ public class SetEmpresaController : ControllerBase
                     Provincia,
                     Canton,
                     Distrito,
-                    Senas
+                    Senas,
+                    ModalidadPago
                 )
                 VALUES (
                     @CedulaJuridica,
@@ -61,7 +63,8 @@ public class SetEmpresaController : ControllerBase
                     @Provincia,
                     @Canton,
                     @Distrito,
-                    @Senas
+                    @Senas,
+                    @ModalidadPago
                 );";
 
             using SqlCommand cmd = new SqlCommand(insertQuery, conn);
@@ -74,6 +77,7 @@ public class SetEmpresaController : ControllerBase
             cmd.Parameters.AddWithValue("@Canton", empresa.Canton);
             cmd.Parameters.AddWithValue("@Distrito", empresa.Distrito);
             cmd.Parameters.AddWithValue("@Senas", empresa.Senas);
+            cmd.Parameters.AddWithValue("@ModalidadPago", empresa.ModalidadPago);
 
             int rowsAffected = cmd.ExecuteNonQuery();
 
