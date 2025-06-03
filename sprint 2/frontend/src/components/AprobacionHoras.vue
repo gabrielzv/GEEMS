@@ -232,12 +232,14 @@ export default {
     };
 
     onMounted(() => {
-      if (!userStore.usuario || !userStore.usuario.cedulaPersona) {
-        router.push("/");
-      } else {
-        fetchEmpresaData();
-      }
-    });
+  if (!userStore.usuario || !userStore.usuario.cedulaPersona) {
+    router.push("/");
+  } else if (userStore.empleado?.tipo !== 'Payroll') {
+    router.push("/");
+  } else {
+    fetchEmpresaData();
+  }
+});
 
     return { 
       empresa, 
