@@ -53,11 +53,11 @@ BEGIN
     END
     ELSE IF @Contrato = 'Medio Tiempo'
     BEGIN
-        SET @SalarioBruto = CAST((CAST(@SalarioBase AS DECIMAL(18,2)) / 80) * @HorasTrabajadas AS INT);
+        SET @SalarioBruto = CAST((CAST(@SalarioBase AS DECIMAL(18,2)) / 160) * @HorasTrabajadas AS INT);
     END
     ELSE IF @Contrato = 'Servicios Profesionales'
     BEGIN
-        SET @SalarioBruto = @SalarioBase;
+        SET @SalarioBruto = CAST((CAST(@SalarioBase AS DECIMAL(18,2)) / 160) * @HorasTrabajadas AS INT);
     END
     ELSE IF @Contrato = 'Por Horas'
     BEGIN
