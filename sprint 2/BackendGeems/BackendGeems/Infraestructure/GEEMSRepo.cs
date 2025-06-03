@@ -263,18 +263,41 @@ namespace BackendGeems.Infraestructure
 
             return impuesto;
         }
+        private bool ExistePago(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        {
+            string query = @"SELECT COUNT(*) FROM Pago WHERE IdEmpleado = @IdEmpleado AND IdPlanilla = @IdPlanilla AND FechaInicio = @FechaInicio AND FechaFinal = @FechaFinal";
+            using (SqlCommand cmd = new SqlCommand(query, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
+                cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
+                _conexion.Open();
+                int count = (int)cmd.ExecuteScalar();
+                _conexion.Close();
+                return count > 0;
+            }
+        }
+
         public void GenerarPagoEmpleado(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
         {
             try
             {
-                if(idEmpleado == Guid.Empty || idPlanilla == Guid.Empty)
+                // Evita pagos duplicados
+                if (ExistePago(idEmpleado, idPlanilla, fechaInicio, fechaFinal))
+                {
+                    return; // Ya existe un pago para este empleado y planilla
+                }
+
+                if (idEmpleado == Guid.Empty || idPlanilla == Guid.Empty)
                 {
                     throw new Exception("Id de empleado o planilla no puede ser vacío.");
-                }else if (fechaInicio >= fechaFinal)
+                }
+                else if (fechaInicio >= fechaFinal)
                 {
                     throw new Exception("La fecha de inicio debe ser anterior a la fecha final.");
                 }
-                    int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
+                int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
                 if (salarioBruto == -1)
                 {
                     throw new Exception("Contrato o Salario Invalidos");
@@ -288,18 +311,10 @@ namespace BackendGeems.Infraestructure
                 bool esQuincenal = duracion.TotalDays <= 16;
 
                 int salarioMensualEstimado = esQuincenal ? salarioBruto * 2 : salarioBruto;
-
-
                 int impuestoRentaMensual = CalcularImpuestoRenta(salarioMensualEstimado);
-
-
                 int impuestoRenta = esQuincenal ? impuestoRentaMensual / 2 : impuestoRentaMensual;
-
-                //TODO: Deducciones APIs
-
                 int seguro = (int)(salarioBruto * 0.1067); // 10.67%
                 int totalDeducciones = impuestoRenta + seguro;
-
 
                 List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
 
@@ -323,11 +338,10 @@ namespace BackendGeems.Infraestructure
                     }
                 }
 
-
                 Guid idPago = Guid.NewGuid();
 
                 string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
-               VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
+                VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
                 using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
                 {
                     cmd.Parameters.AddWithValue("@Id", idPago);
@@ -344,16 +358,13 @@ namespace BackendGeems.Infraestructure
                     _conexion.Close();
                 }
 
-
                 InsertDeduccion(idPago, "Obligatoria", null, impuestoRenta);
                 InsertDeduccion(idPago, "Obligatoria", null, seguro);
-
 
                 foreach (var (idBeneficio, monto) in deduccionesVoluntarias)
                 {
                     InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
                 }
-
             }
             catch (Exception ex)
             {
@@ -400,6 +411,67 @@ namespace BackendGeems.Infraestructure
 
 
             }
+        }
+        public List<Empleado> ObtenerEmpleadosPorEmpresa(string nombreEmpresa)
+        {
+            List<Empleado> empleados = new List<Empleado>();
+            string query = @"SELECT * FROM Empleado WHERE NombreEmpresa = @NombreEmpresa";
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
+                DataTable tabla = CrearTablaConsulta(comando);
+                foreach (DataRow fila in tabla.Rows)
+                {
+                    empleados.Add(new Empleado
+                    {
+                        Id = fila["Id"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["Id"].ToString()),
+                        CedulaPersona = fila["CedulaPersona"] == DBNull.Value ? 0 : Convert.ToInt32(fila["CedulaPersona"]),
+                        Contrato = fila["Contrato"] == DBNull.Value ? "" : fila["Contrato"].ToString(),
+                        NumHorasTrabajadas = fila["NumHorasTrabajadas"] == DBNull.Value ? 0 : Convert.ToInt32(fila["NumHorasTrabajadas"]),
+                        Genero = fila["Genero"] == DBNull.Value ? "" : fila["Genero"].ToString(),
+                        EstadoLaboral = fila["EstadoLaboral"] == DBNull.Value ? "" : fila["EstadoLaboral"].ToString(),
+                        SalarioBruto = fila["SalarioBruto"] == DBNull.Value ? 0 : Convert.ToInt32(fila["SalarioBruto"]),
+                        Tipo = fila["Tipo"] == DBNull.Value ? "" : fila["Tipo"].ToString(),
+                        FechaIngreso = fila["FechaIngreso"] == DBNull.Value ? "" : fila["FechaIngreso"].ToString(),
+                        NombreEmpresa = fila["NombreEmpresa"] == DBNull.Value ? "" : fila["NombreEmpresa"].ToString()
+                    });
+                }
+            }
+            return empleados;
+        }
+
+        public class PlanillaDTO
+        {
+            public Guid Id { get; set; }
+            public DateTime FechaInicio { get; set; }
+            public DateTime FechaFinal { get; set; }
+        }
+
+        public List<PlanillaDTO> ObtenerPlanillasPorEmpresa(string nombreEmpresa)
+        {
+            List<PlanillaDTO> planillas = new List<PlanillaDTO>();
+            string query = @"
+                SELECT p.Id, p.FechaInicio, p.FechaFinal
+                FROM Planilla p
+                INNER JOIN Empleado e ON p.IdPayroll = e.Id
+                WHERE e.NombreEmpresa = @NombreEmpresa
+                ORDER BY p.FechaInicio DESC";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
+                DataTable tabla = CrearTablaConsulta(comando);
+                foreach (DataRow fila in tabla.Rows)
+                {
+                    planillas.Add(new PlanillaDTO
+                    {
+                        Id = Guid.Parse(fila["Id"].ToString()),
+                        FechaInicio = Convert.ToDateTime(fila["FechaInicio"]),
+                        FechaFinal = Convert.ToDateTime(fila["FechaFinal"])
+                    });
+                }
+            }
+            return planillas;
         }
     }
 }
