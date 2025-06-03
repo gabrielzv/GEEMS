@@ -565,7 +565,9 @@ namespace BackendGeems.Infraestructure
                                     int monto = Convert.ToInt32(row["Costo"]);
                                     deduccionesVoluntarias.Add((idBeneficio, monto));
                                     totalDeducciones += monto;
-                                    if (totalDeducciones > salarioBrutoQuincenal)
+                                Console.WriteLine(salarioBrutoQuincenal);
+                                Console.WriteLine(totalDeducciones);
+                                if (totalDeducciones > salarioBrutoQuincenal)
                                     {
                                         throw new Exception("El total de deducciones no puede ser mayor al salario bruto quincenal.");
                                     }
