@@ -239,76 +239,186 @@ namespace BackendGeems.Infraestructure
         public int CalcularImpuestoRenta(int ingresoMensual)
         {
             int impuesto = 0;
+            var limite1 = 922000;
+            var limite2 = 1352000;
+            var limite3 = 2373000;
+            var limite4 = 4745000;
+            var porcentaje1 = 0.10;
+            var porcentaje2 = 0.15;
+            var porcentaje3 = 0.20;
+            var porcentaje4 = 0.25;
 
-            if (ingresoMensual <= 922000)
+            if (ingresoMensual <= limite1)
             {
                 impuesto = 0;
             }
-            else if (ingresoMensual <= 1352000)
+            else if (ingresoMensual <= limite2)
             {
-                impuesto = (int)((ingresoMensual - 922000) * 0.10);
+                impuesto = (int)((ingresoMensual - limite1) * porcentaje1);
             }
-            else if (ingresoMensual <= 2373000)
+            else if (ingresoMensual <= limite3)
             {
-                impuesto = (int)((1352000 - 922000) * 0.10 + (ingresoMensual - 1352000) * 0.15);
+                impuesto = (int)((limite2 - limite1) * porcentaje1 + (ingresoMensual - limite2) * porcentaje2);
             }
-            else if (ingresoMensual <= 4745000)
+            else if (ingresoMensual <= limite4)
             {
-                impuesto = (int)((1352000 - 922000) * 0.10 + (2373000 - 1352000) * 0.15 + (ingresoMensual - 2373000) * 0.20);
+                impuesto = (int)((limite2 - limite1) * porcentaje1 + (limite3 - limite2) * porcentaje2 + (ingresoMensual - limite3) * porcentaje3);
             }
             else
             {
-                impuesto = (int)((1352000 - 922000) * 0.10 + (2373000 - 1352000) * 0.15 + (4745000 - 2373000) * 0.20 + (ingresoMensual - 4745000) * 0.25);
+                impuesto = (int)((limite2 - limite1) * porcentaje1 + (limite3 - limite2) * porcentaje2 + (limite4 - limite3) * porcentaje3 + (ingresoMensual - limite4) * porcentaje4);
             }
 
             return impuesto;
         }
+
+
+        public string ObtenerTipoContratoEmpleado(Guid idEmpleado)
+        {
+            string tipoContrato = null;
+            string query = "SELECT Contrato FROM Empleado WHERE Id = @IdEmpleado";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
+                try
+                {
+                    _conexion.Open();
+                    var result = comando.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        tipoContrato = result.ToString();
+                        
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener el tipo de contrato: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+            return tipoContrato;
+        }
+
+        public int ObtenerSalarioEmpleado(Guid idEmpleado)
+        {
+            int salario = 0;
+            string query = "SELECT SalarioBruto FROM Empleado WHERE Id = @IdEmpleado";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
+                try
+                {
+                    _conexion.Open();
+                    var result = comando.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        salario = Convert.ToInt32(result);
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener el salario del empleado: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+            return salario;
+        }
+
+
         public void GenerarPagoEmpleado(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
         {
             try
             {
-                if(idEmpleado == Guid.Empty || idPlanilla == Guid.Empty)
+                if (idEmpleado == Guid.Empty || idPlanilla == Guid.Empty)
                 {
                     throw new Exception("Id de empleado o planilla no puede ser vacío.");
-                }else if (fechaInicio >= fechaFinal)
+                }
+                else if (fechaInicio >= fechaFinal)
                 {
                     throw new Exception("La fecha de inicio debe ser anterior a la fecha final.");
                 }
-                    int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
+
+                TimeSpan duracion = fechaFinal - fechaInicio;
+                bool esQuincenal = duracion.TotalDays <= 16;
+                if (!esQuincenal)
+                {
+                    GenerarPagoEmpleadoMensual(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
+                    Console.WriteLine("Mensual");
+                }
+                else
+                {
+                    GenerarPagoEmpleadoQuincenal(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
+                    Console.WriteLine("Quincenal");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al crear pago: " + ex.Message);
+            }
+        }
+
+        public void GenerarPagoEmpleadoMensual(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        {
+            try
+            {
+                string tipoContrato = ObtenerTipoContratoEmpleado(idEmpleado);
+                Console.WriteLine(tipoContrato);
+                int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
+
                 if (salarioBruto == -1)
                 {
                     throw new Exception("Contrato o Salario Invalidos");
                 }
                 else if (salarioBruto == -2)
                 {
-                    throw new Exception("El empleado tiene horas sin revisar");
+                    
+                    throw new Exception("El empleado no tiene horas aceptadas en el periodo seleccionado.");
                 }
 
-                TimeSpan duracion = fechaFinal - fechaInicio;
-                bool esQuincenal = duracion.TotalDays <= 16;
+                if (tipoContrato == "Medio Tiempo" || tipoContrato == "Tiempo Completo" || tipoContrato == "Servicios Profesionales")
+                {
+                    if (salarioBruto > 0)
+                    {
+                        salarioBruto = ObtenerSalarioEmpleado(idEmpleado);
+                    }
+                }
+                else if (tipoContrato == "Por Horas")
+                {
+                    Console.WriteLine(tipoContrato);
+                }
 
-                int salarioMensualEstimado = esQuincenal ? salarioBruto * 2 : salarioBruto;
+                int totalDeducciones = 0;
+                int impuestoRentaMensual = 0;
+                int SEM = 0;
+                int IVM = 0;
+                int BancoPopular = 0;
 
-
-                int impuestoRentaMensual = CalcularImpuestoRenta(salarioMensualEstimado);
-
-
-                int impuestoRenta = esQuincenal ? impuestoRentaMensual / 2 : impuestoRentaMensual;
-
-                //TODO: Deducciones APIs
-
-                int seguro = (int)(salarioBruto * 0.1067); // 10.67%
-                int totalDeducciones = impuestoRenta + seguro;
-
+                if (tipoContrato == "Medio Tiempo" || tipoContrato == "Tiempo Completo" || tipoContrato == "Por Horas")
+                {
+                    impuestoRentaMensual = CalcularImpuestoRenta(salarioBruto);
+                    SEM = (int)(salarioBruto * 0.0550); // 5.50%
+                    IVM = (int)(salarioBruto * 0.0417); // 4.17%
+                    BancoPopular = (int)(salarioBruto * 0.01); // 1%
+                    totalDeducciones = impuestoRentaMensual + SEM + IVM + BancoPopular;
+                }
 
                 List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
 
                 string queryBeneficios = @"
-                SELECT b.Id, b.Costo
-                FROM BeneficiosEmpleado be
-                JOIN Beneficio b ON be.IdBeneficio = b.Id
-                WHERE be.IdEmpleado = @IdEmpleado";
-
+                    SELECT b.Id, b.Costo
+                    FROM BeneficiosEmpleado be
+                    JOIN Beneficio b ON be.IdBeneficio = b.Id
+                    WHERE be.IdEmpleado = @IdEmpleado";
                 using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
                 {
                     cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
@@ -316,18 +426,25 @@ namespace BackendGeems.Infraestructure
 
                     foreach (DataRow row in dt.Rows)
                     {
-                        Guid idBeneficio = Guid.Parse(row["Id"].ToString());
-                        int monto = Convert.ToInt32(row["Costo"]);
-                        deduccionesVoluntarias.Add((idBeneficio, monto));
-                        totalDeducciones += monto;
+                        
+                        if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
+                        {
+                            Guid idBeneficio = Guid.Parse(row["Id"].ToString());
+                            int monto = Convert.ToInt32(row["Costo"]);
+                            deduccionesVoluntarias.Add((idBeneficio, monto));
+                            totalDeducciones += monto;
+                            if (totalDeducciones > salarioBruto)
+                            {
+                                throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
+                            }
+                        }
                     }
                 }
-
 
                 Guid idPago = Guid.NewGuid();
 
                 string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
-               VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
+                   VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
                 using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
                 {
                     cmd.Parameters.AddWithValue("@Id", idPago);
@@ -344,19 +461,19 @@ namespace BackendGeems.Infraestructure
                     _conexion.Close();
                 }
 
-
-                InsertDeduccion(idPago, "Obligatoria", null, impuestoRenta);
-                InsertDeduccion(idPago, "Obligatoria", null, seguro);
-
+                InsertDeduccion(idPago, "Obligatoria", null, impuestoRentaMensual);
+                InsertDeduccion(idPago, "Obligatoria", null, SEM);
+                InsertDeduccion(idPago, "Obligatoria", null, IVM);
+                InsertDeduccion(idPago, "Obligatoria", null, BancoPopular);
 
                 foreach (var (idBeneficio, monto) in deduccionesVoluntarias)
                 {
                     InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
                 }
-
             }
             catch (Exception ex)
             {
+               
                 throw new Exception("Error al crear pago: " + ex.Message);
             }
             finally
@@ -367,6 +484,145 @@ namespace BackendGeems.Infraestructure
                 }
             }
         }
+            public void GenerarPagoEmpleadoQuincenal(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+            {
+                try
+                {
+                string tipoContrato = ObtenerTipoContratoEmpleado(idEmpleado);
+                Console.WriteLine(tipoContrato);
+                int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
+                int salarioBrutoMensual = 0;
+                int salarioBrutoQuincenal = 0;
+
+                if (salarioBruto == -1)
+                {
+                    throw new Exception("Contrato o Salario Invalidos");
+                }
+                else if (salarioBruto == -2)
+                {
+
+                    throw new Exception("El empleado no tiene horas aceptadas en el periodo seleccionado.");
+                }
+
+                if (tipoContrato == "Medio Tiempo" || tipoContrato == "Tiempo Completo" || tipoContrato == "Servicios Profesionales")
+                {
+                    if (salarioBruto > 0)
+                    {
+                        salarioBrutoMensual = ObtenerSalarioEmpleado(idEmpleado);
+                        salarioBrutoQuincenal = salarioBruto / 2; 
+                    }
+                }
+
+                else if (tipoContrato == "Por Horas")
+                {
+                    salarioBrutoQuincenal = salarioBruto; 
+                }
+
+               
+                bool esSegundaQuincena = fechaFinal.Day > 15;
+
+                    int totalDeducciones = 0;
+                    int impuestoRentaMensual = 0;
+                    int impuestoRentaQuincenal = 0;
+                    int SEM = 0;
+                    int IVM = 0;
+                    int BancoPopular = 0;
+
+                    // Solo para contratos que aplican deducciones obligatorias
+                    if (tipoContrato == "Medio Tiempo" || tipoContrato == "Tiempo Completo" || tipoContrato == "Por Horas")
+                    {
+                        // El impuesto de renta se calcula sobre el salario mensual, pero se descuenta la mitad en cada quincena si aplica
+                        impuestoRentaMensual = CalcularImpuestoRenta(salarioBrutoMensual);
+                        impuestoRentaQuincenal = impuestoRentaMensual / 2;
+                        
+
+                        SEM = (int)(salarioBrutoQuincenal * 0.0550); // 5.50%
+                        IVM = (int)(salarioBrutoQuincenal * 0.0417); // 4.17%
+                        BancoPopular = (int)(salarioBrutoQuincenal * 0.01); // 1%
+                        totalDeducciones = impuestoRentaQuincenal + SEM + IVM + BancoPopular;
+                    }
+
+                    List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
+
+                    // Solo se cobran beneficios en la segunda quincena
+                    if (esSegundaQuincena)
+                    {
+                        string queryBeneficios = @"
+                            SELECT b.Id, b.Costo
+                            FROM BeneficiosEmpleado be
+                            JOIN Beneficio b ON be.IdBeneficio = b.Id
+                            WHERE be.IdEmpleado = @IdEmpleado";
+                        using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
+                        {
+                            cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                            DataTable dt = CrearTablaConsulta(cmd);
+
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
+                                {
+                                    Guid idBeneficio = Guid.Parse(row["Id"].ToString());
+                                    int monto = Convert.ToInt32(row["Costo"]);
+                                    deduccionesVoluntarias.Add((idBeneficio, monto));
+                                    totalDeducciones += monto;
+                                Console.WriteLine(salarioBrutoQuincenal);
+                                Console.WriteLine(totalDeducciones);
+                                if (totalDeducciones > salarioBrutoQuincenal)
+                                    {
+                                        throw new Exception("El total de deducciones no puede ser mayor al salario bruto quincenal.");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Guid idPago = Guid.NewGuid();
+
+                    string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
+                       VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
+                    using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
+                    {
+                        cmd.Parameters.AddWithValue("@Id", idPago);
+                        cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                        cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
+                        cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                        cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
+                        cmd.Parameters.AddWithValue("@MontoBruto", salarioBrutoQuincenal);
+                        cmd.Parameters.AddWithValue("@MontoPago", salarioBrutoQuincenal - totalDeducciones);
+                        cmd.Parameters.AddWithValue("@FechaRealizada", DateTime.Now);
+
+                        _conexion.Open();
+                        cmd.ExecuteNonQuery();
+                        _conexion.Close();
+                    }
+
+                    // Deducciones obligatorias
+                    InsertDeduccion(idPago, "Obligatoria", null, impuestoRentaQuincenal);
+                    InsertDeduccion(idPago, "Obligatoria", null, SEM);
+                    InsertDeduccion(idPago, "Obligatoria", null, IVM);
+                    InsertDeduccion(idPago, "Obligatoria", null, BancoPopular);
+
+                    // Deducciones voluntarias solo en segunda quincena
+                    if (esSegundaQuincena)
+                    {
+                        foreach (var (idBeneficio, monto) in deduccionesVoluntarias)
+                        {
+                            InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Error al crear pago quincenal: " + ex.Message);
+                }
+                finally
+                {
+                    if (_conexion.State == ConnectionState.Open)
+                    {
+                        _conexion.Close();
+                    }
+                }
+            }
 
         public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, int monto)
         {
