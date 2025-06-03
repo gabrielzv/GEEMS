@@ -2,6 +2,7 @@
 using BackendGeems.Domain;
 using BackendGeems.Infraestructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace BackendGeems.API
 {
@@ -56,37 +57,35 @@ namespace BackendGeems.API
         {
             try
             {
-                var empleados = _repoInfrastructure.ObtenerEmpleadosPorEmpresa(nombreEmpresa);
-                if (empleados == null || empleados.Count == 0)
+                using (var connection = new SqlConnection(_repoInfrastructure.CadenaConexion))
                 {
-                    return Ok(new { totalBruto = 0, totalNeto = 0, totalDeducciones = 0 });
-                }
+                    var cmd = new SqlCommand("SELECT * FROM dbo.fnResumenPlanilla(@nombreEmpresa, @fechaInicio, @fechaFin)", connection);
+                    cmd.Parameters.AddWithValue("@nombreEmpresa", nombreEmpresa);
+                    cmd.Parameters.AddWithValue("@fechaInicio", fechaInicio);
+                    cmd.Parameters.AddWithValue("@fechaFin", fechaFin);
 
-                var pagos = _repoInfrastructure.ObtenerPagos(fechaInicio, fechaFin);
-
-                decimal totalBruto = 0, totalNeto = 0, totalDeducciones = 0;
-
-                foreach (var empleado in empleados)
-                {
-                    var pagosEmpleado = pagos.Where(p => p.IdEmpleado == empleado.Id);
-                    foreach (var pago in pagosEmpleado)
+                    connection.Open();
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        totalBruto += pago.MontoBruto;
-                        totalNeto += pago.MontoPago;
-                        totalDeducciones += (pago.MontoBruto - pago.MontoPago);
+                        if (reader.Read())
+                        {
+                            return Ok(new
+                            {
+                                totalBruto = reader.IsDBNull(0) ? 0 : reader.GetDecimal(0),
+                                totalNeto = reader.IsDBNull(1) ? 0 : reader.GetDecimal(1),
+                                totalDeducciones = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2)
+                            });
+                        }
+                        else
+                        {
+                            return Ok(new { totalBruto = 0, totalNeto = 0, totalDeducciones = 0 });
+                        }
                     }
                 }
-
-                return Ok(new
-                {
-                    totalBruto,
-                    totalNeto,
-                    totalDeducciones
-                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error al obtener el resumen de planilla: " + ex.Message });
+                return StatusCode(500, new { message = "Error al obtener el resumen de planilla: " + ex.ToString() });
             }
         }
     }

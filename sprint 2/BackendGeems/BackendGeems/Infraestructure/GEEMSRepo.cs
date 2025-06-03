@@ -11,6 +11,8 @@ namespace BackendGeems.Infraestructure
         private SqlConnection _conexion;
         private string _cadenaConexion;
 
+        public string CadenaConexion => _cadenaConexion;
+
         public GEEMSRepo()
         {
             var builder = WebApplication.CreateBuilder();
