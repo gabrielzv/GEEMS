@@ -16,8 +16,8 @@ namespace BackendGeems.Controllers
             _configuration = configuration;
         }
 
-        [HttpGet("por-empresa/{cedulaJuridica}")]
-        public IActionResult GetRegistrosPorEmpresa(string cedulaJuridica)
+        [HttpGet("por-empresa/{nombreEmpresa}")]
+        public IActionResult GetRegistrosPorEmpresa(string nombreEmpresa)
         {
             try
             {
@@ -37,11 +37,11 @@ namespace BackendGeems.Controllers
                     INNER JOIN Persona p ON e.CedulaPersona = p.Cedula
                     INNER JOIN Usuario u ON p.Cedula = u.CedulaPersona
                     INNER JOIN Empresa emp ON e.NombreEmpresa = emp.Nombre
-                    WHERE emp.CedulaJuridica = @CedulaJuridica
+                    WHERE emp.Nombre = @NombreEmpresa
                     ORDER BY r.Fecha DESC";
 
                 using SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@CedulaJuridica", cedulaJuridica);
+                cmd.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
 
                 using SqlDataReader reader = cmd.ExecuteReader();
 

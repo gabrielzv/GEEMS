@@ -8,6 +8,16 @@
         </h1>
       </div>
 
+      <!-- Mensaje de error -->
+      <div v-if="error" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+        {{ error }}
+      </div>
+
+      <!-- Indicador de carga -->
+      <div v-if="isLoading" class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+        Cargando registros de horas...
+      </div>
+
       <!-- Barra de búsqueda -->
       <div class="mb-6">
         <input
@@ -48,6 +58,7 @@
                     }
                   ]"
                   @change="updateEstado(registro)"
+                  :disabled="isUpdating"
                 >
                   <option value="NoRevisado" class="bg-gray-100">No revisado</option>
                   <option value="Aprobado" class="bg-green-100">Aprobado</option>
@@ -55,7 +66,7 @@
                 </select>
               </td>
             </tr>
-            <tr v-if="filteredRegistros.length === 0">
+            <tr v-if="filteredRegistros.length === 0 && !isLoading">
               <td colspan="5" class="py-4 text-center text-gray-500">
                 No se encontraron registros de horas
               </td>
@@ -80,6 +91,7 @@ export default {
     const searchQuery = ref("");
     const registrosHoras = ref([]);
     const isLoading = ref(false);
+    const isUpdating = ref(false);
     const error = ref(null);
 
     // Computed property para filtrar registros
@@ -109,70 +121,113 @@ export default {
 
     // Función para actualizar estado
     const updateEstado = async (registro) => {
+      const estadoAnterior = [...registrosHoras.value].find(r => r.id === registro.id)?.estado;
+      
       try {
-        const response = await fetch(`/api/RegistroHoras/${registro.id}`, {
+        isUpdating.value = true;
+        error.value = null;
+
+        const response = await fetch(`https://localhost:7014/api/RegistroHoras/${registro.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${userStore.token}` // Si usas autenticación
+            'Accept': '*/*'
           },
+          credentials: 'include',
           body: JSON.stringify({
             estado: registro.estado
           })
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Error al actualizar el estado');
+          let errorMessage = 'Error al actualizar el estado';
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+          } catch (e) {
+            errorMessage = `Error HTTP: ${response.status}`;
+          }
+          throw new Error(errorMessage);
         }
 
-        // Actualizar el estado localmente para reflejar el cambio inmediato
-        const index = registrosHoras.value.findIndex(r => r.id === registro.id);
-        if (index !== -1) {
-          registrosHoras.value[index].estado = registro.estado;
-        }
+        console.log('Estado actualizado correctamente');
+
       } catch (err) {
         console.error("Error al actualizar estado:", err);
         error.value = err.message;
+        
         // Revertir el cambio en el frontend si falla
-        registro.estado = registro.estado === 'Aprobado' ? 'Denegado' : 'Aprobado';
+        const index = registrosHoras.value.findIndex(r => r.id === registro.id);
+        if (index !== -1 && estadoAnterior) {
+          registrosHoras.value[index].estado = estadoAnterior;
+        }
+      } finally {
+        isUpdating.value = false;
       }
     };
 
     // Función para obtener registros de horas desde el backend
-    const fetchRegistrosHoras = async (cedulaJuridica) => {
-  try {
-    // Usa la URL completa como en Swagger
-    const url = `https://localhost:7014/api/RegistroHoras/por-empresa/${cedulaJuridica}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'Accept': '*/*',
-        'Content-Type': 'application/json'
-      },
-      credentials: 'include'
-    });
+    const fetchRegistrosHoras = async (nombreEmpresa) => {
+      try {
+        isLoading.value = true;
+        error.value = null;
+        
+        // Codificar el nombre de empresa para la URL
+        const encodedNombreEmpresa = encodeURIComponent(nombreEmpresa);
+        const url = `https://localhost:7014/api/RegistroHoras/por-empresa/${encodedNombreEmpresa}`;
+        
+        console.log("Obteniendo registros para empresa:", nombreEmpresa);
+        console.log("URL:", url);
+        
+        const response = await fetch(url, {
+          headers: {
+            'Accept': '*/*',
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
 
-    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-    
-    registrosHoras.value = await response.json();
-  } catch (error) {
-    console.error("Error al obtener registros:", error);
-    error.value = `Error al cargar registros: ${error.message}`;
-  }
-};
+        if (!response.ok) {
+          let errorMessage = `Error HTTP: ${response.status}`;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+          } catch (e) {
+            // Si no se puede parsear el JSON, usar el mensaje genérico
+          }
+          throw new Error(errorMessage);
+        }
+        
+        const data = await response.json();
+        registrosHoras.value = data;
+        console.log("Registros obtenidos:", data);
+        
+      } catch (error) {
+        console.error("Error al obtener registros:", error);
+        error.value = `Error al cargar registros: ${error.message}`;
+        registrosHoras.value = [];
+      } finally {
+        isLoading.value = false;
+      }
+    };
 
     const fetchEmpresaData = async () => {
       try {
+        error.value = null;
         await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
         empresa.value = userStore.empresa;
         
-        if (empresa.value?.cedulaJuridica) {
-          await fetchRegistrosHoras(empresa.value.cedulaJuridica);
+        console.log("Datos de empresa obtenidos:", empresa.value);
+        
+        // Usar el nombre de la empresa en lugar de la cédula jurídica
+        if (userStore.empleado?.nombreEmpresa) {
+          await fetchRegistrosHoras(userStore.empleado?.nombreEmpresa);
+        } else {
+          error.value = "No se pudo obtener el nombre de la empresa";
         }
       } catch (err) {
         console.error("Error al obtener los datos de la empresa:", err);
-        error.value = err.message;
+        error.value = `Error al obtener datos de empresa: ${err.message}`;
       }
     };
 
@@ -190,6 +245,7 @@ export default {
       registrosHoras,
       filteredRegistros,
       isLoading,
+      isUpdating,
       error,
       formatDate,
       updateEstado
