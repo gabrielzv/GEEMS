@@ -13,6 +13,7 @@ namespace BackendGeems.Application
         int CalcularImpuestoRenta(int salarioBruto);
         List<Registro> ObtenerRegistros(Guid idEmpleado);
         void InsertRegister(Registro registro);
+        public int GetMonthHours(Guid idEmpleado, DateTime fecha);
     }
 
 }

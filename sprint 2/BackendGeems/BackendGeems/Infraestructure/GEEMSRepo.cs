@@ -743,5 +743,37 @@ namespace BackendGeems.Infraestructure
             }
             return planillas;
         }
+
+        public int GetMonthHours(Guid idEmpleado, DateTime fecha)
+        {
+            int horas = 0;
+            string query = "SELECT dbo.fnHorasTrabajadasPorMes(@IdEmpleado, @Fecha)";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                comando.Parameters.AddWithValue("@Fecha", fecha);
+
+                try
+                {
+                    _conexion.Open();
+                    var result = comando.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        horas = Convert.ToInt32(result);
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener horas trabajadas: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+            Console.WriteLine("Se encuentra que la persona tiene horas trabajadas ese mes en: "+horas);
+            return horas;
+        }
     }
 }
