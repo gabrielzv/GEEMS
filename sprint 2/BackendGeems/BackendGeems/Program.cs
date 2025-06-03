@@ -13,7 +13,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:8080")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
@@ -22,7 +23,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IGEEMSRepo, GEEMSRepo>();
-builder.Services.AddScoped<IQueryPago,QueryPago>();
+builder.Services.AddScoped<IQueryPago, QueryPago>();
 builder.Services.AddScoped<ISalarioBruto, SalarioBruto>();
 builder.Services.AddScoped<IQueryHoras, QueryHoras>();
 

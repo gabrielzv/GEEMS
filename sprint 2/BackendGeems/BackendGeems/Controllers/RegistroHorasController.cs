@@ -42,7 +42,7 @@ namespace BackendGeems.Controllers
 
                 using SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@CedulaJuridica", cedulaJuridica);
-                
+
                 using SqlDataReader reader = cmd.ExecuteReader();
 
                 List<object> registros = new();

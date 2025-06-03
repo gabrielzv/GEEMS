@@ -4,7 +4,7 @@
       <!-- Encabezado -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">
-          Registros de horas - {{ empresa?.nombre || "Empresa" }}
+          Aprobar horas - {{ empresa?.nombre || "Nombre de empresa" }}
         </h1>
       </div>
 
@@ -68,86 +68,129 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from "vue";
-import axios from "axios";
-import { useRoute } from "vue-router";
+import { useUserStore } from "../store/user";
+import { onMounted, ref, computed } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
-    const route = useRoute();
+    const router = useRouter();
+    const userStore = useUserStore();
     const empresa = ref(null);
-    const registros = ref([]);
     const searchQuery = ref("");
+    const registrosHoras = ref([]);
+    const isLoading = ref(false);
+    const error = ref(null);
 
+    // Computed property para filtrar registros
     const filteredRegistros = computed(() => {
-      if (!searchQuery.value) return registros.value;
-      return registros.value.filter(registro => 
-        registro.nombreEmpleado.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        registro.usuario.toLowerCase().includes(searchQuery.value.toLowerCase())
+      if (!searchQuery.value) {
+        return registrosHoras.value;
+      }
+      const query = searchQuery.value.toLowerCase();
+      return registrosHoras.value.filter(registro =>
+        registro.nombreEmpleado.toLowerCase().includes(query) ||
+        registro.usuario.toLowerCase().includes(query)
       );
     });
 
-    const formatDate = (dateString) => {
-      if (!dateString) return "No disponible";
-      const date = new Date(dateString);
-      return date.toLocaleDateString('es-ES', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric',
+    // Función para formatear fechas
+    const formatDate = (fecha) => {
+      if (!fecha) return "";
+      const date = new Date(fecha);
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
         hour: '2-digit',
         minute: '2-digit'
       });
     };
 
+    // Función para actualizar estado
     const updateEstado = async (registro) => {
       try {
-        await axios.put(`https://localhost:7014/api/RegistroHoras/${registro.id}`, {
-          estado: registro.estado
+        const response = await fetch(`/api/RegistroHoras/${registro.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${userStore.token}` // Si usas autenticación
+          },
+          body: JSON.stringify({
+            estado: registro.estado
+          })
         });
-        console.log(`Estado actualizado a ${registro.estado}`);
-      } catch (error) {
-        console.error("Error al actualizar el estado:", error);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al actualizar el estado');
+        }
+
+        // Actualizar el estado localmente para reflejar el cambio inmediato
+        const index = registrosHoras.value.findIndex(r => r.id === registro.id);
+        if (index !== -1) {
+          registrosHoras.value[index].estado = registro.estado;
+        }
+      } catch (err) {
+        console.error("Error al actualizar estado:", err);
+        error.value = err.message;
+        // Revertir el cambio en el frontend si falla
+        registro.estado = registro.estado === 'Aprobado' ? 'Denegado' : 'Aprobado';
       }
     };
 
-     
-
-    const fetchData = async () => {
-  const empresaId = route.params.empresaId;
+    // Función para obtener registros de horas desde el backend
+    const fetchRegistrosHoras = async (cedulaJuridica) => {
   try {
-    // Obtener datos de la empresa
-    const empresaResponse = await axios.get(
-      `https://localhost:7014/api/Empresa/${empresaId}`
-    );
-    // Asegura que el objeto tenga la estructura correcta
-    empresa.value = {
-      nombre: empresaResponse.data.nombre,
-      cedulaJuridica: empresaResponse.data.cedulaJuridica,
-      telefono: empresaResponse.data.telefono,
-      dueno: empresaResponse.data.dueno,
-      correo: empresaResponse.data.correo,
-    };
-    console.log("Empresa cargada:", empresa.value);
+    // Usa la URL completa como en Swagger
+    const url = `https://localhost:7014/api/RegistroHoras/por-empresa/${cedulaJuridica}`;
+    
+    const response = await fetch(url, {
+      headers: {
+        'Accept': '*/*',
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
 
-    // Obtener registros de horas
-    const registrosResponse = await axios.get(
-      `https://localhost:7014/api/RegistroHoras/por-empresa/${empresaId}`
-    );
-    registros.value = registrosResponse.data;
+    if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+    
+    registrosHoras.value = await response.json();
   } catch (error) {
-    console.error("Error al obtener los datos:", error);
+    console.error("Error al obtener registros:", error);
+    error.value = `Error al cargar registros: ${error.message}`;
   }
 };
 
+    const fetchEmpresaData = async () => {
+      try {
+        await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
+        empresa.value = userStore.empresa;
+        
+        if (empresa.value?.cedulaJuridica) {
+          await fetchRegistrosHoras(empresa.value.cedulaJuridica);
+        }
+      } catch (err) {
+        console.error("Error al obtener los datos de la empresa:", err);
+        error.value = err.message;
+      }
+    };
+
     onMounted(() => {
-      fetchData();
+      if (!userStore.usuario || !userStore.usuario.cedulaPersona) {
+        router.push("/");
+      } else {
+        fetchEmpresaData();
+      }
     });
 
     return { 
       empresa, 
-      registros, 
-      searchQuery, 
+      searchQuery,
+      registrosHoras,
       filteredRegistros,
+      isLoading,
+      error,
       formatDate,
       updateEstado
     };
@@ -156,5 +199,4 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos adicionales si son necesarios */
 </style>
