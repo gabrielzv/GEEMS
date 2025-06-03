@@ -4,7 +4,7 @@
       <!-- Encabezado -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">
-          Empleados de {{ empresa?.nombre || "Empresa" }}
+          Registros de horas - {{ empresa?.nombre || "Empresa" }}
         </h1>
       </div>
 
@@ -18,46 +18,46 @@
         />
       </div>
 
-      <!-- Tabla de empleados -->
+      <!-- Tabla de registros -->
       <div class="overflow-x-auto">
         <table class="min-w-full bg-white">
           <thead>
             <tr class="bg-gray-200 text-gray-700">
               <th class="py-3 px-4 text-left">Nombre</th>
               <th class="py-3 px-4 text-left">Usuario</th>
-              <th class="py-3 px-4 text-center">Horas solicitadas</th>
+              <th class="py-3 px-4 text-center">Horas</th>
               <th class="py-3 px-4 text-left">Fecha de solicitud</th>
               <th class="py-3 px-4 text-left">Estado</th>
             </tr>
           </thead>
           <tbody class="text-gray-700">
-            <tr v-for="empleado in filteredEmpleados" :key="empleado.id" class="border-b border-gray-200 hover:bg-gray-50">
-              <td class="py-3 px-4">{{ empleado.nombre }}</td>
-              <td class="py-3 px-4">{{ empleado.usuario }}</td>
-              <td class="py-3 px-4 text-center">{{ empleado.horasSolicitadas }}</td>
-              <td class="py-3 px-4">{{ formatDate(empleado.fechaSolicitud) }}</td>
+            <tr v-for="registro in filteredRegistros" :key="registro.id" class="border-b border-gray-200 hover:bg-gray-50">
+              <td class="py-3 px-4">{{ registro.nombreEmpleado }}</td>
+              <td class="py-3 px-4">{{ registro.usuario }}</td>
+              <td class="py-3 px-4 text-center">{{ registro.horas || 0 }}</td>
+              <td class="py-3 px-4">{{ formatDate(registro.fechaSolicitud) }}</td>
               <td class="py-3 px-4">
                 <select 
-                  v-model="empleado.estado" 
+                  v-model="registro.estado" 
                   :class="[
                     'border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500',
                     {
-                      'bg-green-100 border-green-500 text-green-800': empleado.estado === 'Aprobado',
-                      'bg-red-100 border-red-500 text-red-800': empleado.estado === 'Denegado',
-                      'bg-gray-100 border-gray-300 text-gray-800': empleado.estado === 'No revisado'
+                      'bg-green-100 border-green-500 text-green-800': registro.estado === 'Aprobado',
+                      'bg-red-100 border-red-500 text-red-800': registro.estado === 'Denegado',
+                      'bg-gray-100 border-gray-300 text-gray-800': registro.estado === 'NoRevisado'
                     }
                   ]"
-                  @change="updateEstado(empleado)"
+                  @change="updateEstado(registro)"
                 >
-                  <option value="No revisado" class="bg-gray-100">No revisado</option>
+                  <option value="NoRevisado" class="bg-gray-100">No revisado</option>
                   <option value="Aprobado" class="bg-green-100">Aprobado</option>
                   <option value="Denegado" class="bg-red-100">Denegado</option>
                 </select>
               </td>
             </tr>
-            <tr v-if="filteredEmpleados.length === 0">
+            <tr v-if="filteredRegistros.length === 0">
               <td colspan="5" class="py-4 text-center text-gray-500">
-                No se encontraron empleados
+                No se encontraron registros de horas
               </td>
             </tr>
           </tbody>
@@ -69,86 +69,85 @@
 
 <script>
 import { ref, onMounted, computed } from "vue";
+import axios from "axios";
+import { useRoute } from "vue-router";
 
 export default {
   setup() {
-    const empresa = ref({
-      nombre: "Tech Solutions S.A.",
-      cedulaJuridica: "3-101-205045"
-    });
-    const empleadosEmpresa = ref([]);
+    const route = useRoute();
+    const empresa = ref(null);
+    const registros = ref([]);
     const searchQuery = ref("");
 
-    // Datos de prueba en JSON
-    const datosPrueba = [
-      {
-        id: 1,
-        nombre: "Juan Pérez Rojas",
-        usuario: "jperez",
-        horasSolicitadas: 8,
-        fechaSolicitud: "2023-05-15",
-        estado: "No revisado"
-      },
-      {
-        id: 2,
-        nombre: "María González López",
-        usuario: "mgonzalez",
-        horasSolicitadas: 4,
-        fechaSolicitud: "2023-05-16",
-        estado: "Aprobado"
-      },
-      {
-        id: 3,
-        nombre: "Carlos Rodríguez Vargas",
-        usuario: "crodriguez",
-        horasSolicitadas: 12,
-        fechaSolicitud: "2023-05-14",
-        estado: "Denegado"
-      },
-      {
-        id: 4,
-        nombre: "Ana Méndez Soto",
-        usuario: "amendez",
-        horasSolicitadas: 6,
-        fechaSolicitud: "2023-05-17",
-        estado: "No revisado"
-      }
-    ];
-
-    const filteredEmpleados = computed(() => {
-      if (!searchQuery.value) return empleadosEmpresa.value;
-      return empleadosEmpresa.value.filter(empleado => 
-        empleado.nombre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        empleado.usuario.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const filteredRegistros = computed(() => {
+      if (!searchQuery.value) return registros.value;
+      return registros.value.filter(registro => 
+        registro.nombreEmpleado.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        registro.usuario.toLowerCase().includes(searchQuery.value.toLowerCase())
       );
     });
 
     const formatDate = (dateString) => {
       if (!dateString) return "No disponible";
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString('es-ES', options);
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
     };
 
-    const updateEstado = async (empleado) => {
+    const updateEstado = async (registro) => {
       try {
-        // Simulación de actualización
-        console.log(`Actualizando estado de ${empleado.nombre} a ${empleado.estado}`);
-        // En una implementación real, aquí iría la llamada a la API
+        await axios.put(`https://localhost:7014/api/RegistroHoras/${registro.id}`, {
+          estado: registro.estado
+        });
+        console.log(`Estado actualizado a ${registro.estado}`);
       } catch (error) {
         console.error("Error al actualizar el estado:", error);
       }
     };
 
+     
+
+    const fetchData = async () => {
+  const empresaId = route.params.empresaId;
+  try {
+    // Obtener datos de la empresa
+    const empresaResponse = await axios.get(
+      `https://localhost:7014/api/Empresa/${empresaId}`
+    );
+    // Asegura que el objeto tenga la estructura correcta
+    empresa.value = {
+      nombre: empresaResponse.data.nombre,
+      cedulaJuridica: empresaResponse.data.cedulaJuridica,
+      telefono: empresaResponse.data.telefono,
+      dueno: empresaResponse.data.dueno,
+      correo: empresaResponse.data.correo,
+    };
+    console.log("Empresa cargada:", empresa.value);
+
+    // Obtener registros de horas
+    const registrosResponse = await axios.get(
+      `https://localhost:7014/api/RegistroHoras/por-empresa/${empresaId}`
+    );
+    registros.value = registrosResponse.data;
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+  }
+};
+
     onMounted(() => {
-      // Cargamos los datos de prueba al montar el componente
-      empleadosEmpresa.value = datosPrueba;
+      fetchData();
     });
 
     return { 
       empresa, 
-      empleadosEmpresa, 
+      registros, 
       searchQuery, 
-      filteredEmpleados,
+      filteredRegistros,
       formatDate,
       updateEstado
     };
