@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendGeems.Infraestructure;
 using System;
 
-namespace BackendGeems.Controllers
+namespace BackendGeems.API
 {
     [Route("api/[controller]")]
     [ApiController]

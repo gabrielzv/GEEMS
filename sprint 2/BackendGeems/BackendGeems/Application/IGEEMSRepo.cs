@@ -14,7 +14,7 @@ namespace BackendGeems.Application
         void InsertRegister(Registro registro);
         public int GetMonthHours(Guid idEmpleado, DateTime fecha);
         public List<Empleado> ObtenerEmpleadosPorEmpresa(string nombreEmpresa);
-        public List<PlanillaDTO> ObtenerPlanillasPorEmpresa(string nombreEmpresa);
+        public List<Planilla> ObtenerPlanillasPorEmpresa(string nombreEmpresa);
 
     }
 
