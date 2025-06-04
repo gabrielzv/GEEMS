@@ -55,8 +55,8 @@ INSERT INTO DatosPrivadosEmpresa VALUES
 ('1-555-9876543', 'Trimestral', 2);
 
 -- Beneficios
-INSERT INTO Beneficio VALUES (@uidBeneficio, 10000, 6, 'Membresía en gimnasio premium', 'Gimnasio Premium', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0, NULL);
-INSERT INTO Beneficio VALUES (@uidBeneficio2, 5000, 12, 'Seguro de vida', 'Seguro Vida', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0, NULL);
+INSERT INTO Beneficio VALUES (@uidBeneficio, 10000, 6, 'Membresía en gimnasio premium', 'Gimnasio Premium', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0);
+INSERT INTO Beneficio VALUES (@uidBeneficio2, 5000, 12, 'Seguro de vida', 'Seguro Vida', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0);
 
 -- Elegibilidad del beneficio
 INSERT INTO BeneficioContratoElegible VALUES (@uidBeneficio, 'Tiempo Completo');
@@ -97,9 +97,6 @@ VALUES (@uidDeduccion1, @uidPago, 'Obligatoria', NULL, 50000);
 INSERT INTO Deducciones (Id, IdPago, TipoDeduccion, IdBeneficio, Monto)
 VALUES (@uidDeduccion2, @uidPago, 'Voluntaria', @uidBeneficio, 35000);
 
--- API guardadas (ejemplo)
-INSERT INTO API_guardadas (nombre_api, metodo, url_completa, nombre_key_header, valor_key_header)
-VALUES ('MediSeguro', 'POST', 'https://mediseguro-vorlagenersteller-d4hmbvf7frg7aqan.southcentralus-01.azurewebsites.net/api/MediSeguroMonto', 'token', 'TOKEN123');
 
 -- Consultas de prueba
 SELECT * FROM Persona;
