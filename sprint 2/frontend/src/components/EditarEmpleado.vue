@@ -78,14 +78,6 @@
             </select>
           </div>
           <div class="form-group mb-4">
-            <label class="block font-medium mb-2">Fecha de Ingreso</label>
-            <input
-              v-model="editableEmployee.fechaIngreso"
-              type="date"
-              class="w-full p-2 border rounded"
-            />
-          </div>
-          <div class="form-group mb-4">
             <label class="block font-medium mb-2">Nombre de la Empresa</label>
             <input
               v-model="editableEmployee.nombreEmpresa"
