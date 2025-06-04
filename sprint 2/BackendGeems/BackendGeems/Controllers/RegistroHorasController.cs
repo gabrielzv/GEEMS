@@ -68,38 +68,5 @@ namespace BackendGeems.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateEstadoRegistro(Guid id, [FromBody] dynamic request)
-        {
-            try
-            {
-                string estado = request.estado;
-
-                using SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-                conn.Open();
-
-                string query = @"
-                    UPDATE Registro 
-                    SET Estado = @Estado 
-                    WHERE Id = @Id";
-
-                using SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@Id", id);
-                cmd.Parameters.AddWithValue("@Estado", estado);
-
-                int rowsAffected = cmd.ExecuteNonQuery();
-
-                if (rowsAffected == 0)
-                {
-                    return NotFound(new { message = "Registro no encontrado" });
-                }
-
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al actualizar el registro", error = ex.Message });
-            }
-        }
     }
 }

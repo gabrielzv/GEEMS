@@ -121,50 +121,67 @@ export default {
 
     // Función para actualizar estado
     const updateEstado = async (registro) => {
-      const estadoAnterior = [...registrosHoras.value].find(r => r.id === registro.id)?.estado;
-      
-      try {
-        isUpdating.value = true;
-        error.value = null;
+  // Guarda el estado anterior para poder revertir el cambio en caso de error.
+  const estadoAnterior = [...registrosHoras.value].find(r => r.id === registro.id)?.estado;
+  
+  try {
+    isUpdating.value = true;
+    error.value = null;
 
-        const response = await fetch(`https://localhost:7014/api/RegistroHoras/${registro.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': '*/*'
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            estado: registro.estado
-          })
-        });
-
-        if (!response.ok) {
-          let errorMessage = 'Error al actualizar el estado';
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.message || errorMessage;
-          } catch (e) {
-            errorMessage = `Error HTTP: ${response.status}`;
-          }
-          throw new Error(errorMessage);
-        }
-
-        console.log('Estado actualizado correctamente');
-
-      } catch (err) {
-        console.error("Error al actualizar estado:", err);
-        error.value = err.message;
-        
-        // Revertir el cambio en el frontend si falla
-        const index = registrosHoras.value.findIndex(r => r.id === registro.id);
-        if (index !== -1 && estadoAnterior) {
-          registrosHoras.value[index].estado = estadoAnterior;
-        }
-      } finally {
-        isUpdating.value = false;
-      }
+    // Mapeo de los estados de cadena a número:
+    const estadoMapping = {
+      "Aprobado": 1,
+      "NoRevisado": 2,
+      "Denegado": 3
     };
+
+    const opcionEstado = estadoMapping[registro.estado];
+    if (!opcionEstado) {
+      throw new Error("El estado seleccionado no es válido.");
+    }
+
+    // Llamada al endpoint del backend
+    const response = await fetch(`https://localhost:7014/api/Registro/actualizar-estado`, {
+      method: 'POST', // Usamos POST para el endpoint definido en el backend
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*'
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        idRegistro: registro.id,       // Se envía el GUID del registro
+        opcionEstado: opcionEstado     // Se envía el valor numérico mapeado
+      })
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Error al actualizar el estado';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        errorMessage = `Error HTTP: ${response.status}`;
+      }
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    console.log('Estado actualizado correctamente:', data);
+    
+  } catch (err) {
+    console.error("Error al actualizar estado:", err);
+    error.value = err.message;
+    
+    // Revertir el cambio en el frontend si ocurre un error
+    const index = registrosHoras.value.findIndex(r => r.id === registro.id);
+    if (index !== -1 && estadoAnterior) {
+      registrosHoras.value[index].estado = estadoAnterior;
+    }
+  } finally {
+    isUpdating.value = false;
+  }
+};
+
 
     // Función para obtener registros de horas desde el backend
     const fetchRegistrosHoras = async (nombreEmpresa) => {
