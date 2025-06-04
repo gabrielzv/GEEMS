@@ -11,11 +11,11 @@ namespace BackendGeems.API
     [ApiController]
     public class HorasController : ControllerBase
     {
-        private readonly GEEMSRepo _repoInfrastructure;
+        private readonly GEEMSHorasRepo _repoHoras;
         private readonly IQueryHoras _queryHoras;
         public HorasController(IQueryHoras queryHoras)
         {
-            _repoInfrastructure = new GEEMSRepo();
+            _repoHoras = new GEEMSHorasRepo();
             _queryHoras = queryHoras;
         }
 
@@ -48,7 +48,7 @@ namespace BackendGeems.API
         {
             try
             {
-                var registros = _repoInfrastructure.ObtenerRegistros(IdEmpleado);
+                var registros = _repoHoras.ObtenerRegistros(IdEmpleado);
                 if (registros == null || registros.Count == 0)
                     return NotFound(new { message = "No se encontraron registros para este empleado." });
 
