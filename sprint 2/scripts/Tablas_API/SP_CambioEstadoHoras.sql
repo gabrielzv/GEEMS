@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE sp_ActualizarEstadoRegistro
+CREATE PROCEDURE sp_ActualizarEstadoRegistro
 (
     @IdRegistro UNIQUEIDENTIFIER,
     @OpcionEstado INT,

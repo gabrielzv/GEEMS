@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Data.SqlClient; // Asegúrate de usar este paquete
 using System;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
-using MiProyecto.DTOs;
+using MiProyecto.DTOs; // Ajusta el namespace según corresponda
 
 namespace MiProyecto.Controllers
 {
@@ -31,38 +31,38 @@ namespace MiProyecto.Controllers
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand("sp_ActualizarEstadoRegistro", conn))
                 {
-                    using (SqlCommand cmd = new SqlCommand("sp_ActualizarEstadoRegistro", conn))
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Parámetros de entrada
+                    cmd.Parameters.Add(new SqlParameter("@IdRegistro", SqlDbType.UniqueIdentifier)
                     {
-                        cmd.CommandType = CommandType.StoredProcedure;
+                        Value = request.IdRegistro
+                    });
+                    cmd.Parameters.Add(new SqlParameter("@OpcionEstado", SqlDbType.Int)
+                    {
+                        Value = request.OpcionEstado
+                    });
 
-                        // Parámetros de entrada
-                        cmd.Parameters.Add(new SqlParameter("@IdRegistro", SqlDbType.UniqueIdentifier)
-                        {
-                            Value = request.IdRegistro
-                        });
-                        cmd.Parameters.Add(new SqlParameter("@OpcionEstado", SqlDbType.Int)
-                        {
-                            Value = request.OpcionEstado
-                        });
+                    // Parámetro de salida
+                    var outputResult = new SqlParameter("@Resultado", SqlDbType.VarChar, 50)
+                    {
+                        Direction = ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(outputResult);
 
-                        // Parámetro de salida
-                        var outputResult = new SqlParameter("@Resultado", SqlDbType.VarChar, 50)
-                        {
-                            Direction = ParameterDirection.Output
-                        };
-                        cmd.Parameters.Add(outputResult);
+                    await conn.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
 
-                        await conn.OpenAsync();
-                        await cmd.ExecuteNonQueryAsync();
-
-                        resultado = outputResult.Value != null ? outputResult.Value.ToString() : "No se obtuvo resultado";
-                    }
+                    resultado = outputResult.Value != null
+                        ? outputResult.Value.ToString()
+                        : "No se obtuvo un resultado";
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error al ejecutar el SP: {ex.Message}");
+                return StatusCode(500, $"Error al ejecutar el stored procedure: {ex.Message}");
             }
 
             return Ok(new { mensaje = resultado });
