@@ -1,5 +1,7 @@
 ﻿using BackendGeems.Application;
 using BackendGeems.Domain;
+using BackendGeems.Controllers;
+using System.Text.Json;
 using Microsoft.Data.SqlClient;
 using System.Data;
 
@@ -223,7 +225,7 @@ namespace BackendGeems.Infraestructure
         {
             try
             {
-                
+
                 if (ExistePago(idEmpleado, idPlanilla, fechaInicio, fechaFinal))
                 {
                     Console.WriteLine("Ya existe un pago para este empleado en el periodo especificado. Eliminando pago existente.");
@@ -246,7 +248,7 @@ namespace BackendGeems.Infraestructure
 
                     if (idPagoExistente != Guid.Empty)
                     {
-                        
+
                         string deleteDeducciones = "DELETE FROM Deducciones WHERE IdPago = @IdPago";
                         using (SqlCommand cmd = new SqlCommand(deleteDeducciones, _conexion))
                         {
@@ -256,7 +258,7 @@ namespace BackendGeems.Infraestructure
                             _conexion.Close();
                         }
 
-                       
+
                         string deletePago = "DELETE FROM Pago WHERE Id = @IdPago";
                         using (SqlCommand cmd = new SqlCommand(deletePago, _conexion))
                         {
@@ -736,38 +738,134 @@ namespace BackendGeems.Infraestructure
             }
         }
 
-            public string GetNombreEmpleadoPorCedula(string cedula)
-            {
-                string nombreCompleto = null;
-                string query = "SELECT NombrePila, Apellido1, Apellido2 FROM Persona WHERE Cedula = @Cedula";
+        public string GetNombreEmpleadoPorCedula(string cedula)
+        {
+            string nombreCompleto = null;
+            string query = "SELECT NombrePila, Apellido1, Apellido2 FROM Persona WHERE Cedula = @Cedula";
 
-                using (SqlCommand comando = new SqlCommand(query, _conexion))
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@Cedula", cedula);
+                try
                 {
-                    comando.Parameters.AddWithValue("@Cedula", cedula);
-                    try
+                    _conexion.Open();
+                    using (SqlDataReader reader = comando.ExecuteReader())
                     {
-                        _conexion.Open();
-                        using (SqlDataReader reader = comando.ExecuteReader())
+                        if (reader.Read())
                         {
-                            if (reader.Read())
-                            {
-                                string nombre = reader["NombrePila"] != DBNull.Value ? reader["NombrePila"].ToString() : "";
-                                string apellido1 = reader["Apellido1"] != DBNull.Value ? reader["Apellido1"].ToString() : "";
-                                string apellido2 = reader["Apellido2"] != DBNull.Value ? reader["Apellido2"].ToString() : "";
-                                nombreCompleto = $"{nombre} {apellido1} {apellido2}".Trim();
-                            }
+                            string nombre = reader["NombrePila"] != DBNull.Value ? reader["NombrePila"].ToString() : "";
+                            string apellido1 = reader["Apellido1"] != DBNull.Value ? reader["Apellido1"].ToString() : "";
+                            string apellido2 = reader["Apellido2"] != DBNull.Value ? reader["Apellido2"].ToString() : "";
+                            nombreCompleto = $"{nombre} {apellido1} {apellido2}".Trim();
                         }
                     }
-                    catch (SqlException ex)
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener el nombre completo del empleado por cédula: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+            return nombreCompleto;
+        }
+        
+
+        public Empleado ObtenerEmpleado(Guid idEmpleado)
+        {
+            Empleado empleado = null;
+            string query = @"SELECT Id, CedulaPersona, Contrato, NumHorasTrabajadas, Genero, EstadoLaboral, SalarioBruto, Tipo, FechaIngreso, NombreEmpresa, CantidadDependientes, fechaNacimiento 
+                             FROM Empleado 
+                             WHERE Id = @IdEmpleado";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
+                try
+                {
+                    _conexion.Open();
+                    using (SqlDataReader reader = comando.ExecuteReader())
                     {
-                        throw new Exception("Error al obtener el nombre completo del empleado por cédula: " + ex.Message);
-                    }
-                    finally
-                    {
-                        _conexion.Close();
+                        if (reader.Read())
+                        {
+                            empleado = new Empleado
+                            {
+                                Id = reader["Id"] != DBNull.Value ? Guid.Parse(reader["Id"].ToString()) : Guid.Empty,
+                                CedulaPersona = reader["CedulaPersona"] != DBNull.Value ? Convert.ToInt32(reader["CedulaPersona"]) : 0,
+                                Contrato = reader["Contrato"] != DBNull.Value ? reader["Contrato"].ToString() : null,
+                                NumHorasTrabajadas = reader["NumHorasTrabajadas"] != DBNull.Value ? Convert.ToInt32(reader["NumHorasTrabajadas"]) : 0,
+                                Genero = reader["Genero"] != DBNull.Value ? reader["Genero"].ToString() : null,
+                                EstadoLaboral = reader["EstadoLaboral"] != DBNull.Value ? reader["EstadoLaboral"].ToString() : null,
+                                SalarioBruto = reader["SalarioBruto"] != DBNull.Value ? Convert.ToInt32(reader["SalarioBruto"]) : 0,
+                                Tipo = reader["Tipo"] != DBNull.Value ? reader["Tipo"].ToString() : null,
+                                FechaIngreso = reader["FechaIngreso"] != DBNull.Value ? reader["FechaIngreso"].ToString() : null,
+                                NombreEmpresa = reader["NombreEmpresa"] != DBNull.Value ? reader["NombreEmpresa"].ToString() : null,
+                                CantidadDependientes = reader["CantidadDependientes"] != DBNull.Value ? Convert.ToInt32(reader["CantidadDependientes"]) : 0,
+                                fechaNacimiento = reader["fechaNacimiento"] != DBNull.Value ? Convert.ToDateTime(reader["fechaNacimiento"]) : DateTime.MinValue
+                            };
+                        }
                     }
                 }
-                return nombreCompleto;
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener el empleado: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
             }
+            return empleado;
+        }
+        public int ObtenerMontoAPI(Guid idEmpleado, string nombreAPI, int salarioBruto)
+        {
+            Empleado empleado = ObtenerEmpleado(idEmpleado);
+            if (nombreAPI == "Solidarista")
+            {
+                var nombreEmpresa = empleado.NombreEmpresa;
+                var builder = WebApplication.CreateBuilder();
+                var configuration = builder.Configuration;
+                var association = new AssociationController(configuration);
+                var request = new AssociationCalculationRequest
+                {
+                    AssociationName = nombreEmpresa,
+                    EmployeeSalary = salarioBruto
+                };
+
+                
+                var response = association.CalculateAssociationFee(request).Result;
+
+                var json = JsonDocument.Parse((Stream)response);
+                var amount = json.RootElement.GetProperty("amountToCharge").GetInt32();
+                Console.WriteLine($"Monto de la asociación: {amount}");
+                return amount;
+            }else if(nombreAPI == "LifeInsurance")
+            {
+                var fechaNacimiento = empleado.fechaNacimiento;
+                var genero = "";
+                if (empleado.Genero == "M")
+                {
+                    genero = "Male";
+                }else if (empleado.Genero == "F")
+                {
+                    genero = "Female";
+                }
+                    var builder = WebApplication.CreateBuilder();
+                var configuration = builder.Configuration;
+                var lifeInsuranceController = new LifeInsuranceController(configuration);
+                var response =lifeInsuranceController.GetPolicyInfo(fechaNacimiento.ToString("yyyy-MM-dd"),genero).Result;
+
+                var json = JsonDocument.Parse((Stream)response);
+                var amount = json.RootElement.GetProperty("amountToCharge").GetInt32();
+                Console.WriteLine($"Monto de la asociación: {amount}");
+
+            }
+            else if (nombreAPI == "Asociacion Calculator")
+
+                return 0;
+        }
     }
 }
