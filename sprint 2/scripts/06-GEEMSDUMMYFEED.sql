@@ -1,18 +1,20 @@
 USE GEEMSDB;
 
 -- Declaración de IDs
-DECLARE @uid1 UNIQUEIDENTIFIER = NEWID(); -- Libre
-DECLARE @uid2 UNIQUEIDENTIFIER = NEWID(); -- DuenoEmpresa
-DECLARE @uid3 UNIQUEIDENTIFIER = NEWID(); -- Colaborador
-DECLARE @uid4 UNIQUEIDENTIFIER = NEWID(); -- Beneficio
-DECLARE @uid5 UNIQUEIDENTIFIER = NEWID(); -- Supervisor
-DECLARE @uid6 UNIQUEIDENTIFIER = NEWID(); -- Payroll
-DECLARE @uid7 UNIQUEIDENTIFIER = NEWID(); -- Pago
-DECLARE @uid8 UNIQUEIDENTIFIER = NEWID(); -- Registro
-DECLARE @uid9 UNIQUEIDENTIFIER = NEWID(); -- SuperAdmin
-DECLARE @uidPlanilla UNIQUEIDENTIFIER = NEWID(); -- Planilla
-DECLARE @uidDeduccion1 UNIQUEIDENTIFIER = NEWID(); -- Deduccion obligatoria
-DECLARE @uidDeduccion2 UNIQUEIDENTIFIER = NEWID(); -- Deduccion voluntaria
+-- Son fijos para que funcionen en los UnitTests sin problema
+DECLARE @uid1 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000001'; -- Libre
+DECLARE @uid2 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000002'; -- DuenoEmpresa
+DECLARE @uid3 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000003'; -- Colaborador
+DECLARE @uid4 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000004'; -- Beneficio
+DECLARE @uid5 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000005'; -- Supervisor
+DECLARE @uid6 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000006'; -- Payroll
+DECLARE @uid7 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000007'; -- Pago
+DECLARE @uid8 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000008'; -- Registro
+DECLARE @uid9 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000009'; -- SuperAdmin
+DECLARE @uidPlanilla UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000010'; -- Planilla
+DECLARE @uidPlanilla2 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000011'; -- Planilla 2
+DECLARE @uidDeduccion1 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000012'; -- Deduccion obligatoria
+DECLARE @uidDeduccion2 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000013'; -- Deduccion voluntaria
 
 -- Personas
 INSERT INTO Persona VALUES 
@@ -70,9 +72,9 @@ INSERT INTO BeneficiosEmpleado VALUES (@uid3, @uid4);
 -- Planilla
 INSERT INTO Planilla VALUES (@uidPlanilla, '2025-04-01', '2025-04-30', @uid6);
 
--- Pago (bruto: 850000, neto calculado tras deducciones)
-INSERT INTO Pago (Id, MontoPago, IdEmpleado, IdPayroll, IdPlanilla, MontoBruto, FechaInicio, FechaFinal)
-VALUES (@uid7, 765000, @uid3, @uid6, @uidPlanilla, 850000, '2025-04-01', '2025-04-30');
+---- Pago (bruto: 850000, neto calculado tras deducciones)
+--INSERT INTO Pago (Id, MontoPago, IdEmpleado, IdPayroll, IdPlanilla, MontoBruto, FechaInicio, FechaFinal)
+--VALUES (@uid7, 765000, @uid3, @uid6, @uidPlanilla, 850000, '2025-04-01', '2025-04-30');
 
 -- Deducción obligatoria
 INSERT INTO Deducciones (Id, IdPago, TipoDeduccion, IdBeneficio, Monto)
@@ -84,7 +86,9 @@ VALUES (@uidDeduccion2, @uid7, 'Voluntaria', @uid4, 35000);
 
 
 -- Registro de horas del colaborador (ya aprobadas)
-INSERT INTO Registro VALUES (@uid8, 160, '2025-04-20', 'Aprobado', @uid3);
+INSERT INTO Registro VALUES (@uid8, 4, '2025-04-20', 'Aprobado', @uid3);
+INSERT INTO Registro VALUES (NEWID(), 3, '2025-04-21', 'Aprobado', @uid5);
+INSERT INTO Registro VALUES (NEWID(), 2, '2025-04-22', 'Aprobado', @uid6);
 
 --Horas De prueba 
 -- DECLARE @uid23 UNIQUEIDENTIFIER = '4E24A20B-6787-43D1-AF95-953E752015DE';
@@ -93,3 +97,10 @@ INSERT INTO Registro VALUES (@uid8, 160, '2025-04-20', 'Aprobado', @uid3);
 -- INSERT INTO Registro VALUES (NEWID(), 160, '2025-04-20', 'Aprobado', @uid23);
 -- INSERT INTO Registro VALUES (NEWID(), 80, '2025-04-20', 'Aprobado', @uid23);
 -- INSERT INTO Registro VALUES (NEWID(), 80, '2025-04-20', 'NoRevisado', @uid23);
+
+SELECT * FROM Usuario;
+SELECT * FROM Empleado;
+SELECT * FROM Planilla;
+SELECT * FROM Pago;
+SELECT * FROM Registro;
+SELECT * FROM Deducciones;

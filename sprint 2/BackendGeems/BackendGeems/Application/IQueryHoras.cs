@@ -7,5 +7,6 @@ namespace BackendGeems.Application
         void InsertRegister(Registro inserting);
         Registro GetRegister(Guid Id);
         void EditRegister(Registro editing, Guid oldId);
+        bool ValidHours(DateTime date, Guid employeeId, int hours);
     }
 }

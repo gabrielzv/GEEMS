@@ -4,6 +4,8 @@ VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackendGeems", "BackendGeems\BackendGeems.csproj", "{A78772DC-D000-45B9-A127-E47E012E062E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{A86ED9D3-5275-48ED-9047-A5DF448B2B12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,6 +16,10 @@ Global
 		{A78772DC-D000-45B9-A127-E47E012E062E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A78772DC-D000-45B9-A127-E47E012E062E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A78772DC-D000-45B9-A127-E47E012E062E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A86ED9D3-5275-48ED-9047-A5DF448B2B12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A86ED9D3-5275-48ED-9047-A5DF448B2B12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A86ED9D3-5275-48ED-9047-A5DF448B2B12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A86ED9D3-5275-48ED-9047-A5DF448B2B12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

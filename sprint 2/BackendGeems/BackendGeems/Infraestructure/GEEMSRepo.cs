@@ -2,7 +2,6 @@
 using BackendGeems.Domain;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using System.Data.SqlClient;
 
 
 namespace BackendGeems.Infraestructure
@@ -11,6 +10,8 @@ namespace BackendGeems.Infraestructure
     {
         private SqlConnection _conexion;
         private string _cadenaConexion;
+
+        public string CadenaConexion => _cadenaConexion;
 
         public GEEMSRepo()
         {
@@ -27,89 +28,6 @@ namespace BackendGeems.Infraestructure
             adaptador.Fill(tablaConsulta);
             _conexion.Close();
             return tablaConsulta;
-        }
-
-        public bool calcularPago(string fechaInicio, string fechaFinal)
-        {
-            SqlCommand comando = new SqlCommand("calcularPago", _conexion);
-            comando.CommandType = CommandType.StoredProcedure;
-            comando.Parameters.AddWithValue("@fechaInicio", fechaInicio);
-            comando.Parameters.AddWithValue("@fechaFinal", fechaFinal);
-            _conexion.Open();
-            int filasAfectadas = comando.ExecuteNonQuery();
-            _conexion.Close();
-            return filasAfectadas > 0;
-        }
-
-        public List<Pago> ObtenerPagos(DateTime fechaInicio, DateTime fechaFinal)
-        {
-            string query = @"SELECT * FROM Pago p WHERE p.FechaInicio >= @fechaInicio 
-                     AND p.FechaFinal <= @fechaFinal";
-            SqlCommand comando = new SqlCommand(query, _conexion);
-            comando.Parameters.AddWithValue("@fechaInicio", fechaInicio);
-            comando.Parameters.AddWithValue("@fechaFinal", fechaFinal);
-
-            DataTable tablaConsulta = CrearTablaConsulta(comando);
-
-            List<Pago> pagos = new List<Pago>();
-            foreach (DataRow fila in tablaConsulta.Rows)
-            {
-                Pago pago = new Pago
-                {
-                    Id = fila["Id"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["Id"].ToString()),
-                    FechaRealizada = fila["FechaRealizada"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(fila["FechaRealizada"]),
-                    MontoPago = fila["MontoPago"] == DBNull.Value ? 0m : Convert.ToDecimal(fila["MontoPago"]),
-                    IdEmpleado = fila["IdEmpleado"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["IdEmpleado"].ToString()),
-                    IdPayroll = fila["IdPayroll"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["IdPayroll"].ToString()),
-                    IdPlanilla = fila["IdPlanilla"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["IdPlanilla"].ToString()),
-                    MontoBruto = fila["MontoBruto"] == DBNull.Value ? 0m : Convert.ToDecimal(fila["MontoBruto"]),
-                    FechaInicio = fila["FechaInicio"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(fila["FechaInicio"]),
-                    FechaFinal = fila["FechaFinal"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(fila["FechaFinal"])
-                };
-                pagos.Add(pago);
-            }
-            return pagos;
-        }
-
-        public int ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal)
-        {
-            int salarioBruto = 0;
-
-            using (SqlCommand comando = new SqlCommand("CalcularSalarioBruto", _conexion))
-            {
-                comando.CommandType = CommandType.StoredProcedure;
-
-                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
-                comando.Parameters.AddWithValue("@FechaInicio", fechaInicio);
-                comando.Parameters.AddWithValue("@FechaFinal", fechaFinal);
-
-                SqlParameter outputParam = new SqlParameter("@SalarioBruto", SqlDbType.Int)
-                {
-                    Direction = ParameterDirection.Output
-                };
-                comando.Parameters.Add(outputParam);
-
-                try
-                {
-                    _conexion.Open();
-                    comando.ExecuteNonQuery();
-
-                    if (outputParam.Value != DBNull.Value)
-                        salarioBruto = (int)outputParam.Value;
-                    else
-                        throw new Exception("El procedimiento no retornó un valor de salario bruto.");
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception("Error al calcular salario bruto: " + ex.Message);
-                }
-                finally
-                {
-                    _conexion.Close();
-                }
-            }
-
-            return salarioBruto;
         }
 
         public List<Registro> ObtenerRegistros(Guid idEmpleado)
@@ -235,6 +153,101 @@ namespace BackendGeems.Infraestructure
                     _conexion.Close();
                 }
             }
+        }
+
+        public List<Empleado> ObtenerEmpleadosPorEmpresa(string nombreEmpresa)
+        {
+            List<Empleado> empleados = new List<Empleado>();
+            string query = @"SELECT * FROM Empleado WHERE NombreEmpresa = @NombreEmpresa";
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
+                DataTable tabla = CrearTablaConsulta(comando);
+                foreach (DataRow fila in tabla.Rows)
+                {
+                    empleados.Add(new Empleado
+                    {
+                        Id = fila["Id"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["Id"].ToString()),
+                        CedulaPersona = fila["CedulaPersona"] == DBNull.Value ? 0 : Convert.ToInt32(fila["CedulaPersona"]),
+                        Contrato = fila["Contrato"] == DBNull.Value ? "" : fila["Contrato"].ToString(),
+                        NumHorasTrabajadas = fila["NumHorasTrabajadas"] == DBNull.Value ? 0 : Convert.ToInt32(fila["NumHorasTrabajadas"]),
+                        Genero = fila["Genero"] == DBNull.Value ? "" : fila["Genero"].ToString(),
+                        EstadoLaboral = fila["EstadoLaboral"] == DBNull.Value ? "" : fila["EstadoLaboral"].ToString(),
+                        SalarioBruto = fila["SalarioBruto"] == DBNull.Value ? 0 : Convert.ToInt32(fila["SalarioBruto"]),
+                        Tipo = fila["Tipo"] == DBNull.Value ? "" : fila["Tipo"].ToString(),
+                        FechaIngreso = fila["FechaIngreso"] == DBNull.Value ? "" : fila["FechaIngreso"].ToString(),
+                        NombreEmpresa = fila["NombreEmpresa"] == DBNull.Value ? "" : fila["NombreEmpresa"].ToString()
+                    });
+                }
+            }
+            return empleados;
+        }
+
+        public class PlanillaDTO
+        {
+            public Guid Id { get; set; }
+            public DateTime FechaInicio { get; set; }
+            public DateTime FechaFinal { get; set; }
+        }
+
+        public List<PlanillaDTO> ObtenerPlanillasPorEmpresa(string nombreEmpresa)
+        {
+            List<PlanillaDTO> planillas = new List<PlanillaDTO>();
+            string query = @"
+                SELECT p.Id, p.FechaInicio, p.FechaFinal
+                FROM Planilla p
+                INNER JOIN Empleado e ON p.IdPayroll = e.Id
+                WHERE e.NombreEmpresa = @NombreEmpresa
+                ORDER BY p.FechaInicio DESC";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
+                DataTable tabla = CrearTablaConsulta(comando);
+                foreach (DataRow fila in tabla.Rows)
+                {
+                    planillas.Add(new PlanillaDTO
+                    {
+                        Id = Guid.Parse(fila["Id"].ToString()),
+                        FechaInicio = Convert.ToDateTime(fila["FechaInicio"]),
+                        FechaFinal = Convert.ToDateTime(fila["FechaFinal"])
+                    });
+                }
+            }
+            return planillas;
+        }
+      
+
+        public int GetMonthHours(Guid idEmpleado, DateTime fecha)
+        {
+            int horas = 0;
+            string query = "SELECT dbo.fnHorasTrabajadasPorMes(@IdEmpleado, @Fecha)";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                comando.Parameters.AddWithValue("@Fecha", fecha);
+
+                try
+                {
+                    _conexion.Open();
+                    var result = comando.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        horas = Convert.ToInt32(result);
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener horas trabajadas: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+            Console.WriteLine("Se encuentra que la persona tiene horas trabajadas ese mes en: " + horas);
+            return horas;
         }
     }
 }

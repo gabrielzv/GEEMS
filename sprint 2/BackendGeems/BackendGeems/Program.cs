@@ -23,8 +23,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IGEEMSRepo, GEEMSRepo>();
+builder.Services.AddScoped<IGEEMSPagoRepo, GEEMSPagoRepo>();
 builder.Services.AddScoped<IQueryPago, QueryPago>();
 builder.Services.AddScoped<ISalarioBruto, SalarioBruto>();
+builder.Services.AddScoped<IGenerarPago, GenerarPago>();
 builder.Services.AddScoped<IQueryHoras, QueryHoras>();
 
 var app = builder.Build();

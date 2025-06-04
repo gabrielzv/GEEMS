@@ -22,6 +22,7 @@ import RegistroHoras from "./components/RegistroHoras.vue";
 import EmployeeRegHistory from "./components/EmployeeRegHistory.vue";
 import EditarHoras from "./components/EditarHoras.vue";
 import AprobarHoras from "./components/AprobacionHoras.vue";
+import PayrollSummary from "./components/PayrollSummary.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -55,6 +56,7 @@ const router = createRouter({
         { path: '/employeeRegHistory', name: 'employeeRegHistory', component: EmployeeRegHistory, meta: {requiresAuth: true} },
         { path: '/editarHoras/:registroId', name: 'editarHoras', component: EditarHoras, meta: {requiresAuth: true}},
         { path: '/aprobarHoras', name: 'aprobarHoras', component: AprobarHoras, meta: {requiresAuth: true} }
+        { path: '/payrollSummary', name: 'payrollSummary', component: PayrollSummary, meta: {requiresAuth: true} }
       ]
     }
   ],
