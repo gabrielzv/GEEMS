@@ -22,12 +22,12 @@ namespace BackendGeems.Controllers
                 using SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
                 conn.Open();
 
-                // Primera consulta: obtener datos del dueño
+                
                 string queryDueno = "SELECT * FROM DuenoEmpresa WHERE CedulaPersona = @cedulaPersona";
                 using SqlCommand cmdDueno = new SqlCommand(queryDueno, conn);
                 cmdDueno.Parameters.AddWithValue("@cedulaPersona", cedulaPersona);
 
-                // Guardamos los valores necesarios antes de cerrar el reader
+                
                 Guid id = Guid.Empty;
                 string cedulaEmpresa = null;
                 int cedulaPersonaValue = 0;
@@ -44,9 +44,9 @@ namespace BackendGeems.Controllers
                     {
                         return NotFound(new { message = "Dueño de empresa no encontrado" });
                     }
-                } // El reader se cierra automáticamente al salir del using
+                } 
 
-                // Segunda consulta: obtener nombre de la empresa
+               
                 string nombreEmpresa = null;
                 string queryEmpresa = "SELECT Nombre FROM Empresa WHERE CedulaJuridica = @cedulaEmpresa";
                 using (SqlCommand cmdEmpresa = new SqlCommand(queryEmpresa, conn))
