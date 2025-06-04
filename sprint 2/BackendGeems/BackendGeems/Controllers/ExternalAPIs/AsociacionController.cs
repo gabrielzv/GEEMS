@@ -40,7 +40,7 @@ namespace BackendGeems.Controllers
                 if (!reader.Read())
                     return NotFound("API de asociación no configurada");
 
-                string url = reader["url_completa"].ToString();
+                string url = reader["url_completa"].ToString() ?? "";
                 string keyName = reader["nombre_key_header"]?.ToString();
                 string keyValue = reader["valor_key_header"]?.ToString();
 

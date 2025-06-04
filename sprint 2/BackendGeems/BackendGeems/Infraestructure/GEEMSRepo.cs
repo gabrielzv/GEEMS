@@ -183,16 +183,9 @@ namespace BackendGeems.Infraestructure
             return empleados;
         }
 
-        public class PlanillaDTO
+        public List<Planilla> ObtenerPlanillasPorEmpresa(string nombreEmpresa)
         {
-            public Guid Id { get; set; }
-            public DateTime FechaInicio { get; set; }
-            public DateTime FechaFinal { get; set; }
-        }
-
-        public List<PlanillaDTO> ObtenerPlanillasPorEmpresa(string nombreEmpresa)
-        {
-            List<PlanillaDTO> planillas = new List<PlanillaDTO>();
+            List<Planilla> planillas = new List<Planilla>();
             string query = @"
                 SELECT p.Id, p.FechaInicio, p.FechaFinal
                 FROM Planilla p
@@ -206,7 +199,7 @@ namespace BackendGeems.Infraestructure
                 DataTable tabla = CrearTablaConsulta(comando);
                 foreach (DataRow fila in tabla.Rows)
                 {
-                    planillas.Add(new PlanillaDTO
+                    planillas.Add(new Planilla
                     {
                         Id = Guid.Parse(fila["Id"].ToString()),
                         FechaInicio = Convert.ToDateTime(fila["FechaInicio"]),
