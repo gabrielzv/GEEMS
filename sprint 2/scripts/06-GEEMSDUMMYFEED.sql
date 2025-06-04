@@ -52,7 +52,7 @@ INSERT INTO DatosPrivadosEmpresa VALUES
 ('1-555-9876543', 'Trimestral', 2);
 
 -- Beneficio
-INSERT INTO Beneficio VALUES (@uid4, 10000, 6, 'Membresía en gimnasio premium', 'Gimnasio Premium', '3-101-1234567', 'Mensual');
+INSERT INTO Beneficio VALUES (@uid4, 10000, 6, 'Membresía en gimnasio premium', 'Gimnasio Premium', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0);
 
 -- Elegibilidad del beneficio
 INSERT INTO BeneficioContratoElegible VALUES (@uid4, 'Tiempo Completo');
@@ -72,9 +72,9 @@ INSERT INTO BeneficiosEmpleado VALUES (@uid3, @uid4);
 -- Planilla
 INSERT INTO Planilla VALUES (@uidPlanilla, '2025-04-01', '2025-04-30', @uid6);
 
----- Pago (bruto: 850000, neto calculado tras deducciones)
---INSERT INTO Pago (Id, MontoPago, IdEmpleado, IdPayroll, IdPlanilla, MontoBruto, FechaInicio, FechaFinal)
---VALUES (@uid7, 765000, @uid3, @uid6, @uidPlanilla, 850000, '2025-04-01', '2025-04-30');
+-- Pago (bruto: 850000, neto calculado tras deducciones)
+INSERT INTO Pago (Id, MontoPago, IdEmpleado, IdPayroll, IdPlanilla, MontoBruto, FechaInicio, FechaFinal)
+VALUES (@uid7, 765000, @uid3, @uid6, @uidPlanilla, 850000, '2025-04-01', '2025-04-30');
 
 -- Deducción obligatoria
 INSERT INTO Deducciones (Id, IdPago, TipoDeduccion, IdBeneficio, Monto)
