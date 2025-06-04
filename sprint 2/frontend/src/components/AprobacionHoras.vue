@@ -149,8 +149,8 @@ export default {
       },
       credentials: 'include',
       body: JSON.stringify({
-        idRegistro: registro.id,       // Se envía el GUID del registro
-        opcionEstado: opcionEstado     // Se envía el valor numérico mapeado
+        idRegistro: registro.id,   
+        opcionEstado: opcionEstado 
       })
     });
 
