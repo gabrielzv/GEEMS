@@ -1,7 +1,10 @@
 ﻿using BackendGeems.Application;
+using BackendGeems.Controllers;
 using BackendGeems.Domain;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Text.Json;
 
 
 namespace BackendGeems.Infraestructure
@@ -223,7 +226,7 @@ namespace BackendGeems.Infraestructure
         {
             try
             {
-                
+
                 if (ExistePago(idEmpleado, idPlanilla, fechaInicio, fechaFinal))
                 {
                     Console.WriteLine("Ya existe un pago para este empleado en el periodo especificado. Eliminando pago existente.");
@@ -246,7 +249,7 @@ namespace BackendGeems.Infraestructure
 
                     if (idPagoExistente != Guid.Empty)
                     {
-                        
+
                         string deleteDeducciones = "DELETE FROM Deducciones WHERE IdPago = @IdPago";
                         using (SqlCommand cmd = new SqlCommand(deleteDeducciones, _conexion))
                         {
@@ -256,7 +259,7 @@ namespace BackendGeems.Infraestructure
                             _conexion.Close();
                         }
 
-                       
+
                         string deletePago = "DELETE FROM Pago WHERE Id = @IdPago";
                         using (SqlCommand cmd = new SqlCommand(deletePago, _conexion))
                         {
@@ -285,13 +288,16 @@ namespace BackendGeems.Infraestructure
                 bool esQuincenal = duracion.TotalDays <= 16;
                 if (!esQuincenal)
                 {
-                    GenerarPagoEmpleadoMensual(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
                     Console.WriteLine("Mensual");
+
+                    GenerarPagoEmpleadoMensual(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
+
                 }
                 else
                 {
-                    GenerarPagoEmpleadoQuincenal(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
                     Console.WriteLine("Quincenal");
+                    GenerarPagoEmpleadoQuincenal(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
+
                 }
             }
             catch (Exception ex)
@@ -348,7 +354,7 @@ namespace BackendGeems.Infraestructure
                 List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
 
                 string queryBeneficios = @"
-                    SELECT b.Id, b.Costo
+                    SELECT b.Id, b.Costo,b.NombreDeAPI,b.EsAPI
                     FROM BeneficiosEmpleado be
                     JOIN Beneficio b ON be.IdBeneficio = b.Id
                     WHERE be.IdEmpleado = @IdEmpleado";
@@ -364,8 +370,24 @@ namespace BackendGeems.Infraestructure
                         {
                             Guid idBeneficio = Guid.Parse(row["Id"].ToString());
                             int monto = Convert.ToInt32(row["Costo"]);
-                            deduccionesVoluntarias.Add((idBeneficio, monto));
-                            totalDeducciones += monto;
+                            bool esAPI = Convert.ToBoolean(row["EsAPI"]);
+                            string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
+                            if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
+                            {
+
+
+                                monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBruto);
+
+                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                totalDeducciones += monto;
+                            }
+                            else
+                            {
+                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                totalDeducciones += monto;
+                            }
+
+
                             if (totalDeducciones > salarioBruto)
                             {
                                 throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
@@ -421,11 +443,13 @@ namespace BackendGeems.Infraestructure
         {
             try
             {
+                Console.WriteLine(idEmpleado);
                 string tipoContrato = ObtenerTipoContratoEmpleado(idEmpleado);
                 Console.WriteLine(tipoContrato);
                 int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
                 int salarioBrutoMensual = 0;
                 int salarioBrutoQuincenal = 0;
+                Console.WriteLine(salarioBrutoQuincenal);
 
                 if (salarioBruto == -1)
                 {
@@ -442,15 +466,19 @@ namespace BackendGeems.Infraestructure
                     if (salarioBruto > 0)
                     {
                         salarioBrutoMensual = ObtenerSalarioEmpleado(idEmpleado);
-                        salarioBrutoQuincenal = salarioBruto / 2;
+                        salarioBrutoQuincenal = salarioBrutoMensual / 2;
+                        Console.WriteLine("Salario mensual " + salarioBrutoMensual);
+                        Console.WriteLine("Salario quincenal " + salarioBrutoQuincenal);
                     }
                 }
+
 
                 else if (tipoContrato == "Por Horas")
                 {
                     salarioBrutoQuincenal = salarioBruto;
                 }
-
+                Console.WriteLine("Salario mensual " + salarioBrutoMensual);
+                Console.WriteLine("Salario quincenal " + salarioBrutoQuincenal);
 
                 bool esSegundaQuincena = fechaFinal.Day > 15;
 
@@ -469,45 +497,65 @@ namespace BackendGeems.Infraestructure
                     impuestoRentaQuincenal = impuestoRentaMensual / 2;
 
 
-                    SEM = (int)(salarioBrutoQuincenal * 0.0550); // 5.50%
-                    IVM = (int)(salarioBrutoQuincenal * 0.0417); // 4.17%
-                    BancoPopular = (int)(salarioBrutoQuincenal * 0.01); // 1%
-                    totalDeducciones = impuestoRentaQuincenal + SEM + IVM + BancoPopular;
+                    SEM = (int)(salarioBrutoMensual * 0.0550); // 5.50%
+                    IVM = (int)(salarioBrutoMensual * 0.0417); // 4.17%
+                    BancoPopular = (int)(salarioBrutoMensual * 0.01); // 1%
+                    totalDeducciones = impuestoRentaQuincenal + SEM / 2 + IVM / 2 + BancoPopular / 2;
                 }
 
                 List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
 
 
-                if (esSegundaQuincena)
-                {
-                    string queryBeneficios = @"
-                            SELECT b.Id, b.Costo
-                            FROM BeneficiosEmpleado be
-                            JOIN Beneficio b ON be.IdBeneficio = b.Id
-                            WHERE be.IdEmpleado = @IdEmpleado";
-                    using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
-                    {
-                        cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
-                        DataTable dt = CrearTablaConsulta(cmd);
 
-                        foreach (DataRow row in dt.Rows)
+
+                string queryBeneficios = @"
+                    SELECT b.Id, b.Costo,b.NombreDeAPI,b.EsAPI
+                    FROM BeneficiosEmpleado be
+                    JOIN Beneficio b ON be.IdBeneficio = b.Id
+                    WHERE be.IdEmpleado = @IdEmpleado";
+                using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
+                {
+                    cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                    DataTable dt = CrearTablaConsulta(cmd);
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+
+                        if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
                         {
-                            if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
+                            Guid idBeneficio = Guid.Parse(row["Id"].ToString());
+                            int monto = Convert.ToInt32(row["Costo"]);
+
+                            bool esAPI = Convert.ToBoolean(row["EsAPI"]);
+                            string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
+                            if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
                             {
-                                Guid idBeneficio = Guid.Parse(row["Id"].ToString());
-                                int monto = Convert.ToInt32(row["Costo"]);
+
+
+                                monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBrutoMensual);
+                                monto = monto / 2;
+                                Console.WriteLine("Monto Mensual: " + monto);
+                                Console.WriteLine("Monto Quincenal: " + monto);
                                 deduccionesVoluntarias.Add((idBeneficio, monto));
                                 totalDeducciones += monto;
-                                Console.WriteLine(salarioBrutoQuincenal);
-                                Console.WriteLine(totalDeducciones);
-                                if (totalDeducciones > salarioBrutoQuincenal)
-                                {
-                                    throw new Exception("El total de deducciones no puede ser mayor al salario bruto quincenal.");
-                                }
+                            }
+                            else
+                            {
+                                monto = monto / 2;
+                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                totalDeducciones += monto;
+                            }
+
+
+                            if (totalDeducciones > salarioBrutoQuincenal)
+                            {
+
+                                throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
                             }
                         }
                     }
                 }
+
 
                 Guid idPago = Guid.NewGuid();
 
@@ -546,7 +594,9 @@ namespace BackendGeems.Infraestructure
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error En pago Quincenal: " + ex.Message);
                 throw new Exception(ex.Message);
+
             }
             finally
             {
@@ -626,15 +676,32 @@ namespace BackendGeems.Infraestructure
 
                         foreach (DataRow row in dt.Rows)
                         {
+
                             if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
                             {
                                 Guid idBeneficio = Guid.Parse(row["Id"].ToString());
                                 int monto = Convert.ToInt32(row["Costo"]);
-                                deduccionesVoluntarias.Add((idBeneficio, monto));
-                                totalDeducciones += monto;
-                                if (totalDeducciones > salarioBrutoSemanal)
+                                bool esAPI = Convert.ToBoolean(row["EsAPI"]);
+                                string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
+                                if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
                                 {
-                                    throw new Exception("El total de deducciones no puede ser mayor al salario bruto semanal.");
+
+
+                                    monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBruto);
+
+                                    deduccionesVoluntarias.Add((idBeneficio, monto));
+                                    totalDeducciones += monto;
+                                }
+                                else
+                                {
+                                    deduccionesVoluntarias.Add((idBeneficio, monto));
+                                    totalDeducciones += monto;
+                                }
+
+
+                                if (totalDeducciones > salarioBruto)
+                                {
+                                    throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
                                 }
                             }
                         }
@@ -736,38 +803,219 @@ namespace BackendGeems.Infraestructure
             }
         }
 
-            public string GetNombreEmpleadoPorCedula(string cedula)
-            {
-                string nombreCompleto = null;
-                string query = "SELECT NombrePila, Apellido1, Apellido2 FROM Persona WHERE Cedula = @Cedula";
+        public string GetNombreEmpleadoPorCedula(string cedula)
+        {
+            string nombreCompleto = null;
+            string query = "SELECT NombrePila, Apellido1, Apellido2 FROM Persona WHERE Cedula = @Cedula";
 
-                using (SqlCommand comando = new SqlCommand(query, _conexion))
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@Cedula", cedula);
+                try
                 {
-                    comando.Parameters.AddWithValue("@Cedula", cedula);
-                    try
+                    _conexion.Open();
+                    using (SqlDataReader reader = comando.ExecuteReader())
                     {
-                        _conexion.Open();
-                        using (SqlDataReader reader = comando.ExecuteReader())
+                        if (reader.Read())
                         {
-                            if (reader.Read())
-                            {
-                                string nombre = reader["NombrePila"] != DBNull.Value ? reader["NombrePila"].ToString() : "";
-                                string apellido1 = reader["Apellido1"] != DBNull.Value ? reader["Apellido1"].ToString() : "";
-                                string apellido2 = reader["Apellido2"] != DBNull.Value ? reader["Apellido2"].ToString() : "";
-                                nombreCompleto = $"{nombre} {apellido1} {apellido2}".Trim();
-                            }
+                            string nombre = reader["NombrePila"] != DBNull.Value ? reader["NombrePila"].ToString() : "";
+                            string apellido1 = reader["Apellido1"] != DBNull.Value ? reader["Apellido1"].ToString() : "";
+                            string apellido2 = reader["Apellido2"] != DBNull.Value ? reader["Apellido2"].ToString() : "";
+                            nombreCompleto = $"{nombre} {apellido1} {apellido2}".Trim();
                         }
                     }
-                    catch (SqlException ex)
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener el nombre completo del empleado por cédula: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+            return nombreCompleto;
+        }
+
+
+        public Empleado ObtenerEmpleado(Guid idEmpleado)
+        {
+            Empleado empleado = null;
+            string query = @"SELECT Id, CedulaPersona, Contrato, NumHorasTrabajadas, Genero, EstadoLaboral, SalarioBruto, Tipo, FechaIngreso, NombreEmpresa, NumDependientes, fechaNacimiento 
+                             FROM Empleado 
+                             WHERE Id = @IdEmpleado";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
+                try
+                {
+                    _conexion.Open();
+                    using (SqlDataReader reader = comando.ExecuteReader())
                     {
-                        throw new Exception("Error al obtener el nombre completo del empleado por cédula: " + ex.Message);
-                    }
-                    finally
-                    {
-                        _conexion.Close();
+                        if (reader.Read())
+                        {
+                            empleado = new Empleado
+                            {
+                                Id = reader["Id"] != DBNull.Value ? Guid.Parse(reader["Id"].ToString()) : Guid.Empty,
+                                CedulaPersona = reader["CedulaPersona"] != DBNull.Value ? Convert.ToInt32(reader["CedulaPersona"]) : 0,
+                                Contrato = reader["Contrato"] != DBNull.Value ? reader["Contrato"].ToString() : null,
+                                NumHorasTrabajadas = reader["NumHorasTrabajadas"] != DBNull.Value ? Convert.ToInt32(reader["NumHorasTrabajadas"]) : 0,
+                                Genero = reader["Genero"] != DBNull.Value ? reader["Genero"].ToString() : null,
+                                EstadoLaboral = reader["EstadoLaboral"] != DBNull.Value ? reader["EstadoLaboral"].ToString() : null,
+                                SalarioBruto = reader["SalarioBruto"] != DBNull.Value ? Convert.ToInt32(reader["SalarioBruto"]) : 0,
+                                Tipo = reader["Tipo"] != DBNull.Value ? reader["Tipo"].ToString() : null,
+                                FechaIngreso = reader["FechaIngreso"] != DBNull.Value ? reader["FechaIngreso"].ToString() : null,
+                                NombreEmpresa = reader["NombreEmpresa"] != DBNull.Value ? reader["NombreEmpresa"].ToString() : null,
+                                CantidadDependientes = reader["NumDependientes"] != DBNull.Value ? Convert.ToInt32(reader["NumDependientes"]) : 0,
+                                fechaNacimiento = reader["fechaNacimiento"] != DBNull.Value ? Convert.ToDateTime(reader["fechaNacimiento"]) : DateTime.MinValue
+                            };
+                        }
                     }
                 }
-                return nombreCompleto;
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener el empleado: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
             }
+            return empleado;
+        }
+        public int ObtenerMontoAPI(Guid idEmpleado, string nombreAPI, int salarioBruto)
+        {
+            try
+            {
+
+                Empleado empleado = ObtenerEmpleado(idEmpleado);
+
+                if (nombreAPI == "Asociacion Calculator")
+                {
+
+                    var nombreEmpresa = empleado.NombreEmpresa;
+                    var builder = WebApplication.CreateBuilder();
+                    var configuration = builder.Configuration;
+                    var association = new AssociationController(configuration);
+                    var request = new AssociationCalculationRequest
+                    {
+                        AssociationName = nombreEmpresa,
+                        EmployeeSalary = salarioBruto
+                    };
+
+
+                    var response = association.CalculateAssociationFee(request).Result;
+
+
+                    try
+                    {
+
+                        var contentResult = (ContentResult)response;
+
+
+                        string jsonString = contentResult.Content;
+                        Console.WriteLine(jsonString);
+
+
+                        var json = JsonDocument.Parse(jsonString);
+                        double rawAmount = json.RootElement.GetProperty("amountToCharge").GetDouble();
+                        int amount = Convert.ToInt32(rawAmount);
+
+
+                        return amount;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error al procesar la respuesta de la API: " + ex.Message);
+                        throw new Exception("Error al procesar la respuesta de la API: " + ex.Message);
+                    }
+                }
+
+                else if (nombreAPI == "Poliza Seguros")
+                {
+
+
+                    var fechaNacimiento = empleado.fechaNacimiento;
+                    var genero = empleado.Genero == "M" ? "Male" : "Female";
+
+                    var builder = WebApplication.CreateBuilder();
+                    var configuration = builder.Configuration;
+                    var lifeInsuranceController = new LifeInsuranceController(configuration);
+
+                    var response = lifeInsuranceController.GetPolicyInfo(fechaNacimiento.ToString("yyyy-MM-dd"), genero).Result;
+
+                    try
+                    {
+                        // Convertir el resultado a ContentResult
+                        var contentResult = (ContentResult)response;
+
+                        // Obtener el contenido del JSON
+                        string jsonString = contentResult.Content;
+
+
+
+                        // Parsear JSON y extraer el valor
+                        var json = JsonDocument.Parse(jsonString);
+                        int cost = json.RootElement.GetProperty("monthlyCost").GetInt32();
+
+                        return cost;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error al procesar la respuesta de la API: " + ex.Message);
+                        return 0;
+                    }
+                }
+
+                else if (nombreAPI == "MediSeguro")
+                {
+
+
+                    var genero = empleado.Genero == "M" ? "masculino" : "femenino";
+
+                    var builder = WebApplication.CreateBuilder();
+                    var configuration = builder.Configuration;
+                    var mediSeguroController = new InsuranceController(configuration);
+                    var request = new InsuranceCalculationRequest
+                    {
+                        FechaNacimiento = empleado.fechaNacimiento.ToString("yyyy-MM-dd"),
+                        Genero = genero,
+                        CantidadDependientes = empleado.CantidadDependientes
+                    };
+
+                    var response = mediSeguroController.CalculateInsurance(request).Result;
+
+                    try
+                    {
+                        var contentResult = (ContentResult)response;
+                        string content = contentResult.Content?.Trim();
+
+
+
+                        if (int.TryParse(content, out int amount))
+                        {
+                            return amount;
+                        }
+                        else
+                        {
+                            throw new Exception("La respuesta no es un número válido.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error al procesar la respuesta de la API: " + ex.Message);
+                        throw new Exception("Error al procesar la respuesta de la API: " + ex.Message);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return 0;
+        }
     }
 }
