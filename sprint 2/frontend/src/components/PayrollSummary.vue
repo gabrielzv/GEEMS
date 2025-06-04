@@ -69,7 +69,6 @@ export default {
       return;
     }
 
-    // --- NUEVO: obtener datos del empleado y extraer nombreEmpresa ---
     await userStore.fetchEmpleado(this.cedulaPersona);
     const empleado = userStore.empleado;
 
@@ -84,30 +83,32 @@ export default {
     await this.generarPagosYResumen();
   },
   methods: {
-    async generarPagosYResumen() {
-      try {
-        await axios.post(
-          "https://localhost:7014/api/Pagos/generarPagosEmpresa",
-          null,
-          {
-            params: {
-              nombreEmpresa: this.nombreEmpresa,
-              idPlanilla: this.idPlanilla,
-              fechaInicio: this.fechaInicio,
-              fechaFinal: this.fechaFin,
-            },
-          }
-        );
-        await this.obtenerResumen();
-      } catch (e) {
-        alert(
-          "Error al generar los pagos de la planilla: " +
-            (e.response?.data?.message || e.message)
-        );
-        console.log(e);
-        return;
+  async generarPagosYResumen() {
+    try {
+      await axios.post(
+        "https://localhost:7014/api/Pagos/generarPagosEmpresa",
+        null,
+        {
+          params: {
+            nombreEmpresa: this.nombreEmpresa,
+            idPlanilla: this.idPlanilla,
+            fechaInicio: this.fechaInicio,
+            fechaFinal: this.fechaFin,
+          },
+        }
+      );
+      await this.obtenerResumen();
+    } catch (e) {
+      const msg = e.response?.data?.message || e.message;
+      if (msg.includes("No hay empleados con horas registradas")) {
+        alert("No hay empleados a los que se les pueda pagar planilla.");
+        this.$router.push({ name: "selectCreatePayroll" }); // Cambia el name si tu ruta es diferente
+      } else {
+        alert("Error al generar los pagos de la planilla: " + msg);
       }
-    },
+      return;
+    }
+  },
     async obtenerResumen() {
       try {
         const res = await axios.get(
@@ -136,9 +137,9 @@ export default {
       }).format(value);
     },
     formatPlanilla(fechaInicio, fechaFin) {
-      const inicio = new Date(fechaInicio);
-      const fin = new Date(fechaFin);
-      return `Planilla ${inicio.getDate()} de ${inicio.toLocaleString('es-ES', { month: 'long' })} a ${fin.getDate()} de ${fin.toLocaleString('es-ES', { month: 'long' })}`;
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
+    return `${inicio.getDate()} de ${inicio.toLocaleString('es-ES', { month: 'long' })} ${inicio.getFullYear()} a ${fin.getDate()} de ${fin.toLocaleString('es-ES', { month: 'long' })} ${fin.getFullYear()}`;
     },
   },
 };

@@ -63,9 +63,9 @@ export default {
     };
 
     const formatPlanilla = (planilla) => {
-      const inicio = new Date(planilla.fechaInicio);
-      const fin = new Date(planilla.fechaFinal);
-      return `Planilla ${inicio.getDate()} de ${inicio.toLocaleString('es-ES', { month: 'long' })} a ${fin.getDate()} de ${fin.toLocaleString('es-ES', { month: 'long' })}`;
+    const inicio = new Date(planilla.fechaInicio);
+    const fin = new Date(planilla.fechaFinal);
+    return `${inicio.getDate()} de ${inicio.toLocaleString('es-ES', { month: 'long' })} ${inicio.getFullYear()} a ${fin.getDate()} de ${fin.toLocaleString('es-ES', { month: 'long' })} ${fin.getFullYear()}`;
     };
 
     const irAResumen = (planilla) => {
@@ -102,8 +102,6 @@ export default {
         await axios.post("https://localhost:7014/api/Planilla/crear", payload);
         await cargarPlanillas();
         alert("Planilla creada correctamente.");
-        // Ya no redirige automáticamente, solo recarga la lista
-        // router.push({ ... });
     } catch (e) {
         console.error("Error al crear la planilla:", e);
         alert("Error al crear la planilla: " + (e.response?.data?.message || e.message));
