@@ -1,30 +1,8 @@
 <template>
   <div class="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow text-center">
-    <h2 class="text-2xl font-bold mb-6 text-blue-700">Resumen de Planilla</h2>
-    <div class="mb-4">
-      <label class="block mb-2 font-semibold">Seleccione la planilla:</label>
-      <select
-        v-model="planillaSeleccionada"
-        @change="onPlanillaChange"
-        class="mb-4 p-2 border rounded w-full"
-      >
-        <option disabled value="">Seleccione una planilla</option>
-        <option
-          v-for="planilla in planillas"
-          :key="planilla.id"
-          :value="planilla"
-        >
-          {{ planilla.fechaInicio }} a {{ planilla.fechaFinal }}
-        </option>
-      </select>
-    </div>
-    <button
-      class="mb-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-      @click="generarPagosYResumen"
-      :disabled="!planillaSeleccionada"
-    >
-      Generar pagos de planilla
-    </button>
+    <h2 class="text-2xl font-bold mb-6 text-blue-700">
+      {{ formatPlanilla(fechaInicio, fechaFin) }}
+    </h2>
     <div class="mb-4">
       <div class="text-lg">
         Total Salarios Brutos:
@@ -36,15 +14,14 @@
       </div>
       <div class="text-lg">
         Total Deducciones:
-        <span class="font-semibold text-red-600">{{
-          currency(resumen.totalDeducciones)
-        }}</span>
+        <span class="font-semibold text-red-600">
+          {{ currency(resumen.totalDeducciones) }}
+        </span>
       </div>
     </div>
     <button
       class="mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
       @click="pagarPlanilla"
-      :disabled="!planillaSeleccionada"
     >
       Pagar planilla
     </button>
@@ -56,7 +33,7 @@ import axios from "axios";
 import { useUserStore } from "../store/user";
 
 export default {
-  name: "PayrollSummary",
+  name: "payrollSummary",
   data() {
     return {
       resumen: {
@@ -64,18 +41,26 @@ export default {
         totalNeto: 0,
         totalDeducciones: 0,
       },
-      planillas: [],
-      planillaSeleccionada: "",
+      idPlanilla: "",
       fechaInicio: "",
       fechaFin: "",
-      idPlanilla: "",
       nombreEmpresa: "",
       cedulaPersona: "",
     };
   },
   async mounted() {
+    // Recibe parámetros por query
+    this.idPlanilla = this.$route.query.idPlanilla;
+    this.fechaInicio = this.$route.query.fechaInicio;
+    this.fechaFin = this.$route.query.fechaFinal;
+
     const userStore = useUserStore();
+    // Asegúrate de cargar el usuario desde sessionStorage si es necesario
+    if (!userStore.usuario) {
+      userStore.cargarDesdeSessionStorage();
+    }
     const usuario = userStore.usuario;
+
     this.cedulaPersona =
       usuario && usuario.cedulaPersona ? usuario.cedulaPersona : "";
 
@@ -84,46 +69,21 @@ export default {
       return;
     }
 
-    // 1. Obtener el nombre de la empresa del empleado Payroll usando la cédula
-    this.nombreEmpresa = await this.obtenerNombreEmpresaDeEmpleado(
-      this.cedulaPersona
-    );
+    // --- NUEVO: obtener datos del empleado y extraer nombreEmpresa ---
+    await userStore.fetchEmpleado(this.cedulaPersona);
+    const empleado = userStore.empleado;
 
-    // 2. Cargar planillas de la empresa
-    await this.cargarPlanillas();
+    this.nombreEmpresa = empleado?.nombreEmpresa || "";
+
+    if (!this.nombreEmpresa) {
+      alert("No se encontró el nombre de la empresa del empleado logueado.");
+      return;
+    }
+
+    // Generar pagos y obtener resumen automáticamente
+    await this.generarPagosYResumen();
   },
   methods: {
-    async obtenerNombreEmpresaDeEmpleado(cedulaPersona) {
-      try {
-        const res = await axios.get(
-          `https://localhost:7014/api/GetEmpleado/${cedulaPersona}`
-        );
-        return res.data.nombreEmpresa;
-      } catch (e) {
-        alert("No se pudo obtener el nombre de la empresa del empleado.");
-        return "";
-      }
-    },
-    async cargarPlanillas() {
-      try {
-        const res = await axios.get(
-          "https://localhost:7014/api/Planilla/listar",
-          {
-            params: { nombreEmpresa: this.nombreEmpresa },
-          }
-        );
-        this.planillas = res.data;
-      } catch (e) {
-        alert("Error al cargar las planillas");
-      }
-    },
-    onPlanillaChange() {
-      if (this.planillaSeleccionada) {
-        this.fechaInicio = this.planillaSeleccionada.fechaInicio;
-        this.fechaFin = this.planillaSeleccionada.fechaFinal;
-        this.idPlanilla = this.planillaSeleccionada.id;
-      }
-    },
     async generarPagosYResumen() {
       try {
         await axios.post(
@@ -142,7 +102,7 @@ export default {
       } catch (e) {
         alert(
           "Error al generar los pagos de la planilla: " +
-            e.response?.data?.message
+            (e.response?.data?.message || e.message)
         );
         console.log(e);
         return;
@@ -167,7 +127,6 @@ export default {
     },
     pagarPlanilla() {
       alert("¡Planilla pagada!");
-      // redirigir a la pagina de inicio
       this.$router.push("/home");
     },
     currency(value) {
@@ -175,6 +134,11 @@ export default {
         style: "currency",
         currency: "CRC",
       }).format(value);
+    },
+    formatPlanilla(fechaInicio, fechaFin) {
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+      return `Planilla ${inicio.getDate()} de ${inicio.toLocaleString('es-ES', { month: 'long' })} a ${fin.getDate()} de ${fin.toLocaleString('es-ES', { month: 'long' })}`;
     },
   },
 };
