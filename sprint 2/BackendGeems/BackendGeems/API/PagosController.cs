@@ -1,4 +1,5 @@
 ﻿using BackendGeems.Application;
+using BackendGeems.Controllers;
 using BackendGeems.Domain;
 using BackendGeems.Infraestructure;
 using Microsoft.AspNetCore.Mvc;
@@ -41,19 +42,30 @@ namespace BackendGeems.API
         {
             try
             {
+                var nombreEmpleado = "";
                 var empleados = _repoInfrastructure.ObtenerEmpleadosPorEmpresa(nombreEmpresa);
                 foreach (var empleado in empleados)
                 {
-                    _pagoInfrastructure.GenerarPagoEmpleado(empleado.Id, idPlanilla, fechaInicio, fechaFinal);
+                    try
+                    {
+                         nombreEmpleado = _pagoInfrastructure.GetNombreEmpleadoPorCedula(empleado.CedulaPersona.ToString());
+                        _pagoInfrastructure.GenerarPagoEmpleado(empleado.Id, idPlanilla, fechaInicio, fechaFinal);
+                        Console.WriteLine("generando Para:" + nombreEmpleado);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Manejar el error para cada empleado individualmente
+                        return StatusCode(500, new { message = $"\nError al generar pago para el empleado {nombreEmpleado}: {ex.Message}\n" });
+                    }
                 }
                 return Ok(new { message = "Pagos generados para todos los empleados." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error al generar pagos: " + ex.Message });
+                return StatusCode(500, new { message = ex.Message });
             }
         }
-        
+
         [HttpGet("resumenPlanilla")]
         public IActionResult ResumenPlanilla([FromQuery] string nombreEmpresa, [FromQuery] DateTime fechaInicio, [FromQuery] DateTime fechaFin)
         {

@@ -4,18 +4,8 @@ namespace BackendGeems.Application
 {
     public interface IGEEMSRepo
     {
-
-
-
-        Registro GetRegister(Guid Id);
-        void EditRegister(Registro editing, Guid oldId);
-
-        List<Registro> ObtenerRegistros(Guid idEmpleado);
-        void InsertRegister(Registro registro);
-        public int GetMonthHours(Guid idEmpleado, DateTime fecha);
         public List<Empleado> ObtenerEmpleadosPorEmpresa(string nombreEmpresa);
         public List<Planilla> ObtenerPlanillasPorEmpresa(string nombreEmpresa);
-
     }
 
 }

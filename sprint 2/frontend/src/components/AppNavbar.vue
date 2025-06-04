@@ -171,10 +171,10 @@
         <!-- Opciones adicionales para Supervisor -->
         <template v-if="empleado?.tipo === 'Supervisor'">
           <router-link
-            to="/desglosePagos"
+            to="/aprobarHoras"
             class="hover:text-blue-600 text-blue-600"
             active-class="text-blue-600 font-medium"
-            >Desglose de pagos</router-link
+            >Aprobar horas</router-link
           >
         </template>
 
@@ -185,6 +185,14 @@
             class="hover:text-blue-600 text-blue-600"
             active-class="text-blue-600 font-medium"
             >Realizar Pago</router-link
+          >
+        </template>
+        <template v-if="empleado?.tipo === 'Payroll'">
+          <router-link
+            to="/aprobarHoras"
+            class="hover:text-blue-600 text-blue-600"
+            active-class="text-blue-600 font-medium"
+            >Aprobar horas</router-link
           >
         </template>
       </template>

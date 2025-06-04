@@ -4,7 +4,7 @@
       <!-- Encabezado -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">
-          Aprobar horas - {{ empresa?.nombre || "Nombre de empresa" }}
+          Aprobar horas {{ empresa?.nombre }}
         </h1>
       </div>
 
@@ -251,7 +251,7 @@ export default {
     onMounted(() => {
   if (!userStore.usuario || !userStore.usuario.cedulaPersona) {
     router.push("/");
-  } else if (userStore.empleado?.tipo !== 'Payroll') {
+  } else if (userStore.empleado?.tipo !== 'Payroll' && userStore.empleado?.tipo !== 'Supervisor') {
     router.push("/");
   } else {
     fetchEmpresaData();

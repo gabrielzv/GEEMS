@@ -27,7 +27,7 @@ namespace UnitTests
             string guidString = "00000000-0000-0000-0000-000000000003";
             Guid guidTest = Guid.Parse(guidString);
             DateTime fechaTest = new DateTime(2025, 4, 20); // Año, mes, día
-            IGEEMSRepo repo = new GEEMSRepo();
+            IGEEMSHorasRepo repo = new GEEMSHorasRepo();
             IQueryHoras queryHoras = new QueryHoras(repo);
             var controller = new HorasController(queryHoras);
 
@@ -44,7 +44,7 @@ namespace UnitTests
 
             Guid guidTest = Guid.Parse(guidString);
             DateTime fechaTest = new DateTime(2022, 4, 20); // Año, mes, día
-            IGEEMSRepo repo = new GEEMSRepo();
+            IGEEMSHorasRepo repo = new GEEMSHorasRepo();
             IQueryHoras queryHoras = new QueryHoras(repo);
             var controller = new HorasController(queryHoras);
             int horas = 161;
@@ -78,7 +78,7 @@ namespace UnitTests
             };
 
 
-            IGEEMSRepo repo = new GEEMSRepo();
+            IGEEMSHorasRepo repo = new GEEMSHorasRepo();
             IQueryHoras queryHoras = new QueryHoras(repo);
             var controller = new HorasController(queryHoras);
 
