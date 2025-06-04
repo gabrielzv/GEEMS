@@ -55,7 +55,7 @@ namespace UnitTests
             DateTime fechaInicio = new DateTime(2025, 4, 1);
             DateTime fechaFin = new DateTime(2025, 4, 30);
 
-            var repo = new GEEMSRepo();
+            var repo = new GEEMSPagoRepo();
             var queryPago = new QueryPago(repo);
             var generarPago = new GenerarPago(repo);
 

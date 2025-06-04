@@ -4,14 +4,14 @@ namespace BackendGeems.Application
 {
     public class QueryHoras : IQueryHoras
     {
-        private readonly IGEEMSRepo _repoInfrastructure;
-        public QueryHoras(IGEEMSRepo repo)
+        private readonly IGEEMSHorasRepo _repoHoras;
+        public QueryHoras(IGEEMSHorasRepo repo)
         {
-            _repoInfrastructure = repo;
+            _repoHoras = repo;
         }
         public bool ValidDate(DateTime date, Guid employeeId)
         {
-            List<Registro> registrosEmpleado = _repoInfrastructure.ObtenerRegistros(employeeId);
+            List<Registro> registrosEmpleado = _repoHoras.ObtenerRegistros(employeeId);
             bool valid = true;
             foreach (var registro in registrosEmpleado)
             {
@@ -25,19 +25,19 @@ namespace BackendGeems.Application
         public void InsertRegister(Registro inserting)
         {
             inserting.Id = Guid.NewGuid();
-            _repoInfrastructure.InsertRegister(inserting);
+            _repoHoras.InsertRegister(inserting);
         }
         public Registro GetRegister(Guid Id)
         {
-            return _repoInfrastructure.GetRegister(Id);
+            return _repoHoras.GetRegister(Id);
         }
         public void EditRegister(Registro editing, Guid oldId)
         {
-            _repoInfrastructure.EditRegister(editing, oldId);
+            _repoHoras.EditRegister(editing, oldId);
         }
         public bool ValidHours(DateTime date, Guid employeeId, int hours)
         {
-            int workedHours = _repoInfrastructure.GetMonthHours(employeeId, date);
+            int workedHours = _repoHoras.GetMonthHours(employeeId, date);
             bool valid = true;
             if(workedHours + hours > 160)
             {
