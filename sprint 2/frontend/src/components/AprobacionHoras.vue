@@ -251,7 +251,7 @@ export default {
     onMounted(() => {
   if (!userStore.usuario || !userStore.usuario.cedulaPersona) {
     router.push("/");
-  } else if (userStore.empleado?.tipo !== 'Payroll') {
+  } else if (userStore.empleado?.tipo !== 'Payroll' && userStore.empleado?.tipo !== 'Supervisor') {
     router.push("/");
   } else {
     fetchEmpresaData();
