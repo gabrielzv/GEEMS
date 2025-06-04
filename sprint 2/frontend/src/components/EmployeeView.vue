@@ -46,7 +46,7 @@
           Volver
         </button>
         <router-link
-          to="/actualizar-perfil"
+          :to="`/editarEmpleado/${cedula}`"
           class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Editar perfil de Empleado
