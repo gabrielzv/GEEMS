@@ -59,9 +59,10 @@ INSERT INTO BeneficioContratoElegible VALUES (@uid4, 'Tiempo Completo');
 
 -- Empleados
 INSERT INTO Empleado VALUES 
-(@uid3, 303030303, 'Tiempo Completo', 160, 'M', 'Activo', 850000, 'Colaborador', '2024-06-15', 'GEEMS Solutions'),
-(@uid5, 404040404, 'Tiempo Completo', 160, 'F', 'Activo', 950000, 'Supervisor', '2023-11-01', 'GEEMS Solutions'),
-(@uid6, 505050505, 'Tiempo Completo', 160, 'M', 'Activo', 1000000, 'Payroll', '2023-01-20', 'GEEMS Solutions');
+(@uid3, 303030303, 'Tiempo Completo', 160, 'M', 'Activo', 850000, 'Colaborador', '2024-06-15', 'GEEMS Solutions', '2025-04-01',5),
+(@uid4, 404040404, 'Medio Tiempo', 80, 'F', 'Activo', 500000, 'Colaborador', '2024-07-01', 'GEEMS Solutions', '2025-04-01',4),
+(@uid5, 404040404, 'Tiempo Completo', 160, 'F', 'Activo', 950000, 'Supervisor', '2023-11-01', 'GEEMS Solutions', '2025-04-01',3),
+(@uid6, 505050505, 'Tiempo Completo', 160, 'M', 'Activo', 1000000, 'Payroll', '2023-01-20', 'GEEMS Solutions', '2025-04-01',1);
 
 -- Supervisor supervisa a colaborador
 INSERT INTO SupervisorSupervisaEmpleado VALUES (@uid5, 303030303);
