@@ -11,6 +11,7 @@ namespace BackendGeems.API
     public class PagosController : ControllerBase
     {
         private readonly GEEMSRepo _repoInfrastructure;
+        private readonly GEEMSPagoRepo _pagoInfrastructure;
         private readonly IQueryPago _queryPago;
         private readonly IGenerarPago _GenerarPago;
 
@@ -19,6 +20,7 @@ namespace BackendGeems.API
             _queryPago = queryPago;
 
             _repoInfrastructure = new GEEMSRepo();
+            _pagoInfrastructure = new GEEMSPagoRepo();
             _GenerarPago = generarPago;
         }
         [HttpGet]
@@ -42,7 +44,7 @@ namespace BackendGeems.API
                 var empleados = _repoInfrastructure.ObtenerEmpleadosPorEmpresa(nombreEmpresa);
                 foreach (var empleado in empleados)
                 {
-                    _repoInfrastructure.GenerarPagoEmpleado(empleado.Id, idPlanilla, fechaInicio, fechaFinal);
+                    _pagoInfrastructure.GenerarPagoEmpleado(empleado.Id, idPlanilla, fechaInicio, fechaFinal);
                 }
                 return Ok(new { message = "Pagos generados para todos los empleados." });
             }
