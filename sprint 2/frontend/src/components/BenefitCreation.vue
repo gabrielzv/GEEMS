@@ -4,6 +4,63 @@
       <h1 class="text-2xl font-bold mb-4 text-center">
         Creación de Beneficios
       </h1>
+      <!-- APIs disponibles -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Beneficios nacionales:</label
+        >
+        <div class="flex flex-col gap-3 items-center">
+          <div class="flex gap-6 text-sm justify-center">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="apis"
+                value="BeneficioNormal"
+                v-model="form.nombreDeAPI"
+                class="mr-2"
+                @change="handleApiSelection"
+              />
+              No seleccionado
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="apis"
+                value="Poliza Seguros"
+                v-model="form.nombreDeAPI"
+                class="mr-2"
+                @change="handleApiSelection"
+              />
+              Póliza de Seguros
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="apis"
+                value="Asociacion Calculator"
+                v-model="form.nombreDeAPI"
+                class="mr-2"
+                @change="handleApiSelection"
+              />
+              Asociación Solidarista
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="apis"
+                value="MediSeguro"
+                v-model="form.nombreDeAPI"
+                class="mr-2"
+                @change="handleApiSelection"
+              />
+              Seguro Médico
+            </label>
+          </div>
+        </div>
+        <p v-if="seleccionApisError" class="text-sm text-red-500 mt-1">
+          {{ seleccionApisError }}
+        </p>
+      </div>
       <!-- Nombre -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
@@ -225,6 +282,8 @@ export default {
       frecuencia: "",
       cedulaJuridica: "",
       contratosElegibles: [],
+      nombreDeAPI: "BeneficioNormal",
+      esApi: false,
     });
 
     // Estados para errores
@@ -236,6 +295,34 @@ export default {
     const contratosElegiblesError = ref("");
     const mensaje = ref("");
     const isSubmitting = ref(false);
+    const seleccionApisError = ref("");
+
+    // Método para completar el nombre del beneficio según la API seleccionada
+    const handleApiSelection = (event) => {
+      const selectedApi = event.target.value;
+
+      if (selectedApi === "BeneficioNormal") {
+        form.value.nombreDeAPI = "BeneficioNormal";
+        form.value.esApi = false;
+        form.value.nombre = "";
+      } else {
+        form.value.nombreDeAPI = selectedApi;
+        form.value.esApi = true;
+
+        switch (selectedApi) {
+          case "MediSeguro":
+            form.value.nombre = "Seguro Médico";
+            break;
+          case "Poliza Seguros":
+            form.value.nombre = "Póliza de Seguros";
+            break;
+          case "Asociacion Calculator":
+            form.value.nombre = "Asociación Solidarista";
+            break;
+        }
+      }
+      validateAPIS();
+    };
 
     // Método para clases de input, para revisar errores
     const inputClass = (error) => {
@@ -289,7 +376,11 @@ export default {
     };
 
     const validateTiempoMinimo = () => {
-      if (form.value.tiempoMinimo === "" || form.value.tiempoMinimo === null || form.value.tiempoMinimo === undefined) {
+      if (
+        form.value.tiempoMinimo === "" ||
+        form.value.tiempoMinimo === null ||
+        form.value.tiempoMinimo === undefined
+      ) {
         tiempoMinimoError.value = "El tiempo mínimo es obligatorio.";
         return false;
       }
@@ -316,6 +407,14 @@ export default {
       return !contratosElegiblesError.value;
     };
 
+    const validateAPIS = () => {
+      seleccionApisError.value =
+        form.value.nombreDeAPI && form.value.nombreDeAPI !== ""
+          ? ""
+          : "Debe seleccionar una opción";
+      return !seleccionApisError.value;
+    };
+
     // Método para validar el formulario, usa todos los métodos de validación de los dintintos campos
     const validateForm = () => {
       const isNombreValid = validateNombre();
@@ -324,6 +423,7 @@ export default {
       const isTiempoMinimoValid = validateTiempoMinimo();
       const isFrecuenciaValid = validateFrecuencia();
       const isContratosValid = validateContratosElegibles();
+      const isAPISValid = validateAPIS();
 
       return (
         isNombreValid &&
@@ -331,7 +431,8 @@ export default {
         isCostoValid &&
         isTiempoMinimoValid &&
         isFrecuenciaValid &&
-        isContratosValid
+        isContratosValid &&
+        isAPISValid
       );
     };
 
@@ -409,6 +510,7 @@ export default {
       validateFrecuencia,
       validateContratosElegibles,
       crearBeneficio,
+      handleApiSelection,
     };
   },
 };
