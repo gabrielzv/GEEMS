@@ -350,7 +350,7 @@ namespace BackendGeems.Infraestructure
                 List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
 
                 string queryBeneficios = @"
-                    SELECT b.Id, b.Costo
+                    SELECT b.Id, b.Costo,b.NombreDeAPI,b.EsAPI
                     FROM BeneficiosEmpleado be
                     JOIN Beneficio b ON be.IdBeneficio = b.Id
                     WHERE be.IdEmpleado = @IdEmpleado";
@@ -366,8 +366,24 @@ namespace BackendGeems.Infraestructure
                         {
                             Guid idBeneficio = Guid.Parse(row["Id"].ToString());
                             int monto = Convert.ToInt32(row["Costo"]);
-                            deduccionesVoluntarias.Add((idBeneficio, monto));
-                            totalDeducciones += monto;
+                            bool esAPI = Convert.ToBoolean(row["EsAPI"]);
+                            string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
+                            if(esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
+                            {
+                                Console.WriteLine("Llamando a la API para obtener el monto del beneficio: " + nombreDeAPI);
+
+                                monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBruto);
+                                Console.WriteLine($"Monto obtenido de la API {nombreDeAPI}: {monto}");
+                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                totalDeducciones += monto;
+                            }
+                            else
+                            {
+                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                totalDeducciones += monto;
+                            }
+                            
+                            
                             if (totalDeducciones > salarioBruto)
                             {
                                 throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
@@ -771,7 +787,7 @@ namespace BackendGeems.Infraestructure
             }
             return nombreCompleto;
         }
-        
+
 
         public Empleado ObtenerEmpleado(Guid idEmpleado)
         {
@@ -823,7 +839,7 @@ namespace BackendGeems.Infraestructure
         public int ObtenerMontoAPI(Guid idEmpleado, string nombreAPI, int salarioBruto)
         {
             Empleado empleado = ObtenerEmpleado(idEmpleado);
-            if (nombreAPI == "Solidarista")
+            if (nombreAPI == "Asociacion Calculator")
             {
                 var nombreEmpresa = empleado.NombreEmpresa;
                 var builder = WebApplication.CreateBuilder();
@@ -835,7 +851,7 @@ namespace BackendGeems.Infraestructure
                     EmployeeSalary = salarioBruto
                 };
 
-                
+
                 var response = association.CalculateAssociationFee(request).Result;
 
                 var json = JsonDocument.Parse((Stream)response);
@@ -844,27 +860,29 @@ namespace BackendGeems.Infraestructure
 
                 Console.WriteLine($"Monto de la asociación: {amount}");
                 return amount;
-            }else if(nombreAPI == "LifeInsurance")
+            }
+            else if (nombreAPI == "Poliza Seguros")
             {
                 var fechaNacimiento = empleado.fechaNacimiento;
                 var genero = "";
                 if (empleado.Genero == "M")
                 {
                     genero = "Male";
-                }else if (empleado.Genero == "F")
+                }
+                else if (empleado.Genero == "F")
                 {
                     genero = "Female";
                 }
-                    var builder = WebApplication.CreateBuilder();
+                var builder = WebApplication.CreateBuilder();
                 var configuration = builder.Configuration;
                 var lifeInsuranceController = new LifeInsuranceController(configuration);
-                var response =lifeInsuranceController.GetPolicyInfo(fechaNacimiento.ToString("yyyy-MM-dd"),genero).Result;
+                var response = lifeInsuranceController.GetPolicyInfo(fechaNacimiento.ToString("yyyy-MM-dd"), genero).Result;
 
                 Console.WriteLine(response.ToString());
                 return Convert.ToInt32(response.ToString().Split(":")[1].TrimEnd('}').TrimEnd('"'));
 
             }
-            else if (nombreAPI == "MediSeguro") 
+            else if (nombreAPI == "MediSeguro")
             {
                 var genero = "";
                 if (empleado.Genero == "M")
@@ -889,6 +907,8 @@ namespace BackendGeems.Infraestructure
                 Console.WriteLine(response.ToString());
 
                 return 0;
+            }
+            return 0;
         }
     }
 }
