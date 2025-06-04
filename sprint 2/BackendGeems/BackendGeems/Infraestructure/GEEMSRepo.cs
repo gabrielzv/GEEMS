@@ -83,5 +83,24 @@ namespace BackendGeems.Infraestructure
             }
             return planillas;
         }
+
+        public void CrearPlanilla(Planilla planilla)
+        {
+            using (var connection = new SqlConnection(CadenaConexion))
+            {
+                var query = @"INSERT INTO Planilla (Id, FechaInicio, FechaFinal, IdPayroll)
+                            VALUES (@Id, @FechaInicio, @FechaFinal, @IdPayroll)";
+                using (var cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Id", planilla.Id);
+                    cmd.Parameters.AddWithValue("@FechaInicio", planilla.FechaInicio);
+                    cmd.Parameters.AddWithValue("@FechaFinal", planilla.FechaFinal);
+                    cmd.Parameters.AddWithValue("@IdPayroll", planilla.IdPayroll);
+
+                    connection.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }
