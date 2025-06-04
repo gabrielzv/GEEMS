@@ -1,39 +1,71 @@
 <template>
-  <div class="flex justify-center items-center min-h-screen bg-gray-100">
-    <div class="bg-white shadow rounded p-6 max-w-md w-full">
-      <h1 class="text-2xl font-bold mb-4 text-center">
-        Beneficios de la Empresa
-      </h1>
+  <div class="container mx-auto px-4 py-8 max-w-[1200px]">
+    <!-- Encabezado -->
+    <div class="flex justify-between items-center mb-8 border-b pb-4">
+      <h1 class="text-2xl font-bold">Beneficios de la empresa</h1>
+    </div>
 
-      <!-- Mensaje de error -->
-      <p v-if="error" class="text-red-500 mt-4 text-center">{{ error }}</p>
-
-      <!-- Lista de beneficios -->
-      <div v-if="beneficios.length" class="mt-6">
-        <h2 class="text-xl font-semibold mb-2 text-center">
-          Beneficios encontrados:
-        </h2>
-        <ul class="space-y-4">
-          <li
+    <!-- Tabla -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Nombre
+            </th>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Descripción
+            </th>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Costo
+            </th>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Tiempo mínimo en empresa (meses)
+            </th>
+            <th
+              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+            >
+              Acciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200 text-center">
+          <tr
             v-for="beneficio in beneficios"
             :key="beneficio.id"
-            class="p-4 border rounded shadow"
+            class="hover:bg-gray-50 transition"
           >
-            <p><strong>Nombre:</strong> {{ beneficio.nombre }}</p>
-            <p><strong>Descripción:</strong> {{ beneficio.descripcion }}</p>
-            <p><strong>Costo:</strong> ₡{{ beneficio.costo }}</p>
-            <p>
-              <strong>Tiempo mínimo en empresa:</strong>
-              {{ beneficio.tiempoMinimoEnEmpresa }} meses
-            </p>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Mensaje si no hay beneficios -->
-      <p v-else class="text-center text-gray-500 mt-4">
-        No se encontraron beneficios para esta empresa.
-      </p>
+            <td class="px-6 py-4 text-sm text-gray-900">
+              {{ beneficio.nombre }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              {{ beneficio.descripcion }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              {{ beneficio.costo }}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              {{ beneficio.tiempoMinimoEnEmpresa }}
+            </td>
+            <td class="px-6 py-4 text-sm font-medium">
+              <button
+                @click="EditarBeneficio(beneficio.id)"
+                class="text-blue-600 hover:text-blue-800"
+              >
+                Editar beneficio
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -42,12 +74,14 @@
 import axios from "axios";
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const userStore = useUserStore();
     const beneficios = ref([]);
     const error = ref("");
+    const router = useRouter();
 
     // Método para obtener los beneficios de la empresa
     const fetchBeneficios = async () => {
@@ -74,6 +108,11 @@ export default {
       }
     };
 
+    // Método para editar el beneficio
+    const EditarBeneficio = (id) => {
+      router.push({ name: "EditarBeneficio", params: { id } });
+    };
+
     // Se llama a la función al montar el componente
     onMounted(() => {
       if (!userStore.usuario || !userStore.usuario.cedulaPersona) {
@@ -86,6 +125,7 @@ export default {
     return {
       beneficios,
       error,
+      EditarBeneficio,
     };
   },
 };

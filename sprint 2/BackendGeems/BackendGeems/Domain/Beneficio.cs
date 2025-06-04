@@ -11,5 +11,6 @@ namespace BackendGeems.Domain
         public List<string>? ContratosElegibles { get; set; }
         public required string NombreDeAPI { get; set; }
         public bool EsApi { get; set; } = true;
+        public string? Id { get; set; }
     }
 }

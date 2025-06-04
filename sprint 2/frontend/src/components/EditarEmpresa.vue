@@ -6,37 +6,6 @@
       class="bg-white p-6 rounded-xl shadow-md w-full max-w-4xl space-y-5"
     >
       <p class="text-3xl font-bold text-center text-gray-800">Editar empresa</p>
-      
-      <!-- Div para observar información de la antigua empresa -->
-      <div
-        class="bg-gray-50 rounded-lg p-4 mb-4 text-sm text-gray-700 shadow-inner"
-      >
-        <p><strong>Nombre anterior:</strong> {{ EmpresaAnterior.nombre }}</p>
-        <p>
-          <strong>Cédula anterior:</strong>
-          {{ EmpresaAnterior.cedulaJuridica }}
-        </p>
-        <p>
-          <strong>Teléfono anterior:</strong> {{ EmpresaAnterior.telefono }}
-        </p>
-        <p><strong>Correo anterior:</strong> {{ EmpresaAnterior.correo }}</p>
-        <p>
-          <strong>Descripción anterior:</strong>
-          {{ EmpresaAnterior.descripcion }}
-        </p>
-        <p>
-          <strong>Provincia anterior:</strong> {{ EmpresaAnterior.provincia }}
-        </p>
-        <p><strong>Cantón anterior:</strong> {{ EmpresaAnterior.canton }}</p>
-        <p>
-          <strong>Distrito anterior:</strong> {{ EmpresaAnterior.distrito }}
-        </p>
-        <p><strong>Señas anteriores:</strong> {{ EmpresaAnterior.senas }}</p>
-        <p>
-          <strong>Modalidad de pago anterior:</strong>
-          {{ EmpresaAnterior.modalidadPago }}
-        </p>
-      </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
@@ -153,7 +122,7 @@
         </div>
 
         <!-- Modalidad de pago -->
-        <div class="col-span-2">
+        <div>
           <label class="block text-sm font-medium text-gray-700"
             >Modalidad de pago:</label
           >
@@ -195,6 +164,41 @@
             class="text-sm text-red-500 mt-1"
           >
             {{ errores.modalidadPagoError }}
+          </p>
+        </div>
+
+        <!-- Máximo de beneficios por empleado -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">
+            Máximo de beneficios por empleado
+          </label>
+          <input
+            type="text"
+            v-model="empresa.maxBeneficiosXEmpleado"
+            maxlength="2"
+            placeholder="3"
+            :class="
+              inputClass(
+                errores.maxBeneficiosXEmpleadoFormatoInvalido ||
+                  errores.maxBeneficiosXEmpleadoVacio ||
+                  errores.maxBeneficiosXEmpleadoError
+              )
+            "
+          />
+          <p
+            v-if="errores.maxBeneficiosXEmpleadoVacio"
+            class="text-sm text-red-500 mt-1"
+          >
+            {{ errores.maxBeneficiosXEmpleadoVacio }}
+          </p>
+          <p
+            v-if="
+              errores.maxBeneficiosXEmpleadoFormatoInvalido &&
+              !errores.maxBeneficiosXEmpleadoVacio
+            "
+            class="text-sm text-red-500 mt-1"
+          >
+            {{ errores.maxBeneficiosXEmpleadoFormatoInvalido }}
           </p>
         </div>
 
@@ -293,6 +297,7 @@ export default {
           senas: "",
         },
         modalidadPago: "",
+        maxBeneficiosXEmpleado: "",
       },
       cedula: "",
       telefono: "",
@@ -312,6 +317,9 @@ export default {
         cedulaFormatoInvalido: "",
         correoFormatoInvalido: "",
         modalidadPagoError: "",
+        maxBeneficiosXEmpleadoError: "",
+        maxBeneficiosXEmpleadoVacio: "",
+        maxBeneficiosXEmpleadoFormatoInvalido: "",
       },
       // Almacena la información de la empresa anterior
       EmpresaAnterior: {
@@ -325,6 +333,7 @@ export default {
         distrito: null,
         senas: null,
         modalidadPago: null,
+        maxBeneficiosXEmpleado: null,
       },
     };
   },
@@ -353,6 +362,11 @@ export default {
         this.empresa.direccion.distrito = this.EmpresaAnterior.distrito;
         this.empresa.direccion.senas = this.EmpresaAnterior.senas;
         this.empresa.modalidadPago = this.EmpresaAnterior.modalidadPago;
+        this.empresa.maxBeneficiosXEmpleado =
+          this.EmpresaAnterior.maxBeneficiosXEmpleado !== null &&
+          this.EmpresaAnterior.maxBeneficiosXEmpleado !== undefined
+            ? String(this.EmpresaAnterior.maxBeneficiosXEmpleado)
+            : "";
       } catch (error) {
         alert("Error al obtener los datos de la empresa.");
         this.$router.push("/home");
@@ -446,6 +460,26 @@ export default {
           "Por favor, ingrese un correo electrónico válido como ejemplo@correo.com";
       }
 
+      this.errores.maxBeneficiosXEmpleadoVacio =
+        this.empresa.maxBeneficiosXEmpleado.trim()
+          ? ""
+          : "El máximo de beneficios por empleado es obligatorio.";
+
+      this.errores.maxBeneficiosXEmpleadoFormatoInvalido = "";
+      if (this.empresa.maxBeneficiosXEmpleado.trim()) {
+        const num = Number(this.empresa.maxBeneficiosXEmpleado);
+        if (
+          isNaN(num) ||
+          !Number.isInteger(num) ||
+          num < 0 ||
+          num > 99 ||
+          this.empresa.maxBeneficiosXEmpleado.length > 2
+        ) {
+          this.errores.maxBeneficiosXEmpleadoFormatoInvalido =
+            "Debe ser un número de hasta 2 dígitos (0 a 99).";
+        }
+      }
+
       await this.validarDuplicados(this.empresa.nombre, this.cedula);
 
       let not_valid =
@@ -461,7 +495,10 @@ export default {
         this.errores.telefonoFormatoInvalido ||
         this.errores.cedulaFormatoInvalido ||
         this.errores.correoFormatoInvalido ||
-        this.errores.modalidadPagoError;
+        this.errores.modalidadPagoError ||
+        this.errores.maxBeneficiosXEmpleadoVacio ||
+        this.errores.maxBeneficiosXEmpleadoFormatoInvalido ||
+        this.errores.maxBeneficiosXEmpleadoError;
 
       if (not_valid) {
         return;
@@ -478,6 +515,7 @@ export default {
         distrito: this.empresa.direccion.distrito,
         senas: this.empresa.direccion.senas,
         modalidadPago: this.empresa.modalidadPago,
+        maxBeneficiosXEmpleado: this.empresa.maxBeneficiosXEmpleado,
       };
 
       try {

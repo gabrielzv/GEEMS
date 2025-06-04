@@ -26,7 +26,7 @@ public class SetEmpresaController : ControllerBase
         public string Distrito { get; set; }
         public string Senas { get; set; }
         public string ModalidadPago { get; set; }
-        // public int MaxBeneficiosXEmpleado { get; set; }
+        public int MaxBeneficiosXEmpleado { get; set; }
     }
 
     [HttpPost("crearEmpresa")]
@@ -53,7 +53,8 @@ public class SetEmpresaController : ControllerBase
                     Canton,
                     Distrito,
                     Senas,
-                    ModalidadPago
+                    ModalidadPago,
+                    MaxBeneficiosXEmpleado
                 )
                 VALUES (
                     @CedulaJuridica,
@@ -65,7 +66,8 @@ public class SetEmpresaController : ControllerBase
                     @Canton,
                     @Distrito,
                     @Senas,
-                    @ModalidadPago
+                    @ModalidadPago,
+                    @MaxBeneficiosXEmpleado
                 );";
 
             using SqlCommand cmd = new SqlCommand(insertQuery, conn);
@@ -79,7 +81,7 @@ public class SetEmpresaController : ControllerBase
             cmd.Parameters.AddWithValue("@Distrito", empresa.Distrito);
             cmd.Parameters.AddWithValue("@Senas", empresa.Senas);
             cmd.Parameters.AddWithValue("@ModalidadPago", empresa.ModalidadPago);
-            // cmd.Parameters.AddWithValue("@MaxBeneficiosXEmpleado", empresa.MaxBeneficiosXEmpleado);
+            cmd.Parameters.AddWithValue("@MaxBeneficiosXEmpleado", empresa.MaxBeneficiosXEmpleado);
 
             int rowsAffected = cmd.ExecuteNonQuery();
 
@@ -122,7 +124,8 @@ public class SetEmpresaController : ControllerBase
                     Canton = @Canton,
                     Distrito = @Distrito,
                     Senas = @Senas,
-                    ModalidadPago = @ModalidadPago
+                    ModalidadPago = @ModalidadPago,
+                    MaxBeneficiosXEmpleado = @MaxBeneficiosXEmpleado
                 WHERE CedulaJuridica = @CedulaJuridica;";
 
             using SqlCommand cmd = new SqlCommand(updateQuery, conn);
@@ -136,7 +139,7 @@ public class SetEmpresaController : ControllerBase
             cmd.Parameters.AddWithValue("@Distrito", empresa.Distrito);
             cmd.Parameters.AddWithValue("@Senas", empresa.Senas);
             cmd.Parameters.AddWithValue("@ModalidadPago", empresa.ModalidadPago);
-            // cmd.Parameters.AddWithValue("@MaxBeneficiosXEmpleado", empresa.MaxBeneficiosXEmpleado);
+            cmd.Parameters.AddWithValue("@MaxBeneficiosXEmpleado", empresa.MaxBeneficiosXEmpleado);
 
             int rowsAffected = cmd.ExecuteNonQuery();
 

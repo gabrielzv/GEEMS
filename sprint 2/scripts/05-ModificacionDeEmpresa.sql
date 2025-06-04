@@ -6,5 +6,5 @@ ADD ModalidadPago NVARCHAR(10)
 CHECK (ModalidadPago IN ('Semanal', 'Quincenal', 'Mensual'));
 
 -- Se agrega el atributo para definir la máxima cantidad de beneficios que puede matricular un empleado
---ALTER TABLE Empresa
---ADD MaxBeneficiosXEmpleado INT;
+ALTER TABLE Empresa
+ADD MaxBeneficiosXEmpleado INT NOT NULL;
