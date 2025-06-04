@@ -5,8 +5,8 @@ namespace BackendGeems.Application
 {
     public class GenerarPago : IGenerarPago
     {
-        private readonly IGEEMSRepo _repoInfrastructure;
-        public GenerarPago(IGEEMSRepo repo)
+        private readonly IGEEMSPagoRepo _repoInfrastructure;
+        public GenerarPago(IGEEMSPagoRepo repo)
         {
             _repoInfrastructure = repo;
         }

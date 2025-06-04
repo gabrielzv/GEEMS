@@ -4,8 +4,8 @@ namespace BackendGeems.Application
 {
     public class QueryPago : IQueryPago
     {
-        private readonly IGEEMSRepo _repoInfrastructure;
-        public QueryPago(IGEEMSRepo repo)
+        private readonly IGEEMSPagoRepo _repoInfrastructure;
+        public QueryPago(IGEEMSPagoRepo repo)
         {
             _repoInfrastructure = repo;
         }

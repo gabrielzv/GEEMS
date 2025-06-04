@@ -12,12 +12,12 @@ AS
 RETURN
 (
     SELECT 
-        SUM(pg.MontoBruto) AS totalBruto,
-        SUM(pg.MontoPago) AS totalNeto,
-        SUM(pg.MontoBruto - pg.MontoPago) AS totalDeducciones
+        SUM(CAST(pg.MontoBruto AS DECIMAL(18,2))) AS totalBruto,
+        SUM(CAST(pg.MontoPago AS DECIMAL(18,2))) AS totalNeto,
+        SUM(CAST(pg.MontoBruto AS DECIMAL(18,2)) - CAST(pg.MontoPago AS DECIMAL(18,2))) AS totalDeducciones
     FROM Pago pg
     JOIN Empleado e ON pg.IdEmpleado = e.Id
     WHERE e.NombreEmpresa = @nombreEmpresa
-      AND pg.FechaInicio = @fechaInicio
-      AND pg.FechaFinal = @fechaFin
+      AND CAST(pg.FechaInicio AS DATE) = @fechaInicio
+      AND CAST(pg.FechaFinal AS DATE) = @fechaFin
 )

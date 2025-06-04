@@ -2,33 +2,40 @@
 {
     public class ImpuestoRenta
     {
-        int CalcularImpuestoRenta(int ingresoMensual)
+        public int CalcularImpuestoRenta(int ingresoMensual)
         {
             int impuesto = 0;
+            var limite1 = 922000;
+            var limite2 = 1352000;
+            var limite3 = 2373000;
+            var limite4 = 4745000;
+            var porcentaje1 = 0.10;
+            var porcentaje2 = 0.15;
+            var porcentaje3 = 0.20;
+            var porcentaje4 = 0.25;
 
-            if (ingresoMensual <= 922000)
+            if (ingresoMensual <= limite1)
             {
                 impuesto = 0;
             }
-            else if (ingresoMensual <= 1352000)
+            else if (ingresoMensual <= limite2)
             {
-                impuesto = (int)((ingresoMensual - 922000) * 0.10);
+                impuesto = (int)((ingresoMensual - limite1) * porcentaje1);
             }
-            else if (ingresoMensual <= 2373000)
+            else if (ingresoMensual <= limite3)
             {
-                impuesto = (int)((1352000 - 922000) * 0.10 + (ingresoMensual - 1352000) * 0.15);
+                impuesto = (int)((limite2 - limite1) * porcentaje1 + (ingresoMensual - limite2) * porcentaje2);
             }
-            else if (ingresoMensual <= 4745000)
+            else if (ingresoMensual <= limite4)
             {
-                impuesto = (int)((1352000 - 922000) * 0.10 + (2373000 - 1352000) * 0.15 + (ingresoMensual - 2373000) * 0.20);
+                impuesto = (int)((limite2 - limite1) * porcentaje1 + (limite3 - limite2) * porcentaje2 + (ingresoMensual - limite3) * porcentaje3);
             }
             else
             {
-                impuesto = (int)((1352000 - 922000) * 0.10 + (2373000 - 1352000) * 0.15 + (4745000 - 2373000) * 0.20 + (ingresoMensual - 4745000) * 0.25);
+                impuesto = (int)((limite2 - limite1) * porcentaje1 + (limite3 - limite2) * porcentaje2 + (limite4 - limite3) * porcentaje3 + (ingresoMensual - limite4) * porcentaje4);
             }
 
             return impuesto;
         }
-
     }
 }
