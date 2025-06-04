@@ -305,6 +305,7 @@ export default {
         form.value.nombreDeAPI = "BeneficioNormal";
         form.value.esApi = false;
         form.value.nombre = "";
+        form.value.costo = "";
       } else {
         form.value.nombreDeAPI = selectedApi;
         form.value.esApi = true;
@@ -312,12 +313,15 @@ export default {
         switch (selectedApi) {
           case "MediSeguro":
             form.value.nombre = "Seguro Médico";
+            form.value.costo = 1;
             break;
           case "Poliza Seguros":
             form.value.nombre = "Póliza de Seguros";
+            form.value.costo = 1;
             break;
           case "Asociacion Calculator":
             form.value.nombre = "Asociación Solidarista";
+            form.value.costo = 1;
             break;
         }
       }
