@@ -61,7 +61,7 @@ namespace UnitTests
 
             var registroAnterior = new Registro
             {
-                Id = Guid.Parse("00000000-0000-0000-0000-000000000008"),
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000007"),
                 NumHoras = 160,
                 Fecha = new DateTime(2025, 4, 20, 0, 0, 0),
                 Estado = "Aprobado",
@@ -70,7 +70,7 @@ namespace UnitTests
 
             var registro = new Registro
             {
-                Id = Guid.Parse("00000000-0000-0000-0000-000000000008"),
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000007"),
                 NumHoras = 7,
                 Fecha = new DateTime(2025, 4, 20, 0, 0, 0),
                 Estado = "Aprobado",

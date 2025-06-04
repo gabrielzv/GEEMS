@@ -43,6 +43,7 @@ namespace BackendGeems.API
             try
             {
                 var empleados = _repoInfrastructure.ObtenerEmpleadosPorEmpresa(nombreEmpresa);
+               
                 int pagosGenerados = 0;
                 foreach (var empleado in empleados)
                 {
@@ -61,6 +62,7 @@ namespace BackendGeems.API
                     catch (Exception ex)
                     {
                         // Opcional: loguear el error, pero no detener el proceso
+                        
                         continue;
                     }
                 }

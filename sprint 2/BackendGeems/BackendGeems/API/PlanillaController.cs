@@ -16,19 +16,19 @@ namespace BackendGeems.API
             _repo = new GEEMSRepo();
         }
 
-        [HttpGet("listar")]
-        public IActionResult ListarPlanillas()
+    [HttpGet("listar")]
+    public IActionResult ListarPlanillas([FromQuery] string nombreEmpresa)
+    {
+        try
         {
-            try
-            {
-                var planillas = _repo.ObtenerPlanillasPorEmpresa(nombreEmpresa: "GEEMS Solutions");
-                return Ok(planillas);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error al obtener planillas: " + ex.Message });
-            }
+            var planillas = _repo.ObtenerPlanillasPorEmpresa(nombreEmpresa);
+            return Ok(planillas);
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al obtener planillas: " + ex.Message });
+        }
+    }
 
         [HttpPost("crear")]
         public IActionResult CrearPlanilla([FromBody] CrearPlanillaDto dto)

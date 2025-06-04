@@ -140,8 +140,8 @@ namespace BackendGeems.Controllers
                 {
                     connection.Open();
 
-                    string empleadoQuery = "INSERT INTO Empleado (Id, CedulaPersona, Contrato, NumHorasTrabajadas, Genero, EstadoLaboral, SalarioBruto, Tipo, FechaIngreso, NombreEmpresa) " +
-                                           "VALUES (@Id, @CedulaPersona, @Contrato, @NumHorasTrabajadas, @Genero, @EstadoLaboral, @SalarioBruto, @Tipo, @FechaIngreso, @NombreEmpresa)";
+                    string empleadoQuery = "INSERT INTO Empleado (Id, CedulaPersona, Contrato, NumHorasTrabajadas, Genero, EstadoLaboral, SalarioBruto, Tipo, FechaIngreso, NombreEmpresa,FechaNacimiento,NumDependientes) " +
+                                           "VALUES (@Id, @CedulaPersona, @Contrato, @NumHorasTrabajadas, @Genero, @EstadoLaboral, @SalarioBruto, @Tipo, @FechaIngreso, @NombreEmpresa,@FechaNacimiento,@NumDependientes)";
                     SqlCommand empleadoCmd = new SqlCommand(empleadoQuery, connection);
                     empleadoCmd.Parameters.AddWithValue("@Id", empleado.Id);
                     empleadoCmd.Parameters.AddWithValue("@CedulaPersona", empleado.CedulaPersona);
@@ -153,6 +153,9 @@ namespace BackendGeems.Controllers
                     empleadoCmd.Parameters.AddWithValue("@Tipo", empleado.Tipo);
                     empleadoCmd.Parameters.AddWithValue("@FechaIngreso", empleado.FechaIngreso); // Ahora es una cadena
                     empleadoCmd.Parameters.AddWithValue("@NombreEmpresa", empleado.NombreEmpresa);
+                    empleadoCmd.Parameters.AddWithValue("@FechaNacimiento", empleado.fechaNacimiento);
+                    empleadoCmd.Parameters.AddWithValue("@NumDependientes", empleado.CantidadDependientes);
+
                     empleadoCmd.ExecuteNonQuery();
 
                     return Ok(new { message = "Empleado registrado exitosamente." });

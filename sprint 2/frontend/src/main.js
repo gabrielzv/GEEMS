@@ -25,6 +25,7 @@ import EditarEmpresa from "./components/EditarEmpresa.vue";
 import AprobarHoras from "./components/AprobacionHoras.vue";
 import PayrollSummary from "./components/PayrollSummary.vue";
 import SelectCreatePayroll from "./components/SelectCreatePayroll.vue"; 
+import EditarEmpleado  from "./components/EditarEmpleado.vue";  
 import EditarBeneficio from "./components/EditarBeneficio.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
@@ -62,6 +63,7 @@ const router = createRouter({
         { path: '/aprobarHoras', name: 'aprobarHoras', component: AprobarHoras, meta: {requiresAuth: true} },
         { path: '/payrollSummary', name: 'payrollSummary', component: PayrollSummary, meta: {requiresAuth: true} },
         { path: '/selectCreatePayroll', name: 'selectCreatePayroll', component: SelectCreatePayroll, meta: {requiresAuth: true} },
+        { path: '/editarEmpleado/:cedula', name: 'editarEmpleado', component: EditarEmpleado, meta: {requiresAuth: true}, props: true }
         { path: "/editarBeneficio/:id", name: "EditarBeneficio", component: EditarBeneficio },
       ]
     }

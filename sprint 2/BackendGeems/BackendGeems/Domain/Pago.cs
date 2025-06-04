@@ -5,7 +5,7 @@ namespace BackendGeems.Domain
     public class Pago
     {
         public Guid Id { get; set; }
-        public DateTime FechaRealizada { get; set; }  // o string si quieres, pero DateTime es mejor
+        public DateTime FechaRealizada { get; set; }  
         public decimal MontoPago { get; set; }
         public Guid IdEmpleado { get; set; }
         public Guid IdPayroll { get; set; }
