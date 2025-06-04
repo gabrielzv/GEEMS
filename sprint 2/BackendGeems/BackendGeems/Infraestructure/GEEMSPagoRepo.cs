@@ -101,8 +101,8 @@ namespace BackendGeems.Infraestructure
             return salarioBruto;
         }
 
-     
-     
+
+
 
         public int CalcularImpuestoRenta(int ingresoMensual)
         {
@@ -223,24 +223,24 @@ namespace BackendGeems.Infraestructure
         {
             try
             {
-                
+
                 if (ExistePago(idEmpleado, idPlanilla, fechaInicio, fechaFinal))
                 {
-                    return;
+                    throw new ArgumentException("\nEl pago para esa fecha y planilla ya existe en el sistema");
                 }
 
                 if (idEmpleado == Guid.Empty || idPlanilla == Guid.Empty)
                 {
-                    throw new ArgumentException("Id de empleado o planilla no puede ser vacío.");
+                    throw new ArgumentException("\nId de empleado o planilla no puede ser vacío.");
                 }
 
                 else if (fechaInicio >= fechaFinal)
                 {
-                    throw new ArgumentException("La fecha de inicio debe ser anterior a la fecha final.");
+                    throw new ArgumentException("\nLa fecha de inicio debe ser anterior a la fecha final.");
                 }
                 if (ExisteEmpleado(idEmpleado) == false)
                 {
-                    throw new ArgumentException("El empleado no existe.");
+                    throw new ArgumentException("\nEl empleado no existe.");
                 }
 
                 TimeSpan duracion = fechaFinal - fechaInicio;
@@ -258,7 +258,7 @@ namespace BackendGeems.Infraestructure
             }
             catch (Exception ex)
             {
-                throw new ArgumentException("Error al crear pago: " + ex.Message);
+                throw new ArgumentException(ex.Message);
             }
         }
 
@@ -369,7 +369,7 @@ namespace BackendGeems.Infraestructure
             catch (Exception ex)
             {
 
-                throw new Exception("Error al crear pago: " + ex.Message);
+                throw new Exception(ex.Message);
             }
             finally
             {
@@ -508,7 +508,7 @@ namespace BackendGeems.Infraestructure
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al crear pago quincenal: " + ex.Message);
+                throw new Exception(ex.Message);
             }
             finally
             {
@@ -640,7 +640,7 @@ namespace BackendGeems.Infraestructure
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al crear pago semanal: " + ex.Message);
+                throw new Exception(ex.Message);
             }
             finally
             {
@@ -698,6 +698,38 @@ namespace BackendGeems.Infraestructure
             }
         }
 
-        
+            public string GetNombreEmpleadoPorCedula(string cedula)
+            {
+                string nombreCompleto = null;
+                string query = "SELECT NombrePila, Apellido1, Apellido2 FROM Persona WHERE Cedula = @Cedula";
+
+                using (SqlCommand comando = new SqlCommand(query, _conexion))
+                {
+                    comando.Parameters.AddWithValue("@Cedula", cedula);
+                    try
+                    {
+                        _conexion.Open();
+                        using (SqlDataReader reader = comando.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                string nombre = reader["NombrePila"] != DBNull.Value ? reader["NombrePila"].ToString() : "";
+                                string apellido1 = reader["Apellido1"] != DBNull.Value ? reader["Apellido1"].ToString() : "";
+                                string apellido2 = reader["Apellido2"] != DBNull.Value ? reader["Apellido2"].ToString() : "";
+                                nombreCompleto = $"{nombre} {apellido1} {apellido2}".Trim();
+                            }
+                        }
+                    }
+                    catch (SqlException ex)
+                    {
+                        throw new Exception("Error al obtener el nombre completo del empleado por cédula: " + ex.Message);
+                    }
+                    finally
+                    {
+                        _conexion.Close();
+                    }
+                }
+                return nombreCompleto;
+            }
     }
 }
