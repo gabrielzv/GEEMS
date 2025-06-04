@@ -181,7 +181,7 @@
         <!-- Opciones adicionales para Payroll -->
         <template v-if="empleado?.tipo === 'Payroll'">
           <router-link
-            to="/payrollSummary"
+            to="/selectCreatePayroll"
             class="hover:text-blue-600 text-blue-600"
             active-class="text-blue-600 font-medium"
             >Realizar Pago</router-link

@@ -42,21 +42,31 @@ namespace BackendGeems.API
         {
             try
             {
-                var nombreEmpleado = "";
                 var empleados = _repoInfrastructure.ObtenerEmpleadosPorEmpresa(nombreEmpresa);
+                int pagosGenerados = 0;
                 foreach (var empleado in empleados)
                 {
                     try
                     {
-                         nombreEmpleado = _pagoInfrastructure.GetNombreEmpleadoPorCedula(empleado.CedulaPersona.ToString());
+                        // Obtener salario bruto antes de intentar generar el pago
+                        int salarioBruto = _pagoInfrastructure.ObtenerSalarioBruto(empleado.Id, fechaInicio, fechaFinal);
+                        if (salarioBruto <= 0)
+                        {
+                            // Saltar empleados sin horas o salario
+                            continue;
+                        }
                         _pagoInfrastructure.GenerarPagoEmpleado(empleado.Id, idPlanilla, fechaInicio, fechaFinal);
-                        Console.WriteLine("generando Para:" + nombreEmpleado);
+                        pagosGenerados++;
                     }
                     catch (Exception ex)
                     {
-                        // Manejar el error para cada empleado individualmente
-                        return StatusCode(500, new { message = $"\nError al generar pago para el empleado {nombreEmpleado}: {ex.Message}\n" });
+                        // Opcional: loguear el error, pero no detener el proceso
+                        continue;
                     }
+                }
+                if (pagosGenerados == 0)
+                {
+                    return BadRequest(new { message = "No hay empleados con horas registradas para esta planilla." });
                 }
                 return Ok(new { message = "Pagos generados para todos los empleados." });
             }
