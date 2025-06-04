@@ -9,6 +9,7 @@ namespace UnitTests
 {
     public class BeneficiosTest
     {
+        // Test para crear un beneficio, todos los datos son válidos y se espera que retorne un resultado exitoso.
         [Test]
         public void CrearBeneficio_DatosValidos_RetornaOk()
         {
@@ -36,6 +37,7 @@ namespace UnitTests
             Assert.IsInstanceOf<IActionResult>(result);
         }
 
+        // Test para crear una empresa, todos los datos son válidos y se espera que retorne un resultado exitoso.
         [Test]
         public void CrearEmpresa_DatosValidos_RetornaOk()
         {
@@ -64,6 +66,7 @@ namespace UnitTests
             Assert.IsInstanceOf<IActionResult>(result);
         }
 
+        // Test para modificar una empresa, todos los datos son válidos, solo se edita el nombre y la descripción y se espera que retorne un resultado exitoso.
         [Test]
         public void EditarEmpresa_DatosValidos_RetornaOk()
         {
