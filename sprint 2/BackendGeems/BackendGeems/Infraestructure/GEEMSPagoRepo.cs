@@ -223,22 +223,60 @@ namespace BackendGeems.Infraestructure
         {
             try
             {
-
+                
                 if (ExistePago(idEmpleado, idPlanilla, fechaInicio, fechaFinal))
                 {
-                    throw new ArgumentException("\nEl pago para esa fecha y planilla ya existe en el sistema");
+                    Console.WriteLine("Ya existe un pago para este empleado en el periodo especificado. Eliminando pago existente.");
+                    string queryPago = @"SELECT Id FROM Pago WHERE IdEmpleado = @IdEmpleado AND IdPlanilla = @IdPlanilla AND FechaInicio = @FechaInicio AND FechaFinal = @FechaFinal";
+                    Guid idPagoExistente = Guid.Empty;
+                    using (SqlCommand cmd = new SqlCommand(queryPago, _conexion))
+                    {
+                        cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                        cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
+                        cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                        cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
+                        _conexion.Open();
+                        var result = cmd.ExecuteScalar();
+                        if (result != null && result != DBNull.Value)
+                        {
+                            idPagoExistente = Guid.Parse(result.ToString());
+                        }
+                        _conexion.Close();
+                    }
+
+                    if (idPagoExistente != Guid.Empty)
+                    {
+                        
+                        string deleteDeducciones = "DELETE FROM Deducciones WHERE IdPago = @IdPago";
+                        using (SqlCommand cmd = new SqlCommand(deleteDeducciones, _conexion))
+                        {
+                            cmd.Parameters.AddWithValue("@IdPago", idPagoExistente);
+                            _conexion.Open();
+                            cmd.ExecuteNonQuery();
+                            _conexion.Close();
+                        }
+
+                       
+                        string deletePago = "DELETE FROM Pago WHERE Id = @IdPago";
+                        using (SqlCommand cmd = new SqlCommand(deletePago, _conexion))
+                        {
+                            cmd.Parameters.AddWithValue("@IdPago", idPagoExistente);
+                            _conexion.Open();
+                            cmd.ExecuteNonQuery();
+                            _conexion.Close();
+                        }
+                    }
                 }
 
                 if (idEmpleado == Guid.Empty || idPlanilla == Guid.Empty)
                 {
                     throw new ArgumentException("\nId de empleado o planilla no puede ser vacío.");
                 }
-
                 else if (fechaInicio >= fechaFinal)
                 {
                     throw new ArgumentException("\nLa fecha de inicio debe ser anterior a la fecha final.");
                 }
-                if (ExisteEmpleado(idEmpleado) == false)
+                if (!ExisteEmpleado(idEmpleado))
                 {
                     throw new ArgumentException("\nEl empleado no existe.");
                 }
