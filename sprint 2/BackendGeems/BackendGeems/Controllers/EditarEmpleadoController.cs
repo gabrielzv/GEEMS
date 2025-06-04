@@ -1,72 +1,97 @@
 using Microsoft.AspNetCore.Mvc;
+using System;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using BackendGeems.Domain;
-using System;
 
-namespace BackendGeems.Controllers
+namespace BackendGeems.Domain
 {
-    [Route("api/Empleado")]
     [ApiController]
-    public class EmpleadoController : ControllerBase
+    [Route("api/[controller]")]
+    public class EmpleadosController : ControllerBase
     {
         private readonly IConfiguration _configuration;
 
-        public EmpleadoController(IConfiguration configuration)
+        public EmpleadosController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-        // POST: api/Empleado/{cedula}
-        [HttpPost("actualizar/{cedula}")]
-        public IActionResult ActualizarEmpleado(string cedula, [FromBody] Empleado empleado)
+        [HttpPost("editarEmpleado")]
+        public IActionResult EditarEmpleado([FromBody] EmpleadoUpdateDto empleado)
         {
-            if (empleado == null)
+            // Validar que el objeto recibido no sea nulo y que tenga una cédula válida
+            if (empleado == null || empleado.CedulaPersona == 0)
             {
-                return BadRequest(new { message = "El objeto Empleado es nulo." });
+                return BadRequest(new { message = "Datos del empleado inválidos." });
             }
-
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
-                    connection.Open();
+                    conn.Open();
 
-                    string query = @"
-                UPDATE Empleado
-                SET Tipo = @Tipo,
-                    SalarioBruto = @SalarioBruto,
-                    FechaIngreso = @FechaIngreso,
-                    Contrato = @Contrato
-                WHERE CedulaPersona = @CedulaPersona";
+                    string updateQuery = @"
+                        UPDATE Empleado
+                        SET 
+                            Contrato = @Contrato,
+                            NumHorasTrabajadas = @NumHorasTrabajadas,
+                            Genero = @Genero,
+                            EstadoLaboral = @EstadoLaboral,
+                            SalarioBruto = @SalarioBruto,
+                            Tipo = @Tipo,
+                            FechaIngreso = @FechaIngreso,
+                            NombreEmpresa = @NombreEmpresa
+                        WHERE CedulaPersona = @CedulaPersona";
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
                     {
-                        command.Parameters.AddWithValue("@Tipo", empleado.Tipo);
-                        command.Parameters.AddWithValue("@SalarioBruto", empleado.SalarioBruto);
-                        command.Parameters.AddWithValue("@FechaIngreso", empleado.FechaIngreso);
-                        command.Parameters.AddWithValue("@Contrato", empleado.Contrato);
-                        command.Parameters.AddWithValue("@CedulaPersona", cedula);
+                        cmd.Parameters.AddWithValue("@CedulaPersona", empleado.CedulaPersona);
+                        cmd.Parameters.AddWithValue("@Contrato", empleado.Contrato ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@NumHorasTrabajadas", empleado.NumHorasTrabajadas);
+                        cmd.Parameters.AddWithValue("@Genero", empleado.Genero ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@EstadoLaboral", empleado.EstadoLaboral ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@SalarioBruto", empleado.SalarioBruto);
+                        cmd.Parameters.AddWithValue("@Tipo", empleado.Tipo ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@FechaIngreso", empleado.FechaIngreso ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@NombreEmpresa", empleado.NombreEmpresa ?? (object)DBNull.Value);
 
-                        int rowsAffected = command.ExecuteNonQuery();
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
                         if (rowsAffected > 0)
                         {
-                            return Ok(new { message = "Datos de empleado actualizados correctamente." });
+                            return Ok(new { message = "Empleado actualizado exitosamente" });
                         }
                         else
                         {
-                            return NotFound(new { message = "No se encontró un empleado con la cédula proporcionada." });
+                            return NotFound(new { message = "Empleado no encontrado." });
                         }
                     }
                 }
             }
+            catch (SqlException ex)
+            {
+                string errorMessage = ex.Number switch
+                {
+                    547 => "Error de constraints: Valores no permitidos según las reglas de la base de datos",
+                    _ => "Error en la base de datos al actualizar el empleado"
+                };
+
+                return StatusCode(500, new
+                {
+                    message = errorMessage,
+                    error = ex.Message
+                });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error al actualizar el empleado: " + ex.Message });
+                return StatusCode(500, new
+                {
+                    message = "Error interno al actualizar el empleado",
+                    error = ex.Message
+                });
             }
         }
-
     }
 }
