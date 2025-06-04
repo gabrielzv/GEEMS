@@ -59,8 +59,8 @@
           <input
             type="text"
             v-model="cedula"
-            maxlength="13"
-            placeholder="1-333-7777777"
+            maxlength="12"
+            placeholder="1-333-666666"
             :class="
               inputClass(
                 errores.cedulaFormatoInvalido ||
@@ -359,10 +359,27 @@ export default {
         ? ""
         : "La modalidad de pago es obligatoria.";
 
+
+
       this.errores.cedulaFormatoInvalido = "";
-      if (!/^\d{1}-\d{3}-\d{7}$/.test(this.cedula)) {
-        this.errores.cedulaFormatoInvalido =
-          "La cédula jurídica debe tener el formato X-XXX-XXXXXXX.";
+      try {
+        // Elimina los guiones de la cédula antes de enviarla al API
+        const cedulaSinGuiones = this.cedula.replace(/-/g, "");
+        const response = await axios.post(
+          "https://localhost:7014/api/national-register/validate/" + cedulaSinGuiones
+        );
+        const apiResult = response.data;
+        if (apiResult.error || apiResult.formatoInvalido) {
+          this.errores.cedulaFormatoInvalido =
+            apiResult.error || apiResult.formatoInvalido || "Cédula jurídica inválida.";
+        }
+      } catch (error) {
+        if (error.response && error.response.data) {
+          this.errores.cedulaFormatoInvalido =
+            error.response.data.message || "Error validando la cédula jurídica.";
+        } else {
+          this.errores.cedulaFormatoInvalido = "Error validando la cédula jurídica.";
+        }
       }
 
       this.errores.telefonoFormatoInvalido = "";
