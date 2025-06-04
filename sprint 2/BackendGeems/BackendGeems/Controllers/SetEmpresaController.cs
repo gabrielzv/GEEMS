@@ -95,4 +95,60 @@ public class SetEmpresaController : ControllerBase
             return StatusCode(500, new { message = "Error al insertar empresa", error = ex.Message });
         }
     }
+    // Metodo para editar una empresa ya registrada
+    [HttpPost("editarEmpresa")]
+    public IActionResult EditarEmpresa([FromBody] EmpresaModel empresa)
+    {
+        if (empresa == null || string.IsNullOrEmpty(empresa.CedulaJuridica))
+        {
+            return BadRequest(new { message = "Datos de la empresa inválidos." });
+        }
+
+        try
+        {
+            using SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            conn.Open();
+
+            string updateQuery = @"
+                UPDATE Empresa
+                SET 
+                    Nombre = @Nombre,
+                    Descripcion = @Descripcion,
+                    Telefono = @Telefono,
+                    Correo = @Correo,
+                    Provincia = @Provincia,
+                    Canton = @Canton,
+                    Distrito = @Distrito,
+                    Senas = @Senas,
+                    ModalidadPago = @ModalidadPago
+                WHERE CedulaJuridica = @CedulaJuridica;";
+
+            using SqlCommand cmd = new SqlCommand(updateQuery, conn);
+            cmd.Parameters.AddWithValue("@CedulaJuridica", empresa.CedulaJuridica);
+            cmd.Parameters.AddWithValue("@Nombre", empresa.Nombre);
+            cmd.Parameters.AddWithValue("@Descripcion", empresa.Descripcion);
+            cmd.Parameters.AddWithValue("@Telefono", empresa.Telefono);
+            cmd.Parameters.AddWithValue("@Correo", empresa.Correo);
+            cmd.Parameters.AddWithValue("@Provincia", empresa.Provincia);
+            cmd.Parameters.AddWithValue("@Canton", empresa.Canton);
+            cmd.Parameters.AddWithValue("@Distrito", empresa.Distrito);
+            cmd.Parameters.AddWithValue("@Senas", empresa.Senas);
+            cmd.Parameters.AddWithValue("@ModalidadPago", empresa.ModalidadPago);
+
+            int rowsAffected = cmd.ExecuteNonQuery();
+
+            if (rowsAffected > 0)
+            {
+                return Ok(new { message = "Empresa actualizada exitosamente" });
+            }
+            else
+            {
+                return NotFound(new { message = "Empresa no encontrada o no se realizaron cambios." });
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al actualizar la empresa", error = ex.Message });
+        }
+    }
 }
