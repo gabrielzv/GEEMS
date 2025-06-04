@@ -288,13 +288,16 @@ namespace BackendGeems.Infraestructure
                 bool esQuincenal = duracion.TotalDays <= 16;
                 if (!esQuincenal)
                 {
-                    GenerarPagoEmpleadoMensual(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
                     Console.WriteLine("Mensual");
+
+                    GenerarPagoEmpleadoMensual(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
+
                 }
                 else
                 {
-                    GenerarPagoEmpleadoQuincenal(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
                     Console.WriteLine("Quincenal");
+                    GenerarPagoEmpleadoQuincenal(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
+
                 }
             }
             catch (Exception ex)
@@ -371,10 +374,10 @@ namespace BackendGeems.Infraestructure
                             string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
                             if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
                             {
-                                
+
 
                                 monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBruto);
-                                
+
                                 deduccionesVoluntarias.Add((idBeneficio, monto));
                                 totalDeducciones += monto;
                             }
@@ -440,11 +443,13 @@ namespace BackendGeems.Infraestructure
         {
             try
             {
+                Console.WriteLine(idEmpleado);
                 string tipoContrato = ObtenerTipoContratoEmpleado(idEmpleado);
                 Console.WriteLine(tipoContrato);
                 int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
                 int salarioBrutoMensual = 0;
                 int salarioBrutoQuincenal = 0;
+                Console.WriteLine(salarioBrutoQuincenal);
 
                 if (salarioBruto == -1)
                 {
@@ -461,15 +466,19 @@ namespace BackendGeems.Infraestructure
                     if (salarioBruto > 0)
                     {
                         salarioBrutoMensual = ObtenerSalarioEmpleado(idEmpleado);
-                        salarioBrutoQuincenal = salarioBruto / 2;
+                        salarioBrutoQuincenal = salarioBrutoMensual / 2;
+                        Console.WriteLine("Salario mensual " + salarioBrutoMensual);
+                        Console.WriteLine("Salario quincenal " + salarioBrutoQuincenal);
                     }
                 }
+
 
                 else if (tipoContrato == "Por Horas")
                 {
                     salarioBrutoQuincenal = salarioBruto;
                 }
-
+                Console.WriteLine("Salario mensual " + salarioBrutoMensual);
+                Console.WriteLine("Salario quincenal " + salarioBrutoQuincenal);
 
                 bool esSegundaQuincena = fechaFinal.Day > 15;
 
@@ -488,45 +497,65 @@ namespace BackendGeems.Infraestructure
                     impuestoRentaQuincenal = impuestoRentaMensual / 2;
 
 
-                    SEM = (int)(salarioBrutoQuincenal * 0.0550); // 5.50%
-                    IVM = (int)(salarioBrutoQuincenal * 0.0417); // 4.17%
-                    BancoPopular = (int)(salarioBrutoQuincenal * 0.01); // 1%
-                    totalDeducciones = impuestoRentaQuincenal + SEM + IVM + BancoPopular;
+                    SEM = (int)(salarioBrutoMensual * 0.0550); // 5.50%
+                    IVM = (int)(salarioBrutoMensual * 0.0417); // 4.17%
+                    BancoPopular = (int)(salarioBrutoMensual * 0.01); // 1%
+                    totalDeducciones = impuestoRentaQuincenal + SEM / 2 + IVM / 2 + BancoPopular / 2;
                 }
 
                 List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
 
 
-                if (esSegundaQuincena)
-                {
-                    string queryBeneficios = @"
-                            SELECT b.Id, b.Costo
-                            FROM BeneficiosEmpleado be
-                            JOIN Beneficio b ON be.IdBeneficio = b.Id
-                            WHERE be.IdEmpleado = @IdEmpleado";
-                    using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
-                    {
-                        cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
-                        DataTable dt = CrearTablaConsulta(cmd);
 
-                        foreach (DataRow row in dt.Rows)
+
+                string queryBeneficios = @"
+                    SELECT b.Id, b.Costo,b.NombreDeAPI,b.EsAPI
+                    FROM BeneficiosEmpleado be
+                    JOIN Beneficio b ON be.IdBeneficio = b.Id
+                    WHERE be.IdEmpleado = @IdEmpleado";
+                using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
+                {
+                    cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                    DataTable dt = CrearTablaConsulta(cmd);
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+
+                        if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
                         {
-                            if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
+                            Guid idBeneficio = Guid.Parse(row["Id"].ToString());
+                            int monto = Convert.ToInt32(row["Costo"]);
+
+                            bool esAPI = Convert.ToBoolean(row["EsAPI"]);
+                            string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
+                            if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
                             {
-                                Guid idBeneficio = Guid.Parse(row["Id"].ToString());
-                                int monto = Convert.ToInt32(row["Costo"]);
+
+
+                                monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBrutoMensual);
+                                monto = monto / 2;
+                                Console.WriteLine("Monto Mensual: " + monto);
+                                Console.WriteLine("Monto Quincenal: " + monto);
                                 deduccionesVoluntarias.Add((idBeneficio, monto));
                                 totalDeducciones += monto;
-                                Console.WriteLine(salarioBrutoQuincenal);
-                                Console.WriteLine(totalDeducciones);
-                                if (totalDeducciones > salarioBrutoQuincenal)
-                                {
-                                    throw new Exception("El total de deducciones no puede ser mayor al salario bruto quincenal.");
-                                }
+                            }
+                            else
+                            {
+                                monto = monto / 2;
+                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                totalDeducciones += monto;
+                            }
+
+
+                            if (totalDeducciones > salarioBrutoQuincenal)
+                            {
+
+                                throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
                             }
                         }
                     }
                 }
+
 
                 Guid idPago = Guid.NewGuid();
 
@@ -565,7 +594,9 @@ namespace BackendGeems.Infraestructure
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error En pago Quincenal: " + ex.Message);
                 throw new Exception(ex.Message);
+
             }
             finally
             {
@@ -645,15 +676,32 @@ namespace BackendGeems.Infraestructure
 
                         foreach (DataRow row in dt.Rows)
                         {
+
                             if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
                             {
                                 Guid idBeneficio = Guid.Parse(row["Id"].ToString());
                                 int monto = Convert.ToInt32(row["Costo"]);
-                                deduccionesVoluntarias.Add((idBeneficio, monto));
-                                totalDeducciones += monto;
-                                if (totalDeducciones > salarioBrutoSemanal)
+                                bool esAPI = Convert.ToBoolean(row["EsAPI"]);
+                                string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
+                                if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
                                 {
-                                    throw new Exception("El total de deducciones no puede ser mayor al salario bruto semanal.");
+
+
+                                    monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBruto);
+
+                                    deduccionesVoluntarias.Add((idBeneficio, monto));
+                                    totalDeducciones += monto;
+                                }
+                                else
+                                {
+                                    deduccionesVoluntarias.Add((idBeneficio, monto));
+                                    totalDeducciones += monto;
+                                }
+
+
+                                if (totalDeducciones > salarioBruto)
+                                {
+                                    throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
                                 }
                             }
                         }
@@ -841,12 +889,12 @@ namespace BackendGeems.Infraestructure
         {
             try
             {
-                Console.WriteLine("aca1");
+
                 Empleado empleado = ObtenerEmpleado(idEmpleado);
-                Console.WriteLine("aca1.1");
+
                 if (nombreAPI == "Asociacion Calculator")
                 {
-                    Console.WriteLine("aca2");
+
                     var nombreEmpresa = empleado.NombreEmpresa;
                     var builder = WebApplication.CreateBuilder();
                     var configuration = builder.Configuration;
@@ -856,10 +904,10 @@ namespace BackendGeems.Infraestructure
                         AssociationName = nombreEmpresa,
                         EmployeeSalary = salarioBruto
                     };
-                    Console.WriteLine("aca2.1");
+
 
                     var response = association.CalculateAssociationFee(request).Result;
-                    Console.WriteLine("aca2.2");
+
 
                     try
                     {
@@ -875,7 +923,7 @@ namespace BackendGeems.Infraestructure
                         double rawAmount = json.RootElement.GetProperty("amountToCharge").GetDouble();
                         int amount = Convert.ToInt32(rawAmount);
 
-                        Console.WriteLine($"Monto procesado: {amount}");
+
                         return amount;
                     }
                     catch (Exception ex)
@@ -887,7 +935,7 @@ namespace BackendGeems.Infraestructure
 
                 else if (nombreAPI == "Poliza Seguros")
                 {
-                    Console.WriteLine("aca3");
+
 
                     var fechaNacimiento = empleado.fechaNacimiento;
                     var genero = empleado.Genero == "M" ? "Male" : "Female";
@@ -906,7 +954,7 @@ namespace BackendGeems.Infraestructure
                         // Obtener el contenido del JSON
                         string jsonString = contentResult.Content;
 
-                        Console.WriteLine("Contenido recibido: " + jsonString);
+
 
                         // Parsear JSON y extraer el valor
                         var json = JsonDocument.Parse(jsonString);
@@ -923,7 +971,7 @@ namespace BackendGeems.Infraestructure
 
                 else if (nombreAPI == "MediSeguro")
                 {
-                    Console.WriteLine("aca4");
+
 
                     var genero = empleado.Genero == "M" ? "masculino" : "femenino";
 
@@ -944,7 +992,7 @@ namespace BackendGeems.Infraestructure
                         var contentResult = (ContentResult)response;
                         string content = contentResult.Content?.Trim();
 
-                        Console.WriteLine("Contenido recibido: " + content);
+
 
                         if (int.TryParse(content, out int amount))
                         {
