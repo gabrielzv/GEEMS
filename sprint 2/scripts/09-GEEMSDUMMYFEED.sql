@@ -40,8 +40,8 @@ INSERT INTO SuperAdmin VALUES (@uidAdmin, 101010101);
 
 -- Empresas
 INSERT INTO Empresa VALUES 
-('3-101-1234567', 'GEEMS Solutions', 'Consultora en gestión empresarial', '2222-2222', 'info@geems.com', 'San José', 'San José', 'Carmen', '300 m norte del parque central', 'Mensual'),
-('1-555-9876543', 'Innova Corp', 'Soluciones digitales y tecnológicas', '2100-3333', 'contacto@innova.com', 'Heredia', 'Heredia', 'San Francisco', 'Detrás del parque industrial', 'Quincenal');
+('3-101-1234567', 'GEEMS Solutions', 'Consultora en gestión empresarial', '2222-2222', 'info@geems.com', 'San José', 'San José', 'Carmen', '300 m norte del parque central', 'Mensual', 3),
+('1-555-9876543', 'Innova Corp', 'Soluciones digitales y tecnológicas', '2100-3333', 'contacto@innova.com', 'Heredia', 'Heredia', 'San Francisco', 'Detrás del parque industrial', 'Quincenal', 4);
 
 -- Asociación SuperAdmin → Empresa
 INSERT INTO SuperAdminAdministraEmpresa VALUES (@uidAdmin, '3-101-1234567');
