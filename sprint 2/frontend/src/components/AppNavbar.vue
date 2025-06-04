@@ -65,7 +65,10 @@
             style="background-color: #ffffff"
           >
             <router-link
-              to="/editarEmpresa"
+              :to="{
+                name: 'editarEmpresa',
+                params: { cedulaDueno: user?.cedulaPersona },
+              }"
               class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
               active-class="text-blue-600 font-medium"
               >Editar empresa</router-link
@@ -278,6 +281,7 @@ export default {
       empleado,
       goToUserPage,
       handleLogout,
+      userStore,
     };
   },
 };
