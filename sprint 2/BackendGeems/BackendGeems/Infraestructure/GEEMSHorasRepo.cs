@@ -152,6 +152,7 @@ namespace BackendGeems.Infraestructure
         }
         public int GetMonthHours(Guid idEmpleado, DateTime fecha)
         {
+            Console.WriteLine("Se entra al GetMonthHours");
             int horas = 0;
             string query = "SELECT dbo.fnHorasTrabajadasPorMes(@IdEmpleado, @Fecha)";
 

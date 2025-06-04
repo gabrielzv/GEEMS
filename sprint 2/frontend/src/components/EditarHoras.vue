@@ -181,6 +181,25 @@ export default {
             ) {
                 this.errores.horasInvalidas = "Las horas a registrar deben ser un número entre 1 y 24.";
             }
+            // Validar con el API si las horas mensuales superan 160
+            try {
+                // Calcular las horas que se van a agregar a la base, se descuentan las anteriores de las actuales
+                const horasNuevas = horas - Number(this.registroAnterior.NumHoras);
+                console.log(horasNuevas, " Horas nuevas valor");
+                const response = await axios.get("https://localhost:7014/api/Horas/ValidHours", {
+                    params: {
+                        date: this.diaRegistrado,
+                        employeeId: this.guidEmpleado,
+                        hours: horasNuevas
+                    }
+                });
+                console.log("Se tiene response.data de horas invalidas en: ", response.data);
+                if (response.data == false) {
+                    this.errores.horasInvalidas = "No se pueden registrar más de 160 horas en el mes.";
+                }
+            } catch (error) {
+                console.error("Error al validar las horas mensuales:", error);
+            }
         },
         async fechaValida() {
             this.errores.diaInvalido = "";
