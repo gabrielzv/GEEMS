@@ -37,6 +37,7 @@ namespace BackendGeems.Application
         }
         public bool ValidHours(DateTime date, Guid employeeId, int hours)
         {
+            Console.WriteLine("Se entra a ValidHours Aplicacion");
             int workedHours = _repoHoras.GetMonthHours(employeeId, date);
             bool valid = true;
             if(workedHours + hours > 160)

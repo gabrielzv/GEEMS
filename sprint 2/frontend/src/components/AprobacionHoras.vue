@@ -4,7 +4,7 @@
       <!-- Encabezado -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">
-          Aprobar horas - {{ empresa?.nombre || "Nombre de empresa" }}
+          Aprobar horas {{ empresa?.nombre }}
         </h1>
       </div>
 

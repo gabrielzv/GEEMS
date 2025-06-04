@@ -26,6 +26,7 @@ public class SetEmpresaController : ControllerBase
         public string Distrito { get; set; }
         public string Senas { get; set; }
         public string ModalidadPago { get; set; }
+        // public int MaxBeneficiosXEmpleado { get; set; }
     }
 
     [HttpPost("crearEmpresa")]
@@ -78,6 +79,7 @@ public class SetEmpresaController : ControllerBase
             cmd.Parameters.AddWithValue("@Distrito", empresa.Distrito);
             cmd.Parameters.AddWithValue("@Senas", empresa.Senas);
             cmd.Parameters.AddWithValue("@ModalidadPago", empresa.ModalidadPago);
+            // cmd.Parameters.AddWithValue("@MaxBeneficiosXEmpleado", empresa.MaxBeneficiosXEmpleado);
 
             int rowsAffected = cmd.ExecuteNonQuery();
 
@@ -134,6 +136,7 @@ public class SetEmpresaController : ControllerBase
             cmd.Parameters.AddWithValue("@Distrito", empresa.Distrito);
             cmd.Parameters.AddWithValue("@Senas", empresa.Senas);
             cmd.Parameters.AddWithValue("@ModalidadPago", empresa.ModalidadPago);
+            // cmd.Parameters.AddWithValue("@MaxBeneficiosXEmpleado", empresa.MaxBeneficiosXEmpleado);
 
             int rowsAffected = cmd.ExecuteNonQuery();
 

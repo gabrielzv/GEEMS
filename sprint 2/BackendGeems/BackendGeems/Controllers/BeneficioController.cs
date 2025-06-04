@@ -21,9 +21,10 @@ namespace BackendGeems.Controllers
             if (string.IsNullOrWhiteSpace(beneficio.Nombre) ||
                 string.IsNullOrWhiteSpace(beneficio.Descripcion) ||
                 beneficio.Costo <= 0 ||
-                beneficio.TiempoMinimo <= 0 ||
+                beneficio.TiempoMinimo < 0 ||
                 string.IsNullOrWhiteSpace(beneficio.Frecuencia) ||
-                string.IsNullOrWhiteSpace(beneficio.CedulaJuridica))
+                string.IsNullOrWhiteSpace(beneficio.CedulaJuridica) ||
+                string.IsNullOrWhiteSpace(beneficio.NombreDeAPI))
             {
                 return BadRequest("Todos los campos son obligatorios y deben ser válidos.");
             }
@@ -49,8 +50,8 @@ namespace BackendGeems.Controllers
                         {
                             // Se hace la inserción del nuevo beneficio
                             beneficioId = Guid.NewGuid();
-                            var insertQuery = "INSERT INTO Beneficio (Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica) " +
-                                              "VALUES (@Id, @Costo, @TiempoMinimo, @Frecuencia, @Descripcion, @Nombre, @CedulaJuridica)";
+                            var insertQuery = "INSERT INTO Beneficio (Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI) " +
+                                              "VALUES (@Id, @Costo, @TiempoMinimo, @Frecuencia, @Descripcion, @Nombre, @CedulaJuridica, @NombreDeAPI, @EsApi)";
                             using (var insertCommand = new SqlCommand(insertQuery, connection))
                             {
                                 insertCommand.Parameters.AddWithValue("@Id", beneficioId);
@@ -60,6 +61,8 @@ namespace BackendGeems.Controllers
                                 insertCommand.Parameters.AddWithValue("@Descripcion", beneficio.Descripcion);
                                 insertCommand.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
                                 insertCommand.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
+                                insertCommand.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
+                                insertCommand.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
 
                                 insertCommand.ExecuteNonQuery();
                             }

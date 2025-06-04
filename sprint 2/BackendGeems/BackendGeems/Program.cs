@@ -30,6 +30,7 @@ builder.Services.AddScoped<ISalarioBruto, SalarioBruto>();
 builder.Services.AddScoped<IGenerarPago, GenerarPago>();
 builder.Services.AddScoped<IQueryHoras, QueryHoras>();
 
+
 var app = builder.Build();
 
 app.UseSwagger();

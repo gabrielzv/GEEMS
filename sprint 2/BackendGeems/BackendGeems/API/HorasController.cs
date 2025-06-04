@@ -62,6 +62,7 @@ namespace BackendGeems.API
         [HttpGet("ValidHours")]
         public bool ValidHours(DateTime date, Guid employeeId, int hours)
         {
+            Console.WriteLine("Se entra a API ValidHours");
             return _queryHoras.ValidHours(date, employeeId, hours);
         }
     }

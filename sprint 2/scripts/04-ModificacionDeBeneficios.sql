@@ -50,5 +50,10 @@ CHECK (ContratoEmpleado IN (
     'Por Horas'
 ));
 
+-- Agregar nuevas columnas en Beneficio para almacenar nombre del API y un flag si el beneficio es un API activo
+ALTER TABLE Beneficio
+ADD NombreDeAPI NVARCHAR(100) NULL,
+    EsAPI BIT NOT NULL DEFAULT 0;
+
 -- SELECT * FROM BeneficioContratoElegible;
 -- SELECT * FROM Beneficio;
