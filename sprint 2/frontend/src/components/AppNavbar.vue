@@ -81,6 +81,42 @@
             >
           </div>
         </div>
+        <!-- Dropdown para los beneficios -->
+        <div class="relative group">
+          <button class="text-blue-600 flex items-center bg-transparent border-none shadow-none p-0 m-0 focus:outline-none">
+            Beneficios
+            <svg
+              class="w-4 h-4 ml-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div
+            class="absolute hidden group-hover:block rounded-md top-full py-1 w-48 z-10 border border-black"
+            style="background-color: #ffffff"
+          >
+            <router-link
+              to="/companyBenefits"
+              class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
+              active-class="text-blue-600 font-medium"
+              >Ver Beneficios</router-link
+            >
+            <router-link
+              to="/benefitCreation"
+              class="block px-4 py-2 hover:bg-gray-50 hover:text-blue-600"
+              active-class="text-blue-600 font-medium"
+              >Crear Beneficios</router-link
+            >
+          </div>
+        </div>
 
         <router-link
           :to="{
