@@ -840,6 +840,8 @@ namespace BackendGeems.Infraestructure
 
                 var json = JsonDocument.Parse((Stream)response);
                 var amount = json.RootElement.GetProperty("amountToCharge").GetInt32();
+                Console.WriteLine(response.ToString());
+
                 Console.WriteLine($"Monto de la asociación: {amount}");
                 return amount;
             }else if(nombreAPI == "LifeInsurance")
@@ -858,12 +860,33 @@ namespace BackendGeems.Infraestructure
                 var lifeInsuranceController = new LifeInsuranceController(configuration);
                 var response =lifeInsuranceController.GetPolicyInfo(fechaNacimiento.ToString("yyyy-MM-dd"),genero).Result;
 
-                var json = JsonDocument.Parse((Stream)response);
-                var amount = json.RootElement.GetProperty("amountToCharge").GetInt32();
-                Console.WriteLine($"Monto de la asociación: {amount}");
+                Console.WriteLine(response.ToString());
+                return Convert.ToInt32(response.ToString().Split(":")[1].TrimEnd('}').TrimEnd('"'));
 
             }
-            else if (nombreAPI == "Asociacion Calculator")
+            else if (nombreAPI == "MediSeguro") 
+            {
+                var genero = "";
+                if (empleado.Genero == "M")
+                {
+                    genero = "Male";
+                }
+                else if (empleado.Genero == "F")
+                {
+                    genero = "Female";
+                }
+                var builder = WebApplication.CreateBuilder();
+                var configuration = builder.Configuration;
+                var mediSeguroController = new InsuranceController(configuration);
+                var request = new InsuranceCalculationRequest
+                {
+                    FechaNacimiento = empleado.fechaNacimiento.ToString("yyyy-MM-dd"),
+                    Genero = genero,
+                    CantidadDependientes = empleado.CantidadDependientes
+
+                };
+                var response = mediSeguroController.CalculateInsurance(request).Result;
+                Console.WriteLine(response.ToString());
 
                 return 0;
         }
