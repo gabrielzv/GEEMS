@@ -47,23 +47,24 @@
               <td class="py-3 px-4 text-center">{{ registro.horas || 0 }}</td>
               <td class="py-3 px-4">{{ formatDate(registro.fechaSolicitud) }}</td>
               <td class="py-3 px-4">
-                <select 
-                  v-model="registro.estado" 
-                  :class="[
-                    'border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500',
-                    {
-                      'bg-green-100 border-green-500 text-green-800': registro.estado === 'Aprobado',
-                      'bg-red-100 border-red-500 text-red-800': registro.estado === 'Denegado',
-                      'bg-gray-100 border-gray-300 text-gray-800': registro.estado === 'NoRevisado'
-                    }
-                  ]"
-                  @change="updateEstado(registro)"
-                  :disabled="isUpdating"
-                >
-                  <option value="NoRevisado" class="bg-gray-100">No revisado</option>
-                  <option value="Aprobado" class="bg-green-100">Aprobado</option>
-                  <option value="Denegado" class="bg-red-100">Denegado</option>
-                </select>
+              <select 
+              v-model="registro.estado" 
+              :class="[
+                'border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                {
+                  'bg-green-100 border-green-500 text-green-800': registro.estado === 'Aprobado',
+                  'bg-red-100 border-red-500 text-red-800': registro.estado === 'Denegado',
+                  'bg-gray-100 border-gray-300 text-gray-800': registro.estado === 'NoRevisado'
+                }
+              ]"
+              @change="updateEstado(registro)"
+              :disabled="registro.estado === 'Aprobado' || isUpdating"
+            >
+              <option value="NoRevisado" class="bg-gray-100">No revisado</option>
+              <option value="Aprobado" class="bg-green-100">Aprobado</option>
+              <option value="Denegado" class="bg-red-100">Denegado</option>
+            </select>
+
               </td>
             </tr>
             <tr v-if="filteredRegistros.length === 0 && !isLoading">

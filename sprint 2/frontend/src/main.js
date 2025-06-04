@@ -63,7 +63,7 @@ const router = createRouter({
         { path: '/aprobarHoras', name: 'aprobarHoras', component: AprobarHoras, meta: {requiresAuth: true} },
         { path: '/payrollSummary', name: 'payrollSummary', component: PayrollSummary, meta: {requiresAuth: true} },
         { path: '/selectCreatePayroll', name: 'selectCreatePayroll', component: SelectCreatePayroll, meta: {requiresAuth: true} },
-        { path: '/editarEmpleado/:cedula', name: 'editarEmpleado', component: EditarEmpleado, meta: {requiresAuth: true}, props: true }
+        { path: '/editarEmpleado/:cedula', name: 'editarEmpleado', component: EditarEmpleado, meta: {requiresAuth: true}, props: true },
         { path: "/editarBeneficio/:id", name: "EditarBeneficio", component: EditarBeneficio },
       ]
     }
