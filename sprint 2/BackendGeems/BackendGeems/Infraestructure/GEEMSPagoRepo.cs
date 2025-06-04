@@ -1,9 +1,10 @@
 ﻿using BackendGeems.Application;
-using BackendGeems.Domain;
 using BackendGeems.Controllers;
-using System.Text.Json;
+using BackendGeems.Domain;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Text.Json;
 
 
 namespace BackendGeems.Infraestructure
@@ -368,12 +369,12 @@ namespace BackendGeems.Infraestructure
                             int monto = Convert.ToInt32(row["Costo"]);
                             bool esAPI = Convert.ToBoolean(row["EsAPI"]);
                             string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
-                            if(esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
+                            if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
                             {
-                                Console.WriteLine("Llamando a la API para obtener el monto del beneficio: " + nombreDeAPI);
+                                
 
                                 monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBruto);
-                                Console.WriteLine($"Monto obtenido de la API {nombreDeAPI}: {monto}");
+                                
                                 deduccionesVoluntarias.Add((idBeneficio, monto));
                                 totalDeducciones += monto;
                             }
@@ -382,8 +383,8 @@ namespace BackendGeems.Infraestructure
                                 deduccionesVoluntarias.Add((idBeneficio, monto));
                                 totalDeducciones += monto;
                             }
-                            
-                            
+
+
                             if (totalDeducciones > salarioBruto)
                             {
                                 throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
@@ -792,7 +793,7 @@ namespace BackendGeems.Infraestructure
         public Empleado ObtenerEmpleado(Guid idEmpleado)
         {
             Empleado empleado = null;
-            string query = @"SELECT Id, CedulaPersona, Contrato, NumHorasTrabajadas, Genero, EstadoLaboral, SalarioBruto, Tipo, FechaIngreso, NombreEmpresa, CantidadDependientes, fechaNacimiento 
+            string query = @"SELECT Id, CedulaPersona, Contrato, NumHorasTrabajadas, Genero, EstadoLaboral, SalarioBruto, Tipo, FechaIngreso, NombreEmpresa, NumDependientes, fechaNacimiento 
                              FROM Empleado 
                              WHERE Id = @IdEmpleado";
 
@@ -819,7 +820,7 @@ namespace BackendGeems.Infraestructure
                                 Tipo = reader["Tipo"] != DBNull.Value ? reader["Tipo"].ToString() : null,
                                 FechaIngreso = reader["FechaIngreso"] != DBNull.Value ? reader["FechaIngreso"].ToString() : null,
                                 NombreEmpresa = reader["NombreEmpresa"] != DBNull.Value ? reader["NombreEmpresa"].ToString() : null,
-                                CantidadDependientes = reader["CantidadDependientes"] != DBNull.Value ? Convert.ToInt32(reader["CantidadDependientes"]) : 0,
+                                CantidadDependientes = reader["NumDependientes"] != DBNull.Value ? Convert.ToInt32(reader["NumDependientes"]) : 0,
                                 fechaNacimiento = reader["fechaNacimiento"] != DBNull.Value ? Convert.ToDateTime(reader["fechaNacimiento"]) : DateTime.MinValue
                             };
                         }
@@ -838,75 +839,132 @@ namespace BackendGeems.Infraestructure
         }
         public int ObtenerMontoAPI(Guid idEmpleado, string nombreAPI, int salarioBruto)
         {
-            Empleado empleado = ObtenerEmpleado(idEmpleado);
-            if (nombreAPI == "Asociacion Calculator")
+            try
             {
-                var nombreEmpresa = empleado.NombreEmpresa;
-                var builder = WebApplication.CreateBuilder();
-                var configuration = builder.Configuration;
-                var association = new AssociationController(configuration);
-                var request = new AssociationCalculationRequest
+                Console.WriteLine("aca1");
+                Empleado empleado = ObtenerEmpleado(idEmpleado);
+                Console.WriteLine("aca1.1");
+                if (nombreAPI == "Asociacion Calculator")
                 {
-                    AssociationName = nombreEmpresa,
-                    EmployeeSalary = salarioBruto
-                };
+                    Console.WriteLine("aca2");
+                    var nombreEmpresa = empleado.NombreEmpresa;
+                    var builder = WebApplication.CreateBuilder();
+                    var configuration = builder.Configuration;
+                    var association = new AssociationController(configuration);
+                    var request = new AssociationCalculationRequest
+                    {
+                        AssociationName = nombreEmpresa,
+                        EmployeeSalary = salarioBruto
+                    };
+                    Console.WriteLine("aca2.1");
+
+                    var response = association.CalculateAssociationFee(request).Result;
+                    Console.WriteLine("aca2.2");
+
+                    try
+                    {
+
+                        var contentResult = (ContentResult)response;
 
 
-                var response = association.CalculateAssociationFee(request).Result;
+                        string jsonString = contentResult.Content;
+                        Console.WriteLine(jsonString);
 
-                var json = JsonDocument.Parse((Stream)response);
-                var amount = json.RootElement.GetProperty("amountToCharge").GetInt32();
-                Console.WriteLine(response.ToString());
 
-                Console.WriteLine($"Monto de la asociación: {amount}");
-                return amount;
+                        var json = JsonDocument.Parse(jsonString);
+                        double rawAmount = json.RootElement.GetProperty("amountToCharge").GetDouble();
+                        int amount = Convert.ToInt32(rawAmount);
+
+                        Console.WriteLine($"Monto procesado: {amount}");
+                        return amount;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error al procesar la respuesta de la API: " + ex.Message);
+                        throw new Exception("Error al procesar la respuesta de la API: " + ex.Message);
+                    }
+                }
+
+                else if (nombreAPI == "Poliza Seguros")
+                {
+                    Console.WriteLine("aca3");
+                    var fechaNacimiento = empleado.fechaNacimiento;
+                    var genero = "";
+                    if (empleado.Genero == "M")
+                    {
+                        genero = "Male";
+                    }
+                    else if (empleado.Genero == "F")
+                    {
+                        genero = "Female";
+                    }
+                    var builder = WebApplication.CreateBuilder();
+                    var configuration = builder.Configuration;
+                    var lifeInsuranceController = new LifeInsuranceController(configuration);
+                    var response = lifeInsuranceController.GetPolicyInfo(fechaNacimiento.ToString("yyyy-MM-dd"), genero).Result;
+                    try
+                    {
+                        Console.WriteLine(response.ToString());
+                        return Convert.ToInt32(response.ToString().Split(":")[1].TrimEnd('}').TrimEnd('"'));
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        Console.WriteLine("Error al procesar la respuesta de la API: " + ex.Message);
+                        return 0;
+                        throw new Exception("Error al procesar la respuesta de la API: " + ex.Message);
+                        
+                    }
+
+
+
+                }
+                else if (nombreAPI == "MediSeguro")
+                {
+                    Console.WriteLine("aca4");
+
+                    var genero = empleado.Genero == "M" ? "masculino" : "femenino";
+
+                    var builder = WebApplication.CreateBuilder();
+                    var configuration = builder.Configuration;
+                    var mediSeguroController = new InsuranceController(configuration);
+                    var request = new InsuranceCalculationRequest
+                    {
+                        FechaNacimiento = empleado.fechaNacimiento.ToString("yyyy-MM-dd"),
+                        Genero = genero,
+                        CantidadDependientes = empleado.CantidadDependientes
+                    };
+
+                    var response = mediSeguroController.CalculateInsurance(request).Result;
+
+                    try
+                    {
+                        var contentResult = (ContentResult)response;
+                        string content = contentResult.Content?.Trim();
+
+                        Console.WriteLine("Contenido recibido: " + content);
+
+                        if (int.TryParse(content, out int amount))
+                        {
+                            return amount;
+                        }
+                        else
+                        {
+                            throw new Exception("La respuesta no es un número válido.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error al procesar la respuesta de la API: " + ex.Message);
+                        throw new Exception("Error al procesar la respuesta de la API: " + ex.Message);
+                    }
+                }
+
             }
-            else if (nombreAPI == "Poliza Seguros")
+            catch (Exception ex)
             {
-                var fechaNacimiento = empleado.fechaNacimiento;
-                var genero = "";
-                if (empleado.Genero == "M")
-                {
-                    genero = "Male";
-                }
-                else if (empleado.Genero == "F")
-                {
-                    genero = "Female";
-                }
-                var builder = WebApplication.CreateBuilder();
-                var configuration = builder.Configuration;
-                var lifeInsuranceController = new LifeInsuranceController(configuration);
-                var response = lifeInsuranceController.GetPolicyInfo(fechaNacimiento.ToString("yyyy-MM-dd"), genero).Result;
-
-                Console.WriteLine(response.ToString());
-                return Convert.ToInt32(response.ToString().Split(":")[1].TrimEnd('}').TrimEnd('"'));
-
-            }
-            else if (nombreAPI == "MediSeguro")
-            {
-                var genero = "";
-                if (empleado.Genero == "M")
-                {
-                    genero = "Male";
-                }
-                else if (empleado.Genero == "F")
-                {
-                    genero = "Female";
-                }
-                var builder = WebApplication.CreateBuilder();
-                var configuration = builder.Configuration;
-                var mediSeguroController = new InsuranceController(configuration);
-                var request = new InsuranceCalculationRequest
-                {
-                    FechaNacimiento = empleado.fechaNacimiento.ToString("yyyy-MM-dd"),
-                    Genero = genero,
-                    CantidadDependientes = empleado.CantidadDependientes
-
-                };
-                var response = mediSeguroController.CalculateInsurance(request).Result;
-                Console.WriteLine(response.ToString());
-
-                return 0;
+                throw new Exception(ex.Message);
             }
             return 0;
         }
