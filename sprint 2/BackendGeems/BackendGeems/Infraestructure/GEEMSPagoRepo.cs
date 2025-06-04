@@ -888,38 +888,39 @@ namespace BackendGeems.Infraestructure
                 else if (nombreAPI == "Poliza Seguros")
                 {
                     Console.WriteLine("aca3");
+
                     var fechaNacimiento = empleado.fechaNacimiento;
-                    var genero = "";
-                    if (empleado.Genero == "M")
-                    {
-                        genero = "Male";
-                    }
-                    else if (empleado.Genero == "F")
-                    {
-                        genero = "Female";
-                    }
+                    var genero = empleado.Genero == "M" ? "Male" : "Female";
+
                     var builder = WebApplication.CreateBuilder();
                     var configuration = builder.Configuration;
                     var lifeInsuranceController = new LifeInsuranceController(configuration);
+
                     var response = lifeInsuranceController.GetPolicyInfo(fechaNacimiento.ToString("yyyy-MM-dd"), genero).Result;
+
                     try
                     {
-                        Console.WriteLine(response.ToString());
-                        return Convert.ToInt32(response.ToString().Split(":")[1].TrimEnd('}').TrimEnd('"'));
+                        // Convertir el resultado a ContentResult
+                        var contentResult = (ContentResult)response;
 
+                        // Obtener el contenido del JSON
+                        string jsonString = contentResult.Content;
+
+                        Console.WriteLine("Contenido recibido: " + jsonString);
+
+                        // Parsear JSON y extraer el valor
+                        var json = JsonDocument.Parse(jsonString);
+                        int cost = json.RootElement.GetProperty("monthlyCost").GetInt32();
+
+                        return cost;
                     }
                     catch (Exception ex)
                     {
-
                         Console.WriteLine("Error al procesar la respuesta de la API: " + ex.Message);
                         return 0;
-                        throw new Exception("Error al procesar la respuesta de la API: " + ex.Message);
-                        
                     }
-
-
-
                 }
+
                 else if (nombreAPI == "MediSeguro")
                 {
                     Console.WriteLine("aca4");
