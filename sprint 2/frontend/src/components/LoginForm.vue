@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 px-4">
     <div class="flex flex-col items-center space-y-6">
-      <img src="../assets/GEEMSLogo.jpg" class="h-20 w-auto mx-auto" />
+      <img src="../assets/GEEMSLogo.png" class="h-20 w-auto mx-auto" />
       <form
         @submit.prevent="login"
         novalidate

@@ -1,4 +1,4 @@
-﻿namespace BackendGeems.Models
+﻿namespace BackendGeems.Domain
 {
     public class Empleado
     {
@@ -12,6 +12,8 @@
         public string Tipo { get; set; }
         public string FechaIngreso { get; set; }
         public string NombreEmpresa { get; set; }
+         public int  CantidadDependientes { get; set; }
+         public DateTime fechaNacimiento { get; set; }
     }
 
 }

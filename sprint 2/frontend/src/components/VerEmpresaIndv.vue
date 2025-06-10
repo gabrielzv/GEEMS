@@ -56,6 +56,11 @@
           <p class="text-gray-700 mb-4">
             {{ empresa?.correo || "Dato no disponible" }}
           </p>
+
+          <p class="text-lg font-bold text-gray-800">Modalidad de pago:</p>
+          <p class="text-gray-700 mb-4">
+            {{ empresa?.modalidadPago || "Dato no disponible" }}
+          </p>
         </div>
       </div>
 
@@ -91,6 +96,7 @@
       <!-- Botones de acción -->
       <div class="flex justify-between mt-6">
         <button
+          @click="goToCrearEditarEmpresa"
           class="bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700"
         >
           Modificar
@@ -99,20 +105,6 @@
           class="bg-red-600 text-white font-semibold py-2 px-4 rounded hover:bg-red-700"
         >
           Eliminar
-        </button>
-      </div>
-
-      <!-- Botones para los beneficios -->
-      <div class="flex justify-between mt-6">
-        <button @click="goToCrearBeneficios"
-          class="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700"
-        >
-          Crear beneficios
-        </button>
-        <button @click="goToVerListaBeneficios"
-          class="bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-green-700"
-        >
-          Ver lista de beneficios
         </button>
       </div>
     </div>
@@ -130,11 +122,10 @@ export default {
     const userStore = useUserStore();
     const empresa = ref(null);
     const empleadosEmpresa = ref([]);
-    const pagosPendientes = ref(0); 
+    const pagosPendientes = ref(0);
 
     const fetchEmpresaData = async () => {
       try {
-        
         // Llama al método fetchEmpresa del store
         await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
 
@@ -162,7 +153,18 @@ export default {
       router.push("/companyBenefits");
     };
 
-    return { empresa, empleadosEmpresa, pagosPendientes, goToCrearBeneficios, goToVerListaBeneficios };
+    const goToCrearEditarEmpresa = () => {
+      router.push("/editarEmpresa/" + userStore.usuario.cedulaPersona);
+    };
+
+    return {
+      empresa,
+      empleadosEmpresa,
+      pagosPendientes,
+      goToCrearBeneficios,
+      goToVerListaBeneficios,
+      goToCrearEditarEmpresa,
+    };
   },
 };
 </script>

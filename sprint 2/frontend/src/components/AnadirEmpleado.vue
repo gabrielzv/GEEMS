@@ -1,125 +1,192 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-    <form @submit.prevent="registrarEmpleado" class="bg-white p-8 rounded-2xl shadow-md w-full max-w-2xl space-y-6">
+    <form
+      @submit.prevent="registrarEmpleado"
+      class="bg-white p-8 rounded-2xl shadow-md w-full max-w-2xl space-y-6"
+    >
       <h2 class="text-2xl font-bold text-center">Registro de Empleado</h2>
 
       <!-- Datos Persona -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Cédula</label
+          >
           <input
             v-model="cedula"
             type="number"
             placeholder="Cédula"
             :class="inputClass(cedulaError)"
           />
-          <p v-if="cedulaError" class="text-sm text-red-500 mt-1">{{ cedulaError }}</p>
+          <p v-if="cedulaError" class="text-sm text-red-500 mt-1">
+            {{ cedulaError }}
+          </p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Nombre</label
+          >
           <input
             v-model="nombre"
             type="text"
             placeholder="Nombre"
             :class="inputClass(nombreError)"
           />
-          <p v-if="nombreError" class="text-sm text-red-500 mt-1">{{ nombreError }}</p>
+          <p v-if="nombreError" class="text-sm text-red-500 mt-1">
+            {{ nombreError }}
+          </p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Primer Apellido</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Primer Apellido</label
+          >
           <input
             v-model="apellido1"
             type="text"
             placeholder="Primer Apellido"
             :class="inputClass(apellido1Error)"
           />
-          <p v-if="apellido1Error" class="text-sm text-red-500 mt-1">{{ apellido1Error }}</p>
+          <p v-if="apellido1Error" class="text-sm text-red-500 mt-1">
+            {{ apellido1Error }}
+          </p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Segundo Apellido</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Segundo Apellido</label
+          >
           <input
             v-model="apellido2"
             type="text"
             placeholder="Segundo Apellido"
             :class="inputClass(apellido2Error)"
           />
-          <p v-if="apellido2Error" class="text-sm text-red-500 mt-1">{{ apellido2Error }}</p>
+          <p v-if="apellido2Error" class="text-sm text-red-500 mt-1">
+            {{ apellido2Error }}
+          </p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Dirección</label
+          >
           <input
             v-model="direccion"
             type="text"
             placeholder="Dirección"
             :class="inputClass(direccionError)"
           />
-          <p v-if="direccionError" class="text-sm text-red-500 mt-1">{{ direccionError }}</p>
+          <p v-if="direccionError" class="text-sm text-red-500 mt-1">
+            {{ direccionError }}
+          </p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Correo</label
+          >
           <input
             v-model="correo"
             type="email"
             placeholder="Correo"
             :class="inputClass(correoError)"
           />
-          <p v-if="correoError" class="text-sm text-red-500 mt-1">{{ correoError }}</p>
+          <p v-if="correoError" class="text-sm text-red-500 mt-1">
+            {{ correoError }}
+          </p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Teléfono</label
+          >
           <input
             v-model="telefono"
             type="text"
             placeholder="Teléfono"
             :class="inputClass(telefonoError)"
           />
-          <p v-if="telefonoError" class="text-sm text-red-500 mt-1">{{ telefonoError }}</p>
+          <p v-if="telefonoError" class="text-sm text-red-500 mt-1">
+            {{ telefonoError }}
+          </p>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Fecha de Nacimiento</label
+          >
           <input
             v-model="fechaNacimiento"
             type="date"
             placeholder="Fecha de nacimiento"
             :class="inputClass(fechaNacimientoError)"
           />
-          <p v-if="fechaNacimientoError" class="text-sm text-red-500 mt-1">{{ fechaNacimientoError }}</p>
+          <p v-if="fechaNacimientoError" class="text-sm text-red-500 mt-1">
+            {{ fechaNacimientoError }}
+          </p>
         </div>
       </div>
 
       <!-- Usuario -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de usuario</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Nombre de usuario</label
+          >
           <input
             v-model="username"
             type="text"
             placeholder="Nombre de usuario"
             :class="inputClass(usernameError)"
           />
-          <p v-if="usernameError" class="text-sm text-red-500 mt-1">{{ usernameError }}</p>
+          <p v-if="usernameError" class="text-sm text-red-500 mt-1">
+            {{ usernameError }}
+          </p>
         </div>
       </div>
-
+      <div>
+        <label class="block font-semibold mb-2">Cantidad Dependientes:</label>
+        <input
+          v-model="cantidadDependientes"
+          type="number"
+          placeholder="Cantidad de dependientes"
+          class="w-full px-4 py-2 rounded border focus:outline-none focus:ring-2 focus:ring-blue-300"
+          :class="inputClass(cantidadDependientesError)"
+        />
+        <p v-if="cantidadDependientesError" class="text-sm text-red-500 mt-1">
+          {{ cantidadDependientesError }}
+        </p>
+      </div>
       <!-- Género -->
       <div>
         <label class="block font-semibold mb-2">Género:</label>
         <div class="flex gap-4">
           <label class="flex items-center">
-            <input type="radio" name="genero" value="M" v-model="genero" class="mr-2" /> Masculino
+            <input
+              type="radio"
+              name="genero"
+              value="M"
+              v-model="genero"
+              class="mr-2"
+            />
+            Masculino
           </label>
           <label class="flex items-center">
-            <input type="radio" name="genero" value="F" v-model="genero" class="mr-2" /> Femenino
+            <input
+              type="radio"
+              name="genero"
+              value="F"
+              v-model="genero"
+              class="mr-2"
+            />
+            Femenino
           </label>
         </div>
-        <p v-if="generoError" class="text-sm text-red-500 mt-1">{{ generoError }}</p>
+        <p v-if="generoError" class="text-sm text-red-500 mt-1">
+          {{ generoError }}
+        </p>
       </div>
 
       <!-- Contrato -->
@@ -127,19 +194,49 @@
         <label class="block font-semibold mb-2">Contrato:</label>
         <div class="flex flex-wrap gap-4">
           <label class="flex items-center">
-            <input type="radio" name="contrato" value="Por Horas" v-model="contrato" class="mr-2" /> Por Horas
+            <input
+              type="radio"
+              name="contrato"
+              value="Por Horas"
+              v-model="contrato"
+              class="mr-2"
+            />
+            Por Horas
           </label>
           <label class="flex items-center">
-            <input type="radio" name="contrato" value="Tiempo Completo" v-model="contrato" class="mr-2" /> Tiempo Completo
+            <input
+              type="radio"
+              name="contrato"
+              value="Tiempo Completo"
+              v-model="contrato"
+              class="mr-2"
+            />
+            Tiempo Completo
           </label>
           <label class="flex items-center">
-            <input type="radio" name="contrato" value="Medio Tiempo" v-model="contrato" class="mr-2" /> Medio Tiempo
+            <input
+              type="radio"
+              name="contrato"
+              value="Medio Tiempo"
+              v-model="contrato"
+              class="mr-2"
+            />
+            Medio Tiempo
           </label>
           <label class="flex items-center">
-            <input type="radio" name="contrato" value="Servicios Profesionales" v-model="contrato" class="mr-2" /> Servicios Profesionales
+            <input
+              type="radio"
+              name="contrato"
+              value="Servicios Profesionales"
+              v-model="contrato"
+              class="mr-2"
+            />
+            Servicios Profesionales
           </label>
         </div>
-        <p v-if="contratoError" class="text-sm text-red-500 mt-1">{{ contratoError }}</p>
+        <p v-if="contratoError" class="text-sm text-red-500 mt-1">
+          {{ contratoError }}
+        </p>
       </div>
 
       <!-- Rol -->
@@ -147,13 +244,34 @@
         <label class="block font-semibold mb-2">Rol:</label>
         <div class="flex gap-4">
           <label class="flex items-center">
-            <input type="radio" name="rol" value="Colaborador" v-model="rol" class="mr-2" /> Colaborador
+            <input
+              type="radio"
+              name="rol"
+              value="Colaborador"
+              v-model="rol"
+              class="mr-2"
+            />
+            Colaborador
           </label>
           <label class="flex items-center">
-            <input type="radio" name="rol" value="Supervisor" v-model="rol" class="mr-2" /> Supervisor
+            <input
+              type="radio"
+              name="rol"
+              value="Supervisor"
+              v-model="rol"
+              class="mr-2"
+            />
+            Supervisor
           </label>
           <label class="flex items-center">
-            <input type="radio" name="rol" value="Payroll" v-model="rol" class="mr-2" /> Payroll
+            <input
+              type="radio"
+              name="rol"
+              value="Payroll"
+              v-model="rol"
+              class="mr-2"
+            />
+            Payroll
           </label>
         </div>
         <p v-if="rolError" class="text-sm text-red-500 mt-1">{{ rolError }}</p>
@@ -162,14 +280,18 @@
       <!-- Empresa y Salario -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Salario Bruto</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >Salario Bruto</label
+          >
           <input
             v-model="salarioBruto"
             type="number"
             placeholder="Salario Bruto"
             :class="inputClass(salarioBrutoError)"
           />
-          <p v-if="salarioBrutoError" class="text-sm text-red-500 mt-1">{{ salarioBrutoError }}</p>
+          <p v-if="salarioBrutoError" class="text-sm text-red-500 mt-1">
+            {{ salarioBrutoError }}
+          </p>
         </div>
       </div>
 
@@ -221,6 +343,7 @@ const salarioBruto = ref("");
 const rol = ref("");
 const nombreEmpresa = ref("");
 const isSubmitting = ref(false);
+const cantidadDependientes = ref(0);
 
 // Variables de error
 const cedulaError = ref("");
@@ -237,12 +360,15 @@ const nombreEmpresaError = ref("");
 const generoError = ref("");
 const contratoError = ref("");
 const rolError = ref("");
+const cantidadDependientesError = ref("");
 
 // Función para estilos de input
 function inputClass(error) {
   return [
     "w-full px-4 py-2 rounded border focus:outline-none focus:ring-2",
-    error ? "border-red-500 focus:ring-red-300" : "border-gray-300 focus:ring-blue-300",
+    error
+      ? "border-red-500 focus:ring-red-300"
+      : "border-gray-300 focus:ring-blue-300",
   ];
 }
 
@@ -322,11 +448,6 @@ function validateFields() {
     valid = false;
   }
 
-  if (!nombreEmpresa.value) {
-    nombreEmpresaError.value = "Nombre de la empresa es obligatorio.";
-    valid = false;
-  }
-
   // Validaciones para radio buttons
   if (!genero.value) {
     generoError.value = "Seleccione un género.";
@@ -342,17 +463,27 @@ function validateFields() {
     rolError.value = "Seleccione un rol.";
     valid = false;
   }
+  if (!cantidadDependientes.value) {
+    cantidadDependientesError.value =
+      "Cantidad de dependientes es obligatoria.";
+    valid = false;
+  }
 
   return valid;
 }
-  // Función para obtener el nombre de la empresa
+// Función para obtener el nombre de la empresa
 async function fetchNombreEmpresa(cedulaPersona) {
+  console.log("Se entra al fetchNombreEmoresa");
   try {
-    const response = await axios.get(`https://localhost:7014/api/GetDuenoEmpresa/${cedulaPersona}`);
+    const response = await axios.get(
+      `https://localhost:7014/api/GetDuenoEmpresa/${cedulaPersona}`
+    );
     if (response.data && response.data.nombreEmpresa) {
       nombreEmpresa.value = response.data.nombreEmpresa;
+      console.log("Se retorna el nombre de la empresa");
       return response.data.nombreEmpresa; // Retornamos el nombre para usarlo después
     }
+    console.log("Se retorna el nombre de la empresa como nulo");
     return null;
   } catch (error) {
     console.error("Error al obtener nombre de empresa:", error);
@@ -364,35 +495,43 @@ async function fetchNombreEmpresa(cedulaPersona) {
 onMounted(async () => {
   if (duenoCedula.value) {
     await fetchNombreEmpresa(duenoCedula.value);
+  } else {
+    console.log("No se tiene cedula para el dueno");
   }
 });
 // Función para registrar empleado
 async function registrarEmpleado() {
   isSubmitting.value = true;
-  
+
   if (!validateFields()) {
     isSubmitting.value = false;
     return;
   }
 
   const uniqueId = uuidv4();
-  const contraseña = `${apellido1.value.toLowerCase()}${new Date(fechaNacimiento.value).getFullYear()}`;
+  const contraseña = `${apellido1.value.toLowerCase()}${new Date(
+    fechaNacimiento.value
+  ).getFullYear()}`;
+  var fechaNacimientoDate = new Date(fechaNacimiento.value);
   const fechaIngreso = getFormattedDateTime();
 
   try {
     console.log("Enviando datos de Persona:");
     const requestPersona = {
-      cedula: parseInt(cedula.value, 10),
-      direccion: direccion.value.trim(),
-      nombrePila: nombre.value.trim(),
-      apellido1: apellido1.value.trim(),
-      apellido2: apellido2.value.trim(),
-      correo: correo.value.trim(),
-      telefono: telefono.value.trim(),
+      Cedula: parseInt(cedula.value, 10),
+      Direccion: direccion.value.trim(),
+      NombrePila: nombre.value.trim(),
+      Apellido1: apellido1.value.trim(),
+      Apellido2: apellido2.value.trim(),
+      Correo: correo.value.trim(),
+      Telefono: telefono.value.trim(),
     };
-    
+
     console.log("Request Persona:", requestPersona);
-    const responsePersona = await axios.post("https://localhost:7014/api/Register/persona", requestPersona);
+    const responsePersona = await axios.post(
+      "https://localhost:7014/api/Register/persona",
+      requestPersona
+    );
     console.log("Respuesta de Persona:", responsePersona.data);
 
     console.log("ID de Persona:", uniqueId);
@@ -407,23 +546,31 @@ async function registrarEmpleado() {
       correoPersona: correo.value,
     };
     console.log("Request Usuario:", requestUsuario);
-    const responseUsuario = await axios.post("https://localhost:7014/api/Register/usuario", requestUsuario);
+    const responseUsuario = await axios.post(
+      "https://localhost:7014/api/Register/usuario",
+      requestUsuario
+    );
     console.log("Respuesta de Usuario:", responseUsuario.data);
-
+    console.log("Se tiene el nombre de empresa en: ", nombreEmpresa.value);
     const requestEmpleado = {
-      id: uniqueId,
-      cedulaPersona: cedula.value,
-      contrato: contrato.value,
-      numHorasTrabajadas: 0,
-      genero: genero.value,
-      estadoLaboral: "Activo",
-      salarioBruto: salarioBruto.value,
-      tipo: rol.value,
-      fechaIngreso: fechaIngreso,
-      nombreEmpresa: nombreEmpresa.value,
+      Id: uniqueId,
+      CedulaPersona: cedula.value,
+      Contrato: contrato.value,
+      NumHorasTrabajadas: 0,
+      Genero: genero.value,
+      EstadoLaboral: "Activo",
+      SalarioBruto: salarioBruto.value,
+      Tipo: rol.value,
+      FechaIngreso: fechaIngreso,
+      NombreEmpresa: nombreEmpresa.value,
+      CantidadDependientes: cantidadDependientes.value,
+      FechaNacimiento: fechaNacimientoDate.toISOString().split("T")[0], // Formatear a YYYY-MM-DD
     };
     console.log("Request Empleado:", requestEmpleado);
-    const responseEmpleado = await axios.post("https://localhost:7014/api/Register/empleado", requestEmpleado);
+    const responseEmpleado = await axios.post(
+      "https://localhost:7014/api/Register/empleado",
+      requestEmpleado
+    );
     console.log("Respuesta de Empleado:", responseEmpleado.data);
 
     alert("Empleado registrado exitosamente");

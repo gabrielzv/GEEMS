@@ -28,7 +28,7 @@ namespace BackendGeems.Controllers
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 string query = @"
-                    SELECT b.Nombre AS NombreBeneficio, b.Descripcion, b.Costo
+                    SELECT b.Nombre AS NombreBeneficio, b.Descripcion, b.Costo, b.Frecuencia
                     FROM BeneficiosEmpleado be
                     JOIN Beneficio b ON be.IdBeneficio = b.Id
                     WHERE be.IdEmpleado = @IdEmpleado;";
@@ -48,7 +48,7 @@ namespace BackendGeems.Controllers
                         Nombre = reader["NombreBeneficio"].ToString(),
                         Descripcion = reader["Descripcion"].ToString(),
                         Costo = Convert.ToInt32(reader["Costo"]),
-                        // AGREGAR LOS OTROS ATRIBUTOS QUE HACEN FALTA DESPUES DE LAS CORRECIONES EN LA BASE DE DATOS
+                        Frecuencia = reader["Frecuencia"].ToString(),
                     });
                 }
 

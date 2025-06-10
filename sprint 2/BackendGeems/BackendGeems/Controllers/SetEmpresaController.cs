@@ -25,6 +25,8 @@ public class SetEmpresaController : ControllerBase
         public string Canton { get; set; }
         public string Distrito { get; set; }
         public string Senas { get; set; }
+        public string ModalidadPago { get; set; }
+        public int MaxBeneficiosXEmpleado { get; set; }
     }
 
     [HttpPost("crearEmpresa")]
@@ -50,7 +52,9 @@ public class SetEmpresaController : ControllerBase
                     Provincia,
                     Canton,
                     Distrito,
-                    Senas
+                    Senas,
+                    ModalidadPago,
+                    MaxBeneficiosXEmpleado
                 )
                 VALUES (
                     @CedulaJuridica,
@@ -61,7 +65,9 @@ public class SetEmpresaController : ControllerBase
                     @Provincia,
                     @Canton,
                     @Distrito,
-                    @Senas
+                    @Senas,
+                    @ModalidadPago,
+                    @MaxBeneficiosXEmpleado
                 );";
 
             using SqlCommand cmd = new SqlCommand(insertQuery, conn);
@@ -74,6 +80,8 @@ public class SetEmpresaController : ControllerBase
             cmd.Parameters.AddWithValue("@Canton", empresa.Canton);
             cmd.Parameters.AddWithValue("@Distrito", empresa.Distrito);
             cmd.Parameters.AddWithValue("@Senas", empresa.Senas);
+            cmd.Parameters.AddWithValue("@ModalidadPago", empresa.ModalidadPago);
+            cmd.Parameters.AddWithValue("@MaxBeneficiosXEmpleado", empresa.MaxBeneficiosXEmpleado);
 
             int rowsAffected = cmd.ExecuteNonQuery();
 
@@ -89,6 +97,64 @@ public class SetEmpresaController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "Error al insertar empresa", error = ex.Message });
+        }
+    }
+    // Metodo para editar una empresa ya registrada
+    [HttpPost("editarEmpresa")]
+    public IActionResult EditarEmpresa([FromBody] EmpresaModel empresa)
+    {
+        if (empresa == null || string.IsNullOrEmpty(empresa.CedulaJuridica))
+        {
+            return BadRequest(new { message = "Datos de la empresa inválidos." });
+        }
+
+        try
+        {
+            using SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            conn.Open();
+
+            string updateQuery = @"
+                UPDATE Empresa
+                SET 
+                    Nombre = @Nombre,
+                    Descripcion = @Descripcion,
+                    Telefono = @Telefono,
+                    Correo = @Correo,
+                    Provincia = @Provincia,
+                    Canton = @Canton,
+                    Distrito = @Distrito,
+                    Senas = @Senas,
+                    ModalidadPago = @ModalidadPago,
+                    MaxBeneficiosXEmpleado = @MaxBeneficiosXEmpleado
+                WHERE CedulaJuridica = @CedulaJuridica;";
+
+            using SqlCommand cmd = new SqlCommand(updateQuery, conn);
+            cmd.Parameters.AddWithValue("@CedulaJuridica", empresa.CedulaJuridica);
+            cmd.Parameters.AddWithValue("@Nombre", empresa.Nombre);
+            cmd.Parameters.AddWithValue("@Descripcion", empresa.Descripcion);
+            cmd.Parameters.AddWithValue("@Telefono", empresa.Telefono);
+            cmd.Parameters.AddWithValue("@Correo", empresa.Correo);
+            cmd.Parameters.AddWithValue("@Provincia", empresa.Provincia);
+            cmd.Parameters.AddWithValue("@Canton", empresa.Canton);
+            cmd.Parameters.AddWithValue("@Distrito", empresa.Distrito);
+            cmd.Parameters.AddWithValue("@Senas", empresa.Senas);
+            cmd.Parameters.AddWithValue("@ModalidadPago", empresa.ModalidadPago);
+            cmd.Parameters.AddWithValue("@MaxBeneficiosXEmpleado", empresa.MaxBeneficiosXEmpleado);
+
+            int rowsAffected = cmd.ExecuteNonQuery();
+
+            if (rowsAffected > 0)
+            {
+                return Ok(new { message = "Empresa actualizada exitosamente" });
+            }
+            else
+            {
+                return NotFound(new { message = "Empresa no encontrada o no se realizaron cambios." });
+            }
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al actualizar la empresa", error = ex.Message });
         }
     }
 }

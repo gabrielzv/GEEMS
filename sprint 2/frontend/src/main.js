@@ -18,6 +18,15 @@ import AnadirEmpleado from "./components/AnadirEmpleado.vue";
 import MatricularBeneficio from "./components/MatricularBeneficio.vue";
 import EmployeeBenefits from "./components/EmployeeBenefits.vue";
 import AuthenticatedLayout from "./layouts/AuthenticatedLayout.vue";
+import RegistroHoras from "./components/RegistroHoras.vue";
+import EmployeeRegHistory from "./components/EmployeeRegHistory.vue";
+import EditarHoras from "./components/EditarHoras.vue";
+import EditarEmpresa from "./components/EditarEmpresa.vue";
+import AprobarHoras from "./components/AprobacionHoras.vue";
+import PayrollSummary from "./components/PayrollSummary.vue";
+import SelectCreatePayroll from "./components/SelectCreatePayroll.vue"; 
+import EditarEmpleado  from "./components/EditarEmpleado.vue";  
+import EditarBeneficio from "./components/EditarBeneficio.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -47,6 +56,15 @@ const router = createRouter({
         { path: "/matricularBeneficio", name: "MatricularBeneficio", component: MatricularBeneficio },
         { path: "/employeeBenefits", name: "EmployeeBenefits", component: EmployeeBenefits },
         { path: '/anadirEmpleado', name: 'anadirEmpleado', component: AnadirEmpleado, meta: { requiresAuth: true }},
+        { path: '/registrarHoras', name: 'registrarHoras', component: RegistroHoras, meta: {requiresAuth: true}},
+        { path: '/employeeRegHistory', name: 'employeeRegHistory', component: EmployeeRegHistory, meta: {requiresAuth: true} },
+        { path: '/editarHoras/:registroId', name: 'editarHoras', component: EditarHoras, meta: {requiresAuth: true}},
+        { path: '/editarEmpresa/:cedulaDueno', name: 'editarEmpresa', component: EditarEmpresa, meta: {requiresAuth: true} },
+        { path: '/aprobarHoras', name: 'aprobarHoras', component: AprobarHoras, meta: {requiresAuth: true} },
+        { path: '/payrollSummary', name: 'payrollSummary', component: PayrollSummary, meta: {requiresAuth: true} },
+        { path: '/selectCreatePayroll', name: 'selectCreatePayroll', component: SelectCreatePayroll, meta: {requiresAuth: true} },
+        { path: '/editarEmpleado/:cedula', name: 'editarEmpleado', component: EditarEmpleado, meta: {requiresAuth: true}, props: true },
+        { path: "/editarBeneficio/:id", name: "EditarBeneficio", component: EditarBeneficio },
       ]
     }
   ],
