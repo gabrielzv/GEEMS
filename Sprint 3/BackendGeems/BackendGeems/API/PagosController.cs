@@ -50,7 +50,7 @@ namespace BackendGeems.API
                     try
                     {
                         // Obtener salario bruto antes de intentar generar el pago
-                        int salarioBruto = _pagoInfrastructure.ObtenerSalarioBruto(empleado.Id, fechaInicio, fechaFinal);
+                        double salarioBruto = _pagoInfrastructure.ObtenerSalarioBruto(empleado.Id, fechaInicio, fechaFinal);
                         if (salarioBruto <= 0)
                         {
                             // Saltar empleados sin horas o salario

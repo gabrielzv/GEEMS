@@ -14,9 +14,9 @@ namespace BackendGeems.Application
         {
             _repoInfrastructure.GenerarPagoEmpleado(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
         }
-        public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, int monto)
+        public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, double monto, string nombreBeneficio)
         {
-            _repoInfrastructure.InsertDeduccion(idPago, tipo, idBeneficio, monto);
+            _repoInfrastructure.InsertDeduccion(idPago, tipo, idBeneficio, monto,nombreBeneficio);
         }
 
     }

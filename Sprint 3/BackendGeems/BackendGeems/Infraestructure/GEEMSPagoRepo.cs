@@ -50,11 +50,11 @@ namespace BackendGeems.Infraestructure
                 {
                     Id = fila["Id"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["Id"].ToString()),
                     FechaRealizada = fila["FechaRealizada"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(fila["FechaRealizada"]),
-                    MontoPago = fila["MontoPago"] == DBNull.Value ? 0m : Convert.ToDecimal(fila["MontoPago"]),
+                    MontoPago = fila["MontoPago"] == DBNull.Value ? 0 : Convert.ToDouble(fila["MontoPago"]),
                     IdEmpleado = fila["IdEmpleado"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["IdEmpleado"].ToString()),
                     IdPayroll = fila["IdPayroll"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["IdPayroll"].ToString()),
                     IdPlanilla = fila["IdPlanilla"] == DBNull.Value ? Guid.Empty : Guid.Parse(fila["IdPlanilla"].ToString()),
-                    MontoBruto = fila["MontoBruto"] == DBNull.Value ? 0m : Convert.ToDecimal(fila["MontoBruto"]),
+                    MontoBruto = fila["MontoBruto"] == DBNull.Value ? 0 : Convert.ToDouble(fila["MontoBruto"]),
                     FechaInicio = fila["FechaInicio"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(fila["FechaInicio"]),
                     FechaFinal = fila["FechaFinal"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(fila["FechaFinal"])
                 };
@@ -63,9 +63,9 @@ namespace BackendGeems.Infraestructure
             return pagos;
         }
 
-        public int ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal)
+        public double ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal)
         {
-            int salarioBruto = 0;
+            double salarioBruto = 0;
 
             using (SqlCommand comando = new SqlCommand("CalcularSalarioBruto", _conexion))
             {
@@ -106,10 +106,9 @@ namespace BackendGeems.Infraestructure
 
 
 
-
-        public int CalcularImpuestoRenta(int ingresoMensual)
+        public double CalcularImpuestoRenta(double ingresoMensual)
         {
-            int impuesto = 0;
+            Double impuesto = 0;
             var limite1 = 922000;
             var limite2 = 1352000;
             var limite3 = 2373000;
@@ -191,9 +190,9 @@ namespace BackendGeems.Infraestructure
             return tipoContrato;
         }
 
-        public int ObtenerSalarioEmpleado(Guid idEmpleado)
+        public double ObtenerSalarioEmpleado(Guid idEmpleado)
         {
-            int salario = 0;
+            double salario = 0;
             string query = "SELECT SalarioBruto FROM Empleado WHERE Id = @IdEmpleado";
 
             using (SqlCommand comando = new SqlCommand(query, _conexion))
@@ -206,7 +205,7 @@ namespace BackendGeems.Infraestructure
                     var result = comando.ExecuteScalar();
                     if (result != null && result != DBNull.Value)
                     {
-                        salario = Convert.ToInt32(result);
+                        salario = Convert.ToDouble(result);
                     }
                 }
                 catch (SqlException ex)
@@ -312,7 +311,7 @@ namespace BackendGeems.Infraestructure
             {
                 string tipoContrato = ObtenerTipoContratoEmpleado(idEmpleado);
                 Console.WriteLine(tipoContrato);
-                int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
+                double salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
 
                 if (salarioBruto == -1)
                 {
@@ -336,25 +335,25 @@ namespace BackendGeems.Infraestructure
                     Console.WriteLine(tipoContrato);
                 }
 
-                int totalDeducciones = 0;
-                int impuestoRentaMensual = 0;
-                int SEM = 0;
-                int IVM = 0;
-                int BancoPopular = 0;
+                double totalDeducciones = 0;
+                double impuestoRentaMensual = 0;
+                double SEM = 0;
+                double IVM = 0;
+                double BancoPopular = 0;
 
                 if (tipoContrato == "Medio Tiempo" || tipoContrato == "Tiempo Completo" || tipoContrato == "Por Horas")
                 {
                     impuestoRentaMensual = CalcularImpuestoRenta(salarioBruto);
-                    SEM = (int)(salarioBruto * 0.0550); // 5.50%
-                    IVM = (int)(salarioBruto * 0.0417); // 4.17%
-                    BancoPopular = (int)(salarioBruto * 0.01); // 1%
+                    SEM = (salarioBruto * 0.0550); // 5.50%
+                    IVM = (salarioBruto * 0.0417); // 4.17%
+                    BancoPopular = (salarioBruto * 0.01); // 1%
                     totalDeducciones = impuestoRentaMensual + SEM + IVM + BancoPopular;
                 }
 
-                List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
+                List<(Guid idBeneficio, double monto,string nombreBeneficio)> deduccionesVoluntarias = new();
 
                 string queryBeneficios = @"
-                    SELECT b.Id, b.Costo,b.NombreDeAPI,b.EsAPI
+                    SELECT b.Id, b.Costo,b.NombreDeAPI,b.EsAPI,b.Nombre
                     FROM BeneficiosEmpleado be
                     JOIN Beneficio b ON be.IdBeneficio = b.Id
                     WHERE be.IdEmpleado = @IdEmpleado";
@@ -369,21 +368,22 @@ namespace BackendGeems.Infraestructure
                         if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
                         {
                             Guid idBeneficio = Guid.Parse(row["Id"].ToString());
-                            int monto = Convert.ToInt32(row["Costo"]);
+                            double monto = Convert.ToDouble(row["Costo"]);
                             bool esAPI = Convert.ToBoolean(row["EsAPI"]);
                             string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
+                            string nombreBeneficio = row["Nombre"]?.ToString() ?? string.Empty;
                             if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
                             {
 
 
                                 monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBruto);
 
-                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                deduccionesVoluntarias.Add((idBeneficio, monto,nombreBeneficio));
                                 totalDeducciones += monto;
                             }
                             else
                             {
-                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                deduccionesVoluntarias.Add((idBeneficio, monto, nombreBeneficio));
                                 totalDeducciones += monto;
                             }
 
@@ -416,14 +416,14 @@ namespace BackendGeems.Infraestructure
                     _conexion.Close();
                 }
 
-                InsertDeduccion(idPago, "Obligatoria", null, impuestoRentaMensual);
-                InsertDeduccion(idPago, "Obligatoria", null, SEM);
-                InsertDeduccion(idPago, "Obligatoria", null, IVM);
-                InsertDeduccion(idPago, "Obligatoria", null, BancoPopular);
+                InsertDeduccion(idPago, "Obligatoria", null, impuestoRentaMensual, "Impuesto De Renta");
+                InsertDeduccion(idPago, "Obligatoria", null, SEM, "SEM");
+                InsertDeduccion(idPago, "Obligatoria", null, IVM, "IVM");
+                InsertDeduccion(idPago, "Obligatoria", null, BancoPopular, "Banco Popular");
 
-                foreach (var (idBeneficio, monto) in deduccionesVoluntarias)
+                foreach (var (idBeneficio, monto,nombreBeneficio) in deduccionesVoluntarias)
                 {
-                    InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
+                    InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto,nombreBeneficio);
                 }
             }
             catch (Exception ex)
@@ -446,9 +446,9 @@ namespace BackendGeems.Infraestructure
                 Console.WriteLine(idEmpleado);
                 string tipoContrato = ObtenerTipoContratoEmpleado(idEmpleado);
                 Console.WriteLine(tipoContrato);
-                int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
-                int salarioBrutoMensual = 0;
-                int salarioBrutoQuincenal = 0;
+                double salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
+                double salarioBrutoMensual = 0;
+                double salarioBrutoQuincenal = 0;
                 Console.WriteLine(salarioBrutoQuincenal);
 
                 if (salarioBruto == -1)
@@ -482,12 +482,12 @@ namespace BackendGeems.Infraestructure
 
                 bool esSegundaQuincena = fechaFinal.Day > 15;
 
-                int totalDeducciones = 0;
-                int impuestoRentaMensual = 0;
-                int impuestoRentaQuincenal = 0;
-                int SEM = 0;
-                int IVM = 0;
-                int BancoPopular = 0;
+                double totalDeducciones = 0;
+                double impuestoRentaMensual = 0;
+                double impuestoRentaQuincenal = 0;
+                double SEM = 0;
+                double IVM = 0;
+                double BancoPopular = 0;
 
 
                 if (tipoContrato == "Medio Tiempo" || tipoContrato == "Tiempo Completo" || tipoContrato == "Por Horas")
@@ -497,19 +497,19 @@ namespace BackendGeems.Infraestructure
                     impuestoRentaQuincenal = impuestoRentaMensual / 2;
 
 
-                    SEM = (int)(salarioBrutoMensual * 0.0550); // 5.50%
-                    IVM = (int)(salarioBrutoMensual * 0.0417); // 4.17%
-                    BancoPopular = (int)(salarioBrutoMensual * 0.01); // 1%
+                    SEM = (salarioBrutoMensual * 0.0550); // 5.50%
+                    IVM = (salarioBrutoMensual * 0.0417); // 4.17%
+                    BancoPopular = (salarioBrutoMensual * 0.01); // 1%
                     totalDeducciones = impuestoRentaQuincenal + SEM / 2 + IVM / 2 + BancoPopular / 2;
                 }
 
-                List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
+                List<(Guid idBeneficio, double monto, string nombreBeneficio)> deduccionesVoluntarias = new();
 
 
 
 
                 string queryBeneficios = @"
-                    SELECT b.Id, b.Costo,b.NombreDeAPI,b.EsAPI
+                    SELECT b.Id, b.Costo,b.NombreDeAPI,b.EsAPI, b.Nombre
                     FROM BeneficiosEmpleado be
                     JOIN Beneficio b ON be.IdBeneficio = b.Id
                     WHERE be.IdEmpleado = @IdEmpleado";
@@ -524,10 +524,11 @@ namespace BackendGeems.Infraestructure
                         if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
                         {
                             Guid idBeneficio = Guid.Parse(row["Id"].ToString());
-                            int monto = Convert.ToInt32(row["Costo"]);
+                            double monto = Convert.ToDouble(row["Costo"]);
 
                             bool esAPI = Convert.ToBoolean(row["EsAPI"]);
                             string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
+                            string nombreBeneficio = row["Nombre"]?.ToString() ?? string.Empty;
                             if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
                             {
 
@@ -536,13 +537,13 @@ namespace BackendGeems.Infraestructure
                                 monto = monto / 2;
                                 Console.WriteLine("Monto Mensual: " + monto);
                                 Console.WriteLine("Monto Quincenal: " + monto);
-                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                deduccionesVoluntarias.Add((idBeneficio, monto,nombreBeneficio));
                                 totalDeducciones += monto;
                             }
                             else
                             {
                                 monto = monto / 2;
-                                deduccionesVoluntarias.Add((idBeneficio, monto));
+                                deduccionesVoluntarias.Add((idBeneficio, monto,nombreBeneficio));
                                 totalDeducciones += monto;
                             }
 
@@ -578,17 +579,17 @@ namespace BackendGeems.Infraestructure
                 }
 
 
-                InsertDeduccion(idPago, "Obligatoria", null, impuestoRentaQuincenal);
-                InsertDeduccion(idPago, "Obligatoria", null, SEM);
-                InsertDeduccion(idPago, "Obligatoria", null, IVM);
-                InsertDeduccion(idPago, "Obligatoria", null, BancoPopular);
+                InsertDeduccion(idPago, "Obligatoria", null, impuestoRentaQuincenal, "Impuesto de Renta Quincenal");
+                InsertDeduccion(idPago, "Obligatoria", null, SEM,"SEM");
+                InsertDeduccion(idPago, "Obligatoria", null, IVM,"IVM");
+                InsertDeduccion(idPago, "Obligatoria", null, BancoPopular,"Banco Popular");
 
 
                 if (esSegundaQuincena)
                 {
-                    foreach (var (idBeneficio, monto) in deduccionesVoluntarias)
+                    foreach (var (idBeneficio, monto,nombreBeneficio) in deduccionesVoluntarias)
                     {
-                        InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
+                        InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto,nombreBeneficio);
                     }
                 }
             }
@@ -606,162 +607,14 @@ namespace BackendGeems.Infraestructure
                 }
             }
         }
-        public void GenerarPagoEmpleadoSemanal(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        
+
+        public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, double monto,string NombreBeneficio)
         {
             try
             {
-                string tipoContrato = ObtenerTipoContratoEmpleado(idEmpleado);
-                Console.WriteLine(tipoContrato);
-                int salarioBruto = ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
-                int salarioBrutoMensual = 0;
-                int salarioBrutoSemanal = 0;
-
-                if (salarioBruto == -1)
-                {
-                    throw new Exception("Contrato o Salario Invalidos");
-                }
-                else if (salarioBruto == -2)
-                {
-                    throw new Exception("El empleado no tiene horas aceptadas en el periodo seleccionado.");
-                }
-
-                if (tipoContrato == "Medio Tiempo" || tipoContrato == "Tiempo Completo" || tipoContrato == "Servicios Profesionales")
-                {
-                    if (salarioBruto > 0)
-                    {
-                        salarioBrutoMensual = ObtenerSalarioEmpleado(idEmpleado);
-
-                        salarioBrutoSemanal = salarioBrutoMensual / 4;
-                    }
-                }
-                else if (tipoContrato == "Por Horas")
-                {
-                    salarioBrutoSemanal = salarioBruto;
-                }
-
-                int totalDeducciones = 0;
-                int impuestoRentaMensual = 0;
-                int impuestoRentaSemanal = 0;
-                int SEM = 0;
-                int IVM = 0;
-                int BancoPopular = 0;
-
-
-                if (tipoContrato == "Medio Tiempo" || tipoContrato == "Tiempo Completo" || tipoContrato == "Por Horas")
-                {
-
-                    impuestoRentaMensual = CalcularImpuestoRenta(salarioBrutoMensual);
-                    impuestoRentaSemanal = impuestoRentaMensual / 4;
-
-                    SEM = (int)(salarioBrutoSemanal * 0.0550); // 5.50%
-                    IVM = (int)(salarioBrutoSemanal * 0.0417); // 4.17%
-                    BancoPopular = (int)(salarioBrutoSemanal * 0.01); // 1%
-                    totalDeducciones = impuestoRentaSemanal + SEM + IVM + BancoPopular;
-                }
-
-                List<(Guid idBeneficio, int monto)> deduccionesVoluntarias = new();
-
-                bool esUltimaSemanaDelMes = fechaFinal.AddDays(7).Month != fechaFinal.Month;
-                if (esUltimaSemanaDelMes)
-                {
-                    string queryBeneficios = @"
-                        SELECT b.Id, b.Costo
-                        FROM BeneficiosEmpleado be
-                        JOIN Beneficio b ON be.IdBeneficio = b.Id
-                        WHERE be.IdEmpleado = @IdEmpleado";
-                    using (SqlCommand cmd = new SqlCommand(queryBeneficios, _conexion))
-                    {
-                        cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
-                        DataTable dt = CrearTablaConsulta(cmd);
-
-                        foreach (DataRow row in dt.Rows)
-                        {
-
-                            if (row["Id"] != DBNull.Value && !string.IsNullOrWhiteSpace(row["Id"].ToString()))
-                            {
-                                Guid idBeneficio = Guid.Parse(row["Id"].ToString());
-                                int monto = Convert.ToInt32(row["Costo"]);
-                                bool esAPI = Convert.ToBoolean(row["EsAPI"]);
-                                string nombreDeAPI = row["NombreDeAPI"]?.ToString() ?? string.Empty;
-                                if (esAPI && !string.IsNullOrWhiteSpace(nombreDeAPI))
-                                {
-
-
-                                    monto = ObtenerMontoAPI(idEmpleado, nombreDeAPI, salarioBruto);
-
-                                    deduccionesVoluntarias.Add((idBeneficio, monto));
-                                    totalDeducciones += monto;
-                                }
-                                else
-                                {
-                                    deduccionesVoluntarias.Add((idBeneficio, monto));
-                                    totalDeducciones += monto;
-                                }
-
-
-                                if (totalDeducciones > salarioBruto)
-                                {
-                                    throw new Exception("El total de deducciones no puede ser mayor al salario bruto.");
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Guid idPago = Guid.NewGuid();
-
-                string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
-                       VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
-                using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
-                {
-                    cmd.Parameters.AddWithValue("@Id", idPago);
-                    cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
-                    cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
-                    cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
-                    cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
-                    cmd.Parameters.AddWithValue("@MontoBruto", salarioBrutoSemanal);
-                    cmd.Parameters.AddWithValue("@MontoPago", salarioBrutoSemanal - totalDeducciones);
-                    cmd.Parameters.AddWithValue("@FechaRealizada", DateTime.Now);
-
-                    _conexion.Open();
-                    cmd.ExecuteNonQuery();
-                    _conexion.Close();
-                }
-
-
-                InsertDeduccion(idPago, "Obligatoria", null, impuestoRentaSemanal);
-                InsertDeduccion(idPago, "Obligatoria", null, SEM);
-                InsertDeduccion(idPago, "Obligatoria", null, IVM);
-                InsertDeduccion(idPago, "Obligatoria", null, BancoPopular);
-
-
-                if (esUltimaSemanaDelMes)
-                {
-                    foreach (var (idBeneficio, monto) in deduccionesVoluntarias)
-                    {
-                        InsertDeduccion(idPago, "Voluntaria", idBeneficio, monto);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-            finally
-            {
-                if (_conexion.State == ConnectionState.Open)
-                {
-                    _conexion.Close();
-                }
-            }
-        }
-
-        public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, int monto)
-        {
-            try
-            {
-                string insertQuery = @"INSERT INTO Deducciones (Id, IdPago, TipoDeduccion, IdBeneficio, Monto)
-                           VALUES (@Id, @IdPago, @TipoDeduccion, @IdBeneficio, @Monto)";
+                string insertQuery = @"INSERT INTO Deducciones (Id, IdPago, TipoDeduccion, IdBeneficio, Monto, Nombre)
+                           VALUES (@Id, @IdPago, @TipoDeduccion, @IdBeneficio, @Monto, @Nombre)";
                 using (SqlCommand cmd = new SqlCommand(insertQuery, _conexion))
                 {
                     cmd.Parameters.AddWithValue("@Id", Guid.NewGuid());
@@ -769,6 +622,7 @@ namespace BackendGeems.Infraestructure
                     cmd.Parameters.AddWithValue("@TipoDeduccion", tipo);
                     cmd.Parameters.AddWithValue("@IdBeneficio", (object?)idBeneficio ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@Monto", monto);
+                    cmd.Parameters.AddWithValue("@Nombre", (object?)NombreBeneficio ?? DBNull.Value);
 
                     _conexion.Open();
                     cmd.ExecuteNonQuery();
@@ -885,7 +739,7 @@ namespace BackendGeems.Infraestructure
             }
             return empleado;
         }
-        public int ObtenerMontoAPI(Guid idEmpleado, string nombreAPI, int salarioBruto)
+        public double ObtenerMontoAPI(Guid idEmpleado, string nombreAPI, double salarioBruto)
         {
             try
             {
@@ -921,7 +775,7 @@ namespace BackendGeems.Infraestructure
 
                         var json = JsonDocument.Parse(jsonString);
                         double rawAmount = json.RootElement.GetProperty("amountToCharge").GetDouble();
-                        int amount = Convert.ToInt32(rawAmount);
+                        double amount = Convert.ToDouble(rawAmount);
 
 
                         return amount;
@@ -958,7 +812,7 @@ namespace BackendGeems.Infraestructure
 
                         // Parsear JSON y extraer el valor
                         var json = JsonDocument.Parse(jsonString);
-                        int cost = json.RootElement.GetProperty("monthlyCost").GetInt32();
+                        Double cost = json.RootElement.GetProperty("monthlyCost").GetInt32();
 
                         return cost;
                     }
@@ -994,7 +848,7 @@ namespace BackendGeems.Infraestructure
 
 
 
-                        if (int.TryParse(content, out int amount))
+                        if (double.TryParse(content, out double amount))
                         {
                             return amount;
                         }

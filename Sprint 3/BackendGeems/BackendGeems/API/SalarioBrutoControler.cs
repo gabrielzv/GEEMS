@@ -18,7 +18,7 @@ namespace BackendGeems.API
             _repoInfrastructure = new GEEMSRepo();
         }
         [HttpGet]
-        public int Get(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFin)
+        public double Get(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFin)
         {
             var salarioBruto = _salarioBruto.ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFin);
             return salarioBruto;
