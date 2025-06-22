@@ -51,8 +51,8 @@ namespace BackendGeems.Controllers
                         {
                             // Se hace la inserción del nuevo beneficio
                             beneficioId = Guid.NewGuid();
-                            var insertQuery = "INSERT INTO Beneficio (Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI) " +
-                                              "VALUES (@Id, @Costo, @TiempoMinimo, @Frecuencia, @Descripcion, @Nombre, @CedulaJuridica, @NombreDeAPI, @EsApi)";
+                            var insertQuery = "INSERT INTO Beneficio (Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual) " +
+                                              "VALUES (@Id, @Costo, @TiempoMinimo, @Frecuencia, @Descripcion, @Nombre, @CedulaJuridica, @NombreDeAPI, @EsApi, @EsPorcentual)";
                             using (var insertCommand = new SqlCommand(insertQuery, connection))
                             {
                                 insertCommand.Parameters.AddWithValue("@Id", beneficioId);
@@ -64,6 +64,7 @@ namespace BackendGeems.Controllers
                                 insertCommand.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
                                 insertCommand.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
                                 insertCommand.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
+                                insertCommand.Parameters.AddWithValue("@EsPorcentual", beneficio.EsPorcentual);
 
                                 insertCommand.ExecuteNonQuery();
                             }
@@ -139,7 +140,8 @@ namespace BackendGeems.Controllers
                             TiempoMinimoEnEmpresa = @TiempoMinimo,
                             Frecuencia = @Frecuencia,
                             NombreDeAPI = @NombreDeAPI,
-                            EsAPI = @EsApi
+                            EsAPI = @EsApi,
+                            EsPorcentual = @EsPorcentual
                         WHERE Id = @Id";
                     using (var cmd = new SqlCommand(updateQuery, connection))
                     {
@@ -151,6 +153,7 @@ namespace BackendGeems.Controllers
                         cmd.Parameters.AddWithValue("@Frecuencia", beneficio.Frecuencia);
                         cmd.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
                         cmd.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
+                        cmd.Parameters.AddWithValue("@EsPorcentual", beneficio.EsPorcentual);
 
                         cmd.ExecuteNonQuery();
                     }
@@ -196,7 +199,7 @@ namespace BackendGeems.Controllers
                 using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
                 {
                     connection.Open();
-                    var query = @"SELECT Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI
+                    var query = @"SELECT Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual
                                 FROM Beneficio WHERE Id = @Id";
                     using (var cmd = new SqlCommand(query, connection))
                     {
@@ -215,7 +218,8 @@ namespace BackendGeems.Controllers
                                     Nombre = reader["Nombre"],
                                     CedulaJuridica = reader["CedulaJuridica"],
                                     NombreDeAPI = reader["NombreDeAPI"],
-                                    EsApi = reader["EsAPI"]
+                                    EsApi = reader["EsAPI"],
+                                    EsPorcentual = reader["EsPorcentual"]
                                 };
                                 return Ok(beneficio);
                             }
