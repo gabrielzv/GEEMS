@@ -68,7 +68,7 @@ import { useRoute } from "vue-router";
 import axios from "axios";
 import UserInfo from "./UserInfo.vue";
 import { useUserStore } from "../store/user";
-
+import { API_BASE_URL } from "../config";
 const route = useRoute();
 const cedula = route.params.cedula;
 console.log(cedula);
@@ -83,8 +83,9 @@ const fetchUserView = async () => {
   error.value = false;
 
   try {
+    const url = `${API_BASE_URL}Persona/${cedula}`;
     const personaRes = await axios.get(
-      `https://localhost:7014/api/Persona/${cedula}`
+      url
     );
     const data = personaRes.data;
 

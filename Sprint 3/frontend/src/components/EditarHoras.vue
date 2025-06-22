@@ -58,7 +58,7 @@
 <script>
 import axios from "axios";
 import { useUserStore } from "../store/user";
-
+import { API_BASE_URL } from "../config";
 export default {
     data() {
         return {
@@ -101,8 +101,9 @@ export default {
     },
     methods: {
         async getRegistroAnterior() {
+            const url = `${API_BASE_URL}Horas/Register`;
             try {
-                const response = await axios.get("https://localhost:7014/api/Horas/Register", {
+                const response = await axios.get(url, {
                     params: {
                         Id: this.registroAnterior.Id,
                     },
@@ -136,8 +137,9 @@ export default {
             }
         },
         async getEmpleadoId() {
+            const url = `${API_BASE_URL}GetEmpleado/${this.cedulaPersona}`;
             try {
-                const response = await axios.get(`https://localhost:7014/api/GetEmpleado/${this.cedulaPersona}`);
+                const response = await axios.get(url);
                 this.guidEmpleado = response.data.id;
             } catch (error) {
                 alert("No se pudo obtener el ID del empleado.");
@@ -150,8 +152,9 @@ export default {
             ];
         },
         async fechaRepetida() {
+            const url = `${API_BASE_URL}Horas`;
             try {
-                const response = await axios.get("https://localhost:7014/api/Horas", {
+                const response = await axios.get(url, {
                     params: {
                         date: this.diaRegistrado,
                         employeeId: this.guidEmpleado,
@@ -186,7 +189,8 @@ export default {
                 // Calcular las horas que se van a agregar a la base, se descuentan las anteriores de las actuales
                 const horasNuevas = horas - Number(this.registroAnterior.NumHoras);
                 console.log(horasNuevas, " Horas nuevas valor");
-                const response = await axios.get("https://localhost:7014/api/Horas/ValidHours", {
+                const url = `${API_BASE_URL}Horas/ValidHours`;
+                const response = await axios.get(url, {
                     params: {
                         date: this.diaRegistrado,
                         employeeId: this.guidEmpleado,
@@ -243,8 +247,9 @@ export default {
                     Estado: "NoRevisado",
                 };
                 try {
+                    const url = `${API_BASE_URL}Horas/Editar?oldId=${this.registroAnterior.Id}`;
                     await axios.post(
-                        `https://localhost:7014/api/Horas/Editar?oldId=${this.registroAnterior.Id}`,
+                        url,
                         registroPayload
                     );
                     alert("Edición de horas realizada correctamente.");

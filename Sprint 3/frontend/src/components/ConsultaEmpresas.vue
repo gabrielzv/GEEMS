@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import { API_BASE_URL } from "../config";
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { useUserStore } from "../store/user";
@@ -111,8 +112,9 @@ export default {
     });
 
     const fetchEmpresas = async () => {
+      const url = `${API_BASE_URL}Empresa`;
       try {
-        const res = await axios.get("https://localhost:7014/api/Empresa");
+        const res = await axios.get(url);
         companies.value = res.data.map((empresa) => ({
           id: empresa.cedulaJuridica,
           name: empresa.nombre,

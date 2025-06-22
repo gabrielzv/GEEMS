@@ -269,7 +269,7 @@ import axios from "axios";
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-
+import { API_BASE_URL } from "../config";
 export default {
   setup() {
     const router = useRouter();
@@ -450,10 +450,10 @@ export default {
 
       isSubmitting.value = true;
       mensaje.value = "";
-
+      const url = `${API_BASE_URL}Beneficio/crearBeneficio`;
       try {
         const response = await axios.post(
-          "https://localhost:7014/api/Beneficio/crearBeneficio",
+          url,
           form.value
         );
         mensaje.value = response.data;

@@ -144,7 +144,7 @@
 <script>
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-
+import { API_BASE_URL } from "../config";
 export default {
   data() {
     return {
@@ -276,7 +276,8 @@ export default {
         const uniqueId = uuidv4();
 
         // Hacer las solicitudes POST
-        const responsePersona = await axios.post("https://localhost:7014/api/Register/persona", {
+        const urlPersona = `${API_BASE_URL}Register/persona`;
+        const responsePersona = await axios.post(urlPersona, {
           cedula: this.cedula,
           direccion: this.direccion,
           telefono: this.telefono,
@@ -287,8 +288,8 @@ export default {
         });
 
         console.log("Respuesta de Persona:", responsePersona.data);
-
-        const responseUsuario = await axios.post("https://localhost:7014/api/Register/usuario", {
+        const urlUsuario = `${API_BASE_URL}Register/usuario`;
+        const responseUsuario = await axios.post(urlUsuario, {
           id: uniqueId,
           username: this.nombreUsuario,
           contrasena: this.contrasena,

@@ -75,6 +75,7 @@ import axios from "axios";
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { API_BASE_URL } from "../config";
 
 export default {
   setup() {
@@ -93,8 +94,9 @@ export default {
           const cedulaJuridica = userStore.empresa.cedulaJuridica;
 
           // Se hace el get para obtener los beneficios creados de la empresa
+          const url = `${API_BASE_URL}GetCompanyBenefits/${cedulaJuridica}`;
           const response = await axios.get(
-            `https://localhost:7014/api/GetCompanyBenefits/${cedulaJuridica}`
+            url
           );
           beneficios.value = response.data;
         } else {

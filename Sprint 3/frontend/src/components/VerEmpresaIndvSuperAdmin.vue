@@ -80,7 +80,7 @@
   import { ref, onMounted } from "vue";
   import axios from "axios";
   import { useRoute } from "vue-router";
-  
+  import { API_BASE_URL } from "../config";
   export default {
     setup() {
       const route = useRoute();
@@ -90,9 +90,10 @@
       const fetchEmpresaData = async () => {
         const empresaId = route.params.empresaId; // Obtener el ID de la empresa desde el routing
         console.log("ID de la empresa:", empresaId);
+        const url = `${API_BASE_URL}Empresa/por-cedula-juridica/${empresaId}`;
         try {
           const response = await axios.get(
-            `https://localhost:7014/api/Empresa/por-cedula-juridica/${empresaId}`
+            url
           );
   
           // Asignar los datos de la empresa y empleados

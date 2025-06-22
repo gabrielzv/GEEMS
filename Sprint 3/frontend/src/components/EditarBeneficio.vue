@@ -267,6 +267,7 @@ import axios from "axios";
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { API_BASE_URL } from "../config";
 
 export default {
   setup() {
@@ -309,9 +310,10 @@ export default {
 
     // Método para obtener los datos del beneficio anterior
     const getBeneficioAnterior = async () => {
+      const url = `${API_BASE_URL}Beneficio/${route.params.id}`;
       try {
         const response = await axios.get(
-          `https://localhost:7014/api/Beneficio/${route.params.id}`
+          url
         );
         beneficioAnterior.value = response.data;
         // Se copian todos los datos al formulario para editar
@@ -479,10 +481,10 @@ export default {
 
       isSubmitting.value = true;
       mensaje.value = "";
-
+      const url = `${API_BASE_URL}Beneficio/editarBeneficio`;
       try {
         const response = await axios.post(
-          "https://localhost:7014/api/Beneficio/editarBeneficio",
+          url,
           form.value
         );
         mensaje.value = response.data;

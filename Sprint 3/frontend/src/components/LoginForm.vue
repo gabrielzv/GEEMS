@@ -89,7 +89,7 @@
 import axios from "axios";
 import "../styles/login.css";
 import { useUserStore } from "../store/user";
-
+import { API_BASE_URL } from "../config";
 export default {
   data() {
     return {
@@ -141,8 +141,9 @@ export default {
       this.isSubmitting = true;
       this.mensaje = "";
       //const hashedPassword = await this.hashPassword(this.contrasena);
+      const url = `${API_BASE_URL}Auth/login`;
       try {
-        const res = await axios.post("https://localhost:7014/api/Auth/login", {
+        const res = await axios.post(url, {
           Id: this.Id || "00000000-0000-0000-0000-000000000000",
           Username: this.nombreUsuario,
           Contrasena: this.contrasena,
