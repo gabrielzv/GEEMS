@@ -1,10 +1,9 @@
 import { createApp } from "vue";
 import App from "./components/App.vue";
 import { createRouter, createWebHistory } from "vue-router";
-// Importa todos tus componentes...
+// Componentes
 import Login from "./components/LoginForm.vue";
 import Home from "./components/HomePage.vue";
-import Recuperar from "./components/RecuperarCont.vue";
 import BenefitCreation from "./components/BenefitCreation.vue";
 import UserView from "./components/UserView.vue";
 import Register from "./components/RegisterForm.vue";
@@ -27,6 +26,12 @@ import PayrollSummary from "./components/PayrollSummary.vue";
 import SelectCreatePayroll from "./components/SelectCreatePayroll.vue"; 
 import EditarEmpleado  from "./components/EditarEmpleado.vue";  
 import EditarBeneficio from "./components/EditarBeneficio.vue";
+import Reporte1Desglose from "./components/Reporte1Desglose.vue";
+import Reporte2Pagos from "./components/Reporte2Pagos.vue";
+import Reporte3Historico from "./components/Reporte3Historico.vue";
+import Reporte4Desglose from "./components/Reporte4Desglose.vue";
+import Reporte5Pagos from "./components/Reporte5Pagos.vue";
+
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -38,7 +43,6 @@ const router = createRouter({
     {path: "/login", name: "Login", component: Login},
     { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
     { path: "/register", name: "Register", component: Register },
-    { path: "/recuperar", name: "Recuperar", component: Recuperar },
     
     // Rutas que requieren autenticación (con header)
     {
@@ -65,6 +69,12 @@ const router = createRouter({
         { path: '/selectCreatePayroll', name: 'selectCreatePayroll', component: SelectCreatePayroll, meta: {requiresAuth: true} },
         { path: '/editarEmpleado/:cedula', name: 'editarEmpleado', component: EditarEmpleado, meta: {requiresAuth: true}, props: true },
         { path: "/editarBeneficio/:id", name: "EditarBeneficio", component: EditarBeneficio },
+        { path: "/reporte1", name: "Reporte1Desglose", component: Reporte1Desglose, meta: {requiresAuth: true} },
+        { path: "/reporte2", name: "Reporte2Pagos", component: Reporte2Pagos, meta: {requiresAuth: true} },
+        { path: "/reporte3", name: "Reporte3Historico", component: Reporte3Historico, meta: {requiresAuth: true} },
+        { path: "/reporte4", name: "Reporte4Desglose", component: Reporte4Desglose, meta: {requiresAuth: true} },
+        { path: "/reporte5", name: "Reporte5Pagos", component: Reporte5Pagos, meta: {requiresAuth: true} },
+
       ]
     }
   ],
