@@ -10,12 +10,12 @@ namespace BackendGeems.API
     [ApiController]
     public class SalarioBrutoControler : ControllerBase
     {
-        private readonly GEEMSRepo _repoInfrastructure;
+        private readonly GeneralRepo _repoInfrastructure;
         private readonly ISalarioBruto _salarioBruto;
         public SalarioBrutoControler(ISalarioBruto salarioBruto)
         {
             _salarioBruto = salarioBruto;
-            _repoInfrastructure = new GEEMSRepo();
+            _repoInfrastructure = new GeneralRepo();
         }
         [HttpGet]
         public int Get(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFin)

@@ -1,7 +1,7 @@
 ﻿using BackendGeems.Domain;
 namespace BackendGeems.Application
 {
-    public interface IGEEMSHorasRepo
+    public interface IHorasRepo
     {
         Registro GetRegister(Guid Id);
         void EditRegister(Registro editing, Guid oldId);
