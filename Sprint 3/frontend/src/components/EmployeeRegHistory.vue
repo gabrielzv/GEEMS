@@ -79,7 +79,7 @@ import axios from "axios";
 import { useUserStore } from "../store/user";
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-
+import { API_BASE_URL } from "../config";
 export default {
   setup() {
     const userStore = useUserStore();
@@ -95,7 +95,8 @@ export default {
       try {
         isLoading.value = true;
         error.value = null;
-        const res = await axios.get(`https://localhost:7014/api/Horas/getRegister/${guidEmpleado.value}`);
+        const url = `${API_BASE_URL}Horas/getRegister/${guidEmpleado.value}`;
+        const res = await axios.get(url);
         registros.value = res.data;
       } catch (e) {
         error.value = "Error al obtener los registros de horas.";
@@ -109,7 +110,8 @@ export default {
       if (userStore.usuario && userStore.usuario.cedulaPersona) {
         try {
           isLoading.value = true;
-          const res = await axios.get(`https://localhost:7014/api/GetEmpleado/${userStore.usuario.cedulaPersona}`);
+          const url = `${API_BASE_URL}GetEmpleado/${userStore.usuario.cedulaPersona}`;
+          const res = await axios.get(url);
           guidEmpleado.value = res.data.id;
           await obtenerRegistros();
         } catch (e) {

@@ -11,11 +11,11 @@ namespace BackendGeems.API
     [ApiController]
     public class HorasController : ControllerBase
     {
-        private readonly GEEMSHorasRepo _repoHoras;
+        private readonly HorasRepo _repoHoras;
         private readonly IQueryHoras _queryHoras;
         public HorasController(IQueryHoras queryHoras)
         {
-            _repoHoras = new GEEMSHorasRepo();
+            _repoHoras = new HorasRepo();
             _queryHoras = queryHoras;
         }
 

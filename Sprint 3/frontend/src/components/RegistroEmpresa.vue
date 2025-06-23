@@ -283,7 +283,7 @@
 </template>
 <script>
 import axios from "axios";
-
+import { API_BASE_URL } from "../config";
 export default {
   data() {
     return {
@@ -340,8 +340,8 @@ export default {
       try {
         this.errores.nombreDuplicado = "";
         this.errores.cedulaDuplicada = "";
-
-        const response = await axios.get("https://localhost:7014/api/Empresa");
+        const url = `${API_BASE_URL}Empresa`;
+        const response = await axios.get(url);
         const empresas = response.data;
 
         const nombreDuplicado = empresas.some(
@@ -407,8 +407,9 @@ export default {
       try {
         // Elimina los guiones de la cédula antes de enviarla al API
         const cedulaSinGuiones = this.cedula.replace(/-/g, "");
+        const url = `${API_BASE_URL}national-register/validate/` + cedulaSinGuiones;
         const response = await axios.post(
-          "https://localhost:7014/api/national-register/validate/" + cedulaSinGuiones
+          url
         );
         const apiResult = response.data;
         if (apiResult.error || apiResult.formatoInvalido) {
@@ -493,14 +494,15 @@ export default {
         modalidadPago: this.empresa.modalidadPago,
         maxBeneficiosXEmpleado: this.empresa.maxBeneficiosXEmpleado,
       };
-
+      const urlCrearEmpresa = `${API_BASE_URL}SetEmpresa/crearEmpresa`;
       try {
         await axios.post(
-          "https://localhost:7014/api/SetEmpresa/crearEmpresa",
+          urlCrearEmpresa,
           empresaPayload
         );
         try {
-          await axios.post("https://localhost:7014/api/Register/duenoempresa", {
+          const urlDuenoEmpresa = `${API_BASE_URL}Register/duenoempresa`;
+          await axios.post(urlDuenoEmpresa, {
             id: this.idUsuario,
             cedulaPersona: this.cedulaPersona,
             cedulaEmpresa: this.cedula,

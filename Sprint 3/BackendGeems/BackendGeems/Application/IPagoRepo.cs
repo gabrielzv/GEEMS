@@ -1,8 +1,8 @@
 ﻿using BackendGeems.Domain;
-using static BackendGeems.Infraestructure.GEEMSPagoRepo;
+using static BackendGeems.Infraestructure.PagoRepo;
 namespace BackendGeems.Application
 {
-    public interface IGEEMSPagoRepo
+    public interface IPagoRepo
     {
         
         List<Pago> ObtenerPagos(DateTime fechaInicio, DateTime fechaFinal);

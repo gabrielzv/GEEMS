@@ -11,8 +11,8 @@ namespace BackendGeems.API
     [ApiController]
     public class PagosController : ControllerBase
     {
-        private readonly GEEMSRepo _repoInfrastructure;
-        private readonly GEEMSPagoRepo _pagoInfrastructure;
+        private readonly GeneralRepo _repoInfrastructure;
+        private readonly PagoRepo _pagoInfrastructure;
         private readonly IQueryPago _queryPago;
         private readonly IGenerarPago _GenerarPago;
 
@@ -20,8 +20,8 @@ namespace BackendGeems.API
         {
             _queryPago = queryPago;
 
-            _repoInfrastructure = new GEEMSRepo();
-            _pagoInfrastructure = new GEEMSPagoRepo();
+            _repoInfrastructure = new GeneralRepo();
+            _pagoInfrastructure = new PagoRepo();
             _GenerarPago = generarPago;
         }
         [HttpGet]

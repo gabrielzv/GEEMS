@@ -312,6 +312,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
+import  {API_BASE_URL} from "../config";
 
 const router = useRouter();
 const route = useRoute();
@@ -475,8 +476,9 @@ function validateFields() {
 async function fetchNombreEmpresa(cedulaPersona) {
   console.log("Se entra al fetchNombreEmoresa");
   try {
+    const urlGetDuenoEmpresa = `${API_BASE_URL}GetDuenoEmpresa/${cedulaPersona}`;
     const response = await axios.get(
-      `https://localhost:7014/api/GetDuenoEmpresa/${cedulaPersona}`
+      urlGetDuenoEmpresa
     );
     if (response.data && response.data.nombreEmpresa) {
       nombreEmpresa.value = response.data.nombreEmpresa;
@@ -528,8 +530,9 @@ async function registrarEmpleado() {
     };
 
     console.log("Request Persona:", requestPersona);
+    const urlRegisterPersona = `${API_BASE_URL}Register/persona`;
     const responsePersona = await axios.post(
-      "https://localhost:7014/api/Register/persona",
+      urlRegisterPersona,
       requestPersona
     );
     console.log("Respuesta de Persona:", responsePersona.data);
@@ -546,8 +549,9 @@ async function registrarEmpleado() {
       correoPersona: correo.value,
     };
     console.log("Request Usuario:", requestUsuario);
+    const  urlRegisterUsuario = `${API_BASE_URL}Register/usuario`;
     const responseUsuario = await axios.post(
-      "https://localhost:7014/api/Register/usuario",
+      urlRegisterUsuario,
       requestUsuario
     );
     console.log("Respuesta de Usuario:", responseUsuario.data);
@@ -567,8 +571,9 @@ async function registrarEmpleado() {
       FechaNacimiento: fechaNacimientoDate.toISOString().split("T")[0], // Formatear a YYYY-MM-DD
     };
     console.log("Request Empleado:", requestEmpleado);
+    const urlRegisterEmpleado = `${API_BASE_URL}Register/empleado`;
     const responseEmpleado = await axios.post(
-      "https://localhost:7014/api/Register/empleado",
+      urlRegisterEmpleado,
       requestEmpleado
     );
     console.log("Respuesta de Empleado:", responseEmpleado.data);

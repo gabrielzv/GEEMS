@@ -111,6 +111,7 @@ import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import { useUserStore } from "../store/user";
+import { API_BASE_URL } from "../config";
 
 const route = useRoute();
 const router = useRouter();
@@ -179,7 +180,8 @@ const saveChanges = async () => {
     };
 
     console.log("Datos a enviar:", empleadoUpdate);
-    await axios.post(`https://localhost:7014/api/Empleados/editarEmpleado`, empleadoUpdate);
+    const url = `${API_BASE_URL}Empleados/editarEmpleado`;
+    await axios.post(url, empleadoUpdate);
     await userStore.fetchEmpleado(cedula);
     alert("Cambios guardados exitosamente");
     router.push(`/employee/${cedula}`);

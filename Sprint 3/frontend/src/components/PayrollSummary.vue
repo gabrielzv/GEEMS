@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { API_BASE_URL } from "../config";
 import axios from "axios";
 import { useUserStore } from "../store/user";
 
@@ -84,9 +85,10 @@ export default {
   },
   methods: {
     async generarPagosYResumen() {
+      const url = `${API_BASE_URL}Pagos/generarPagosEmpresa`;
       try {
         await axios.post(
-          "https://localhost:7014/api/Pagos/generarPagosEmpresa",
+          url,
           null,
           {
             params: {
@@ -112,9 +114,10 @@ export default {
       }
     },
     async obtenerResumen() {
+      const url = `${API_BASE_URL}Pagos/resumenPlanilla`;
       try {
         const res = await axios.get(
-          `https://localhost:7014/api/Pagos/resumenPlanilla`,
+          url,
           {
             params: {
               nombreEmpresa: this.nombreEmpresa,

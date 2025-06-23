@@ -282,7 +282,7 @@
 </template>
 <script>
 import axios from "axios";
-
+import { API_BASE_URL } from "../config";
 export default {
   data() {
     return {
@@ -345,8 +345,9 @@ export default {
     // Método para obtener la información de la empresa anterior
     async getEmpresaAnterior() {
       try {
+        const url = `${API_BASE_URL}Empresa/${this.cedulaPersona}`;
         const response = await axios.get(
-          `https://localhost:7014/api/Empresa/${this.cedulaPersona}`
+          url
         );
         // Se almacena la información de la empresa anterior con lo obtenido de la API
         this.EmpresaAnterior = response.data.empresa;
@@ -377,8 +378,8 @@ export default {
       try {
         this.errores.nombreDuplicado = "";
         this.errores.cedulaDuplicada = "";
-
-        const response = await axios.get("https://localhost:7014/api/Empresa");
+        const url = `${API_BASE_URL}Empresa`;
+        const response = await axios.get(url);
         const empresas = response.data;
 
         const nombreDuplicado = empresas.some(
@@ -517,10 +518,10 @@ export default {
         modalidadPago: this.empresa.modalidadPago,
         maxBeneficiosXEmpleado: this.empresa.maxBeneficiosXEmpleado,
       };
-
+      const url = `${API_BASE_URL}SetEmpresa/editarEmpresa`;
       try {
         await axios.post(
-          "https://localhost:7014/api/SetEmpresa/editarEmpresa",
+          url,
           empresaPayload
         );
         alert("Empresa editada exitosamente.");

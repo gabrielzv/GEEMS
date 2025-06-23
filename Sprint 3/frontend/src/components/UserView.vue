@@ -62,6 +62,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from "../config";
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import UserInfo from "./UserInfo.vue";
@@ -79,8 +80,9 @@ const fetchUserView = async () => {
   error.value = false;
 
   try {
+    const url = `${API_BASE_URL}Persona/${usuario.cedulaPersona}`;
     const personaRes = await axios.get(
-      `https://localhost:7014/api/Persona/${usuario.cedulaPersona}`
+      url
     );
     const data = personaRes.data;
 

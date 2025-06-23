@@ -33,7 +33,7 @@ namespace UnitTests
         {
             // Arrange
             string nombreEmpresa = "GEEMS Solutions";
-            var repo = new GEEMSRepo();
+            var repo = new GeneralRepo();
             var controller = new PlanillaController();
 
             // Act
@@ -55,7 +55,7 @@ namespace UnitTests
             DateTime fechaInicio = new DateTime(2025, 4, 1);
             DateTime fechaFin = new DateTime(2025, 4, 30);
 
-            var repo = new GEEMSPagoRepo();
+            var repo = new PagoRepo();
             var queryPago = new QueryPago(repo);
             var generarPago = new GenerarPago(repo);
 
@@ -80,7 +80,7 @@ namespace UnitTests
         {
             // Arrange
             string nombreEmpresa = "EmpresaQueNoExiste123";
-            var repo = new GEEMSRepo();
+            var repo = new GeneralRepo();
             var controller = new PlanillaController();
 
             // Act

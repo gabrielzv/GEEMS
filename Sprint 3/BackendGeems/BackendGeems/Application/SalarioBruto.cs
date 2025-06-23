@@ -2,8 +2,8 @@
 {
     public class SalarioBruto : ISalarioBruto
     {
-        private readonly IGEEMSPagoRepo _repoInfrastructure;
-        public SalarioBruto(IGEEMSPagoRepo repo)
+        private readonly IPagoRepo _repoInfrastructure;
+        public SalarioBruto(IPagoRepo repo)
         {
             _repoInfrastructure = repo;
         }

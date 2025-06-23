@@ -9,14 +9,14 @@ using System.Text.Json;
 
 namespace BackendGeems.Infraestructure
 {
-    public class GEEMSPagoRepo : IGEEMSPagoRepo
+    public class PagoRepo : IPagoRepo
     {
         private SqlConnection _conexion;
         private string _cadenaConexion;
 
         public string CadenaConexion => _cadenaConexion;
 
-        public GEEMSPagoRepo()
+        public PagoRepo()
         {
             var builder = WebApplication.CreateBuilder();
             _cadenaConexion = builder.Configuration.GetConnectionString("DefaultConnection");
