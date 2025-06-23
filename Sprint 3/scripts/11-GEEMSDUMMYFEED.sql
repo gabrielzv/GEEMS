@@ -55,8 +55,8 @@ INSERT INTO DatosPrivadosEmpresa VALUES
 ('1-555-9876543', 'Trimestral', 2);
 
 -- Beneficios
-INSERT INTO Beneficio VALUES (@uidBeneficio, 10000, 6, 'Membresía en gimnasio premium', 'Gimnasio Premium', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0);
-INSERT INTO Beneficio VALUES (@uidBeneficio2, 5000, 12, 'Seguro de vida', 'Seguro Vida', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0);
+INSERT INTO Beneficio VALUES (@uidBeneficio, 10000, 6, 'Membresía en gimnasio premium', 'Gimnasio Premium', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0, 0);
+INSERT INTO Beneficio VALUES (@uidBeneficio2, 5000, 12, 'Seguro de vida', 'Seguro Vida', '3-101-1234567', 'Mensual', 'BeneficioNormal', 0, 0);
 
 -- Elegibilidad del beneficio
 INSERT INTO BeneficioContratoElegible VALUES (@uidBeneficio, 'Tiempo Completo');
@@ -74,8 +74,8 @@ INSERT INTO Empleado (
 INSERT INTO SupervisorSupervisaEmpleado VALUES (@uidSup, 303030303);
 
 -- Beneficio otorgado al colaborador
-INSERT INTO BeneficiosEmpleado VALUES (@uidColab, @uidBeneficio);
-INSERT INTO BeneficiosEmpleado VALUES (@uidSup, @uidBeneficio2);
+INSERT INTO BeneficiosEmpleado VALUES (@uidColab, @uidBeneficio, '2025-04-01');
+INSERT INTO BeneficiosEmpleado VALUES (@uidSup, @uidBeneficio2, '2025-04-01');
 
 -- Planillas
 INSERT INTO Planilla VALUES (@uidPlanilla, '2025-04-01', '2025-04-30', @uidPayroll);

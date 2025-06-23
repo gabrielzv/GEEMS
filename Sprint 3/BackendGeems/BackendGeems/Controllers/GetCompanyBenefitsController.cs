@@ -48,7 +48,7 @@ namespace BackendGeems.Controllers
                         Id = reader["Id"].ToString(),
                         Nombre = reader["Nombre"].ToString(),
                         Descripcion = reader["Descripcion"].ToString(),
-                        Costo = Convert.ToInt32(reader["Costo"]),
+                        Costo = Convert.ToDecimal(reader["Costo"]),
                         TiempoMinimoEnEmpresa = Convert.ToInt32(reader["TiempoMinimoEnEmpresa"])
                     });
                 }
