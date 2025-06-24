@@ -29,6 +29,8 @@ builder.Services.AddScoped<IQueryPago, QueryPago>();
 builder.Services.AddScoped<ISalarioBruto, SalarioBruto>();
 builder.Services.AddScoped<IGenerarPago, GenerarPago>();
 builder.Services.AddScoped<IQueryHoras, QueryHoras>();
+builder.Services.AddScoped<ServicioCalculoPago>();
+builder.Services.AddScoped<GestorPagosService>();
 
 
 var app = builder.Build();

@@ -16,11 +16,12 @@ public class CalculosTest
     {
         // Arrange
         var repo = new PagoRepo();
+    
         int ingresoMensual = 1352000;
-        decimal impuestoEsperado = 43000; 
+        double impuestoEsperado = 43000; 
 
         // Act
-        decimal impuesto = repo.CalcularImpuestoRenta(ingresoMensual);
+        double impuesto = repo.CalcularImpuestoRenta(ingresoMensual);
 
         // Assert
         Assert.That(impuesto, Is.EqualTo(impuestoEsperado));
@@ -32,6 +33,8 @@ public class CalculosTest
         {
             // Arrange
             var repo = new PagoRepo();
+            var servicioDeCalculo = new ServicioCalculoPago(repo);
+            var gestorPagos = new GestorPagosService(repo,servicioDeCalculo);
             Guid idEmpleado = Guid.NewGuid();
             Guid idPlanilla = Guid.NewGuid();
             DateTime fechaInicio = new DateTime(2024, 7, 1);
@@ -39,7 +42,7 @@ public class CalculosTest
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() =>
-                repo.GenerarPagoEmpleado(idEmpleado, idPlanilla, fechaInicio, fechaFinal)
+                gestorPagos.GenerarPagoEmpleado(idEmpleado, idPlanilla, fechaInicio, fechaFinal)
             );
         }
     [Test]
@@ -47,6 +50,8 @@ public class CalculosTest
     {
         // Arrange
         var repo = new PagoRepo();
+        var servicioDeCalculo = new ServicioCalculoPago(repo);
+        var gestorPagos = new GestorPagosService(repo, servicioDeCalculo);
         Guid idEmpleado = Guid.NewGuid();
         Guid idPlanilla = Guid.NewGuid();
         DateTime fechaInicio = new DateTime(2024, 5, 1);
@@ -54,7 +59,7 @@ public class CalculosTest
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() =>
-            repo.GenerarPagoEmpleado(idEmpleado, idPlanilla, fechaInicio, fechaFinal)
+            gestorPagos.GenerarPagoEmpleado(idEmpleado, idPlanilla, fechaInicio, fechaFinal)
         );
     }
 }

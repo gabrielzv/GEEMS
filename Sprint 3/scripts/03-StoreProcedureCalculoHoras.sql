@@ -2,7 +2,7 @@ USE GEEMSDB;
 
 
 GO 
-CREATE PROCEDURE CalcularSalarioBruto
+CREATE OR ALTER PROCEDURE CalcularSalarioBruto
     @IdEmpleado UNIQUEIDENTIFIER,
     @FechaInicio DATETIME,
     @FechaFinal DATETIME,
