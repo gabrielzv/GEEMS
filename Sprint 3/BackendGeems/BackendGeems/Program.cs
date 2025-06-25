@@ -31,6 +31,8 @@ builder.Services.AddScoped<IGenerarPago, GenerarPago>();
 builder.Services.AddScoped<IQueryHoras, QueryHoras>();
 builder.Services.AddScoped<ServicioCalculoPago>();
 builder.Services.AddScoped<GestorPagosService>();
+builder.Services.AddScoped<IQueryBeneficio, QueryBeneficio>();
+builder.Services.AddScoped<IBeneficioRepo, BeneficioRepo>();
 
 
 var app = builder.Build();

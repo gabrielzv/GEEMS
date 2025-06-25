@@ -41,11 +41,6 @@
             <th
               class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
             >
-              Tiempo mínimo en empresa (meses)
-            </th>
-            <th
-              class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
-            >
               Acciones
             </th>
           </tr>
@@ -64,9 +59,6 @@
             </td>
             <td class="px-6 py-4 text-sm text-gray-500">
               {{ beneficio.costo }}
-            </td>
-            <td class="px-6 py-4 text-sm text-gray-500">
-              {{ beneficio.tiempoMinimoEnEmpresa }}
             </td>
             <td class="px-6 py-4 text-sm font-medium">
               <button
@@ -136,14 +128,14 @@ export default {
           const cedulaJuridica = cedulaResponse.data.cedulaJuridica;
 
           // Se hace el get para obtener los beneficios filtrados según el contrato del empleado
-          const urlBeneficios = `${API_BASE_URL}GetCompanyBenefits/BenefitsEmployeeContract/${cedulaJuridica}/${idEmpleado}`;
+          const urlBeneficios = `${API_BASE_URL}Beneficio/BenefitsEmployeeContract/${cedulaJuridica}/${idEmpleado}`;
           const beneficiosResponse = await axios.get(
             urlBeneficios
           );
           beneficios.value = beneficiosResponse.data;
 
           // Se hace el get para obtener los beneficios matriculados por empleado
-          const urlBeneficiosEmpleado = `${API_BASE_URL}GetEmployeeBenefits/${idEmpleado}`;
+          const urlBeneficiosEmpleado = `${API_BASE_URL}Beneficio/Employee/${idEmpleado}`;
           const beneficiosPorEmpleadoResponse = await axios.get(
             urlBeneficiosEmpleado
           );
@@ -172,7 +164,7 @@ export default {
         }
 
         // Se hace el post para poder matricular el beneficio
-        const url = `${API_BASE_URL}SetBeneficioPorEmpleado/matricularBeneficio`;
+        const url = `${API_BASE_URL}Beneficio/matricularBeneficio`;
         const response = await axios.post(
           url,
           {
