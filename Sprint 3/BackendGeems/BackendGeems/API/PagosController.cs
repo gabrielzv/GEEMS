@@ -32,6 +32,19 @@ namespace BackendGeems.API
             var pagos = _queryPago.ObtenerPagos(fechaInicio, fechaFin);
             return pagos;
         }
+        [HttpGet("{idEmpleado}")]
+        public ActionResult<List<Pago>> GetPagosPorEmpleado(Guid idEmpleado)
+        {
+            try
+            {
+                var pagos = _pagoInfrastructure.ObtenerPagosPorEmpleado(idEmpleado);
+                return Ok(pagos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener pagos: {ex.Message}");
+            }
+        }
         [HttpPost]
         public void Post(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFin)
         {

@@ -6,9 +6,11 @@ namespace BackendGeems.Application
     {
         
         List<Pago> ObtenerPagos(DateTime fechaInicio, DateTime fechaFinal);
+        List<Pago> ObtenerPagosPorEmpleado(Guid idEmpleado);
         double ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal);
         
         void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, double monto,string nombreBeneficio);
+        List<Deduccion> ObtenerDeduccionesPorPago(Guid idPago);
         double CalcularImpuestoRenta(double salarioBruto);
         public string ObtenerTipoContratoEmpleado(Guid idEmpleado);
         public void BorrarPagoExistente(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal);
