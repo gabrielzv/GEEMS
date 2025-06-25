@@ -319,7 +319,7 @@ export default {
       contratosElegibles: [],
       nombreDeAPI: "BeneficioNormal",
       esApi: false,
-      esPorcentual: "",
+      esPorcentual: false,
     });
     const beneficioAnterior = ref({
       nombre: null,
@@ -360,6 +360,11 @@ export default {
         form.value.contratosElegibles = Array.isArray(response.data.contratosElegibles)
           ? response.data.contratosElegibles
           : [];
+        // Se asegura que esPorcentual siempre sea un booleano
+        form.value.esPorcentual =
+          response.data.esPorcentual === true || response.data.esPorcentual === "true"
+            ? true
+            : false;
       } catch (error) {
         alert("Error al obtener los datos del beneficio.");
       }
@@ -484,7 +489,8 @@ export default {
     };
 
     const validateDeduction = () => {
-      seleccionDeduccionError.value = form.value.esPorcentual
+      seleccionDeduccionError.value =
+        form.value.esPorcentual === true || form.value.esPorcentual === false
         ? ""
         : "Debe seleccionar un tipo de deducción.";
       return !seleccionDeduccionError.value;
