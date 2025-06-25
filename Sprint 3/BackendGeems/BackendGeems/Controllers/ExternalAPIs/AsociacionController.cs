@@ -76,6 +76,6 @@ namespace BackendGeems.Controllers
     public class AssociationCalculationRequest
     {
         public string AssociationName { get; set; }
-        public decimal EmployeeSalary { get; set; }
+        public double EmployeeSalary { get; set; }
     }
 }
