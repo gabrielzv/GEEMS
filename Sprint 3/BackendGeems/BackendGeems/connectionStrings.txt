@@ -1,0 +1,1 @@
+Gabriel: Data Source=DESKTOP-2DR0SCD;Initial Catalog=GEEMSDB;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False
