@@ -67,9 +67,9 @@ namespace BackendGeems.Tests
 
             var resultado = _servicio.CalcularPagoQuincenal(_empleadoId, _fechaInicio, _fechaFinal);
 
-            Assert.AreEqual(1000, resultado.SalarioBruto); // Mitad del salario mensual
-            Assert.AreEqual(100, resultado.ImpuestoRenta); // Renta / 2
-            Assert.IsTrue(resultado.EsSegundaQuincena);    // 30 > 15
+            Assert.AreEqual(1000, resultado.SalarioBruto); 
+            Assert.AreEqual(100, resultado.ImpuestoRenta); 
+            Assert.IsTrue(resultado.EsSegundaQuincena);   
         }
 
         [Test]
