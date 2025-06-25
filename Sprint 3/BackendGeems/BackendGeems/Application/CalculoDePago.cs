@@ -74,8 +74,20 @@ namespace BackendGeems.Application
 
             foreach (var b in beneficios)
             {
-                double monto = b.esAPI ? _pagoRepo.ObtenerMontoAPI(idEmpleado, b.NombreDeAPI, salarioBase) : b.Monto;
-                monto = esQuincenal ? monto / 2 : monto;
+                double monto = 0;
+                if (b.esAPI)
+                {
+                    monto = _pagoRepo.ObtenerMontoAPI(idEmpleado, b.NombreDeAPI, salarioBase);
+                }else if (b.esPorcentual)
+                {
+                    monto = salarioBase * b.Monto;
+                }
+                else
+                {
+                    monto = b.Monto;
+                }
+
+                    monto = esQuincenal ? monto / 2 : monto;
 
                 total += monto;
 

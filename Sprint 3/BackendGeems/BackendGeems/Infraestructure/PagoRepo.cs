@@ -15,8 +15,6 @@ namespace BackendGeems.Infraestructure
      
         private string _cadenaConexion;
         
-       
-
         public string CadenaConexion => _cadenaConexion;
 
         public PagoRepo()
@@ -575,7 +573,6 @@ namespace BackendGeems.Infraestructure
                                 NombreDeAPI = reader["NombreDeAPI"]?.ToString() ?? string.Empty,
                                 esAPI = reader["EsAPI"] != DBNull.Value && Convert.ToBoolean(reader["EsAPI"]),
                                 Nombre = reader["Nombre"]?.ToString() ?? string.Empty,
-                                
                                 esPorcentual = reader["EsPorcentual"] != DBNull.Value && Convert.ToBoolean(reader["EsPorcentual"])
                             };
                            
