@@ -53,7 +53,7 @@
 <script>
 import axios from "axios";
 import { useUserStore } from "../store/user";
-
+import { API_BASE_URL } from "../config";
 export default {
     data() {
         return {
@@ -78,8 +78,9 @@ export default {
     },
     methods: {
         async getEmpleadoId() {
+            const url = `${API_BASE_URL}GetEmpleado/${this.cedulaPersona}`;
             try {
-                const response = await axios.get(`https://localhost:7014/api/GetEmpleado/${this.cedulaPersona}`);
+                const response = await axios.get(url);
                 this.guidEmpleado = response.data.id;
             } catch (error) {
                 alert("No se pudo obtener el ID del empleado.");
@@ -93,7 +94,8 @@ export default {
         },
         async fechaRepetida(){
             try {
-            const response = await axios.get("https://localhost:7014/api/Horas", {
+                const url = `${API_BASE_URL}Horas`;
+                const response = await axios.get(url, {
                 params: {
                     date: this.diaRegistrado,
                     employeeId: this.guidEmpleado,
@@ -124,7 +126,8 @@ export default {
 
             // Validar con el API si las horas mensuales superan 160
             try {
-                const response = await axios.get("https://localhost:7014/api/Horas/ValidHours", {
+                const url = `${API_BASE_URL}Horas/ValidHours`;
+                const response = await axios.get(url, {
                     params: {
                         date: this.diaRegistrado,
                         employeeId: this.guidEmpleado,
@@ -181,9 +184,10 @@ export default {
                     Estado: "NoRevisado",
                 };
                 try {
+                    const url = `${API_BASE_URL}Horas`;
                     await axios.post(
-                    "https://localhost:7014/api/Horas",
-                    registroPayload
+                        url,
+                        registroPayload
                     );
                     alert("Registro de horas realizado correctamente.");
                     this.$router.push("/home");

@@ -6,14 +6,14 @@ using System.Data;
 
 namespace BackendGeems.Infraestructure
 {
-    public class GEEMSRepo : IGEEMSRepo
+    public class GeneralRepo : IGeneralRepo
     {
         private SqlConnection _conexion;
         private string _cadenaConexion;
 
         public string CadenaConexion => _cadenaConexion;
 
-        public GEEMSRepo()
+        public GeneralRepo()
         {
             var builder = WebApplication.CreateBuilder();
             _cadenaConexion = builder.Configuration.GetConnectionString("DefaultConnection");

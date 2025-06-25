@@ -43,7 +43,7 @@ import axios from "axios";
 import { useUserStore } from "../store/user";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-
+import { API_BASE_URL } from "../config";
 export default {
   setup() {
     const userStore = useUserStore();
@@ -56,7 +56,9 @@ export default {
 
     const cargarPlanillas = async () => {
       if (!nombreEmpresa.value) return;
-      const res = await axios.get("https://localhost:7014/api/Planilla/listar", {
+
+      const url = `${API_BASE_URL}Planilla/listar`;
+      const res = await axios.get(url, {
         params: { nombreEmpresa: nombreEmpresa.value },
       });
       planillas.value = res.data;
@@ -99,7 +101,8 @@ export default {
     console.log("Payload enviado a backend:", payload);
 
     try {
-        await axios.post("https://localhost:7014/api/Planilla/crear", payload);
+        const url = `${API_BASE_URL}Planilla/crear`;
+        await axios.post(url, payload);
         await cargarPlanillas();
         alert("Planilla creada correctamente.");
     } catch (e) {

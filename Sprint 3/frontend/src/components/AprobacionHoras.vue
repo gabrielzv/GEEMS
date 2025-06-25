@@ -83,7 +83,7 @@
 import { useUserStore } from "../store/user";
 import { onMounted, ref, computed } from "vue";
 import { useRouter } from "vue-router";
-
+import { API_BASE_URL } from "../config";
 export default {
   setup() {
     const router = useRouter();
@@ -142,7 +142,8 @@ export default {
     }
 
     // Llamada al endpoint del backend
-    const response = await fetch(`https://localhost:7014/api/Registro/actualizar-estado`, {
+    const urlActualizarRegistro = `${API_BASE_URL}Registro/actualizar-estado`;
+    const response = await fetch(urlActualizarRegistro, {
       method: 'POST', // Usamos POST para el endpoint definido en el backend
       headers: {
         'Content-Type': 'application/json',
@@ -192,8 +193,7 @@ export default {
         
         // Codificar el nombre de empresa para la URL
         const encodedNombreEmpresa = encodeURIComponent(nombreEmpresa);
-        const url = `https://localhost:7014/api/RegistroHoras/por-empresa/${encodedNombreEmpresa}`;
-        
+        const url = `${API_BASE_URL}RegistroHoras/por-empresa/${encodedNombreEmpresa}`;
         console.log("Obteniendo registros para empresa:", nombreEmpresa);
         console.log("URL:", url);
         

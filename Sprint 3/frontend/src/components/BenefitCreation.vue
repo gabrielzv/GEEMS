@@ -64,7 +64,7 @@
       <!-- Nombre -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
-          >Nombre</label
+          >Nombre:</label
         >
         <input
           v-model="form.nombre"
@@ -82,7 +82,7 @@
       <!-- Descripción -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
-          >Descripción</label
+          >Descripción:</label
         >
         <textarea
           v-model="form.descripcion"
@@ -97,16 +97,51 @@
           {{ descripcionError }}
         </p>
       </div>
+      <!-- Tipo de deducción (Regular o Porcentual) -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1"
+          >Tipo de deducción:</label
+        >
+        <div class="flex flex-col gap-3 items-center">
+          <div class="flex gap-6 text-sm justify-center">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="deducciones"
+                :value="false"
+                v-model="form.esPorcentual"
+                class="mr-2"
+                @change="validateDeduction"
+              />
+              Regular
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="deducciones"
+                :value="true"
+                v-model="form.esPorcentual"
+                class="mr-2"
+                @change="validateDeduction"
+              />
+              Porcentual
+            </label>
+          </div>
+        </div>
+        <p v-if="seleccionDeduccionError" class="text-sm text-red-500 mt-1">
+          {{ seleccionDeduccionError }}
+        </p>
+      </div>
       <!-- Costo -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
-          >Costo</label
+          >Costo / Porcentaje:</label
         >
         <input
           v-model="form.costo"
-          type="number"
+          type="float"
           min="0"
-          placeholder="Ej: 12000"
+          placeholder="Ej: 12000 / 5.5"
           @blur="validateCosto"
           :class="inputClass(costoError)"
         />
@@ -117,7 +152,7 @@
       <!-- Tiempo Mínimo en Empresa -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1"
-          >Tiempo Mínimo en Empresa (meses)</label
+          >Tiempo Mínimo en Empresa (meses):</label
         >
         <input
           v-model="form.tiempoMinimo"
@@ -269,7 +304,7 @@ import axios from "axios";
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-
+import { API_BASE_URL } from "../config";
 export default {
   setup() {
     const router = useRouter();
@@ -284,6 +319,7 @@ export default {
       contratosElegibles: [],
       nombreDeAPI: "BeneficioNormal",
       esApi: false,
+      esPorcentual: "",
     });
 
     // Estados para errores
@@ -296,6 +332,7 @@ export default {
     const mensaje = ref("");
     const isSubmitting = ref(false);
     const seleccionApisError = ref("");
+    const seleccionDeduccionError = ref("");
 
     // Método para completar el nombre del beneficio según la API seleccionada
     const handleApiSelection = (event) => {
@@ -419,6 +456,15 @@ export default {
       return !seleccionApisError.value;
     };
 
+    const validateDeduction = () => {
+      seleccionDeduccionError.value =
+      form.value.esPorcentual === true ||
+      form.value.esPorcentual === false
+        ? ""
+        : "Debe seleccionar un tipo de deducción.";
+      return !seleccionDeduccionError.value;
+    };
+
     // Método para validar el formulario, usa todos los métodos de validación de los dintintos campos
     const validateForm = () => {
       const isNombreValid = validateNombre();
@@ -428,6 +474,7 @@ export default {
       const isFrecuenciaValid = validateFrecuencia();
       const isContratosValid = validateContratosElegibles();
       const isAPISValid = validateAPIS();
+      const isDeductionValid = validateDeduction();
 
       return (
         isNombreValid &&
@@ -436,7 +483,8 @@ export default {
         isTiempoMinimoValid &&
         isFrecuenciaValid &&
         isContratosValid &&
-        isAPISValid
+        isAPISValid  &&
+        isDeductionValid
       );
     };
 
@@ -450,10 +498,10 @@ export default {
 
       isSubmitting.value = true;
       mensaje.value = "";
-
+      const url = `${API_BASE_URL}Beneficio/crearBeneficio`;
       try {
         const response = await axios.post(
-          "https://localhost:7014/api/Beneficio/crearBeneficio",
+          url,
           form.value
         );
         mensaje.value = response.data;
@@ -504,6 +552,8 @@ export default {
       tiempoMinimoError,
       frecuenciaError,
       contratosElegiblesError,
+      seleccionApisError,
+      seleccionDeduccionError,
       mensaje,
       isSubmitting,
       inputClass,
@@ -513,6 +563,8 @@ export default {
       validateTiempoMinimo,
       validateFrecuencia,
       validateContratosElegibles,
+      validateAPIS,
+      validateDeduction,
       crearBeneficio,
       handleApiSelection,
     };

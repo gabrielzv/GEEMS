@@ -33,7 +33,7 @@ namespace UnitTests
         {
             // Arrange
             string nombreEmpresa = "GEEMS Solutions";
-            var repo = new GEEMSRepo();
+            var repo = new GeneralRepo();
             var controller = new PlanillaController();
 
             // Act
@@ -55,11 +55,15 @@ namespace UnitTests
             DateTime fechaInicio = new DateTime(2025, 4, 1);
             DateTime fechaFin = new DateTime(2025, 4, 30);
 
-            var repo = new GEEMSPagoRepo();
-            var queryPago = new QueryPago(repo);
-            var generarPago = new GenerarPago(repo);
+            var repo = new PagoRepo();
 
-            var controller = new PagosController(queryPago, generarPago);
+           
+            var queryPago = new QueryPago(repo);
+            var servicioDeCalculo = new ServicioCalculoPago(repo);
+            var gestorPagos = new GestorPagosService(repo, servicioDeCalculo);
+            var generarPago = new GenerarPago(repo,gestorPagos);
+
+            var controller = new PagosController(queryPago, generarPago,gestorPagos);
 
             // Act
             var result = controller.ResumenPlanilla(nombreEmpresa, fechaInicio, fechaFin) as OkObjectResult;
@@ -80,7 +84,7 @@ namespace UnitTests
         {
             // Arrange
             string nombreEmpresa = "EmpresaQueNoExiste123";
-            var repo = new GEEMSRepo();
+            var repo = new GeneralRepo();
             var controller = new PlanillaController();
 
             // Act

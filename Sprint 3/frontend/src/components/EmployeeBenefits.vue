@@ -72,6 +72,7 @@
 </template>
 
 <script>
+import { API_BASE_URL } from "../config";
 import axios from "axios";
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
@@ -92,8 +93,9 @@ export default {
           const idEmpleado = userStore.empleado.id;
 
           // Se hace el get para obtener los beneficios que tiene matriculados el empleado
+          const url = `${API_BASE_URL}GetEmployeeBenefits/${idEmpleado}`;
           const response = await axios.get(
-            `https://localhost:7014/api/GetEmployeeBenefits/${idEmpleado}`
+            url
           );
           beneficios.value = response.data;
         } else {

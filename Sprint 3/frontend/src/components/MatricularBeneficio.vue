@@ -95,7 +95,7 @@
 import axios from "axios";
 import { useUserStore } from "../store/user";
 import { onMounted, ref, computed } from "vue";
-
+import { API_BASE_URL } from "../config";
 export default {
   setup() {
     const userStore = useUserStore();
@@ -129,20 +129,23 @@ export default {
           const idEmpleado = userStore.empleado.id;
 
           // Se obtiene la cédula jurídica de la empresa usando el nombre
+          const urlCedula = `${API_BASE_URL}Empresa/cedula-juridica/${nombreEmpresa}`;
           const cedulaResponse = await axios.get(
-            `https://localhost:7014/api/Empresa/cedula-juridica/${nombreEmpresa}`
+            urlCedula
           );
           const cedulaJuridica = cedulaResponse.data.cedulaJuridica;
 
           // Se hace el get para obtener los beneficios filtrados según el contrato del empleado
+          const urlBeneficios = `${API_BASE_URL}GetCompanyBenefits/BenefitsEmployeeContract/${cedulaJuridica}/${idEmpleado}`;
           const beneficiosResponse = await axios.get(
-            `https://localhost:7014/api/GetCompanyBenefits/BenefitsEmployeeContract/${cedulaJuridica}/${idEmpleado}`
+            urlBeneficios
           );
           beneficios.value = beneficiosResponse.data;
 
           // Se hace el get para obtener los beneficios matriculados por empleado
+          const urlBeneficiosEmpleado = `${API_BASE_URL}GetEmployeeBenefits/${idEmpleado}`;
           const beneficiosPorEmpleadoResponse = await axios.get(
-            `https://localhost:7014/api/GetEmployeeBenefits/${idEmpleado}`
+            urlBeneficiosEmpleado
           );
           beneficiosPorEmpleado.value = beneficiosPorEmpleadoResponse.data;
 
@@ -169,8 +172,9 @@ export default {
         }
 
         // Se hace el post para poder matricular el beneficio
+        const url = `${API_BASE_URL}SetBeneficioPorEmpleado/matricularBeneficio`;
         const response = await axios.post(
-          "https://localhost:7014/api/SetBeneficioPorEmpleado/matricularBeneficio",
+          url,
           {
             IdEmpleado: empleadoId,
             IdBeneficio: beneficioId,

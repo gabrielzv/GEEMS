@@ -4,8 +4,8 @@ namespace BackendGeems.Application
 {
     public class QueryHoras : IQueryHoras
     {
-        private readonly IGEEMSHorasRepo _repoHoras;
-        public QueryHoras(IGEEMSHorasRepo repo)
+        private readonly IHorasRepo _repoHoras;
+        public QueryHoras(IHorasRepo repo)
         {
             _repoHoras = repo;
         }

@@ -5,13 +5,13 @@ using System.Data;
 
 namespace BackendGeems.Infraestructure
 {
-    public class GEEMSHorasRepo : IGEEMSHorasRepo
+    public class HorasRepo : IHorasRepo
     {
         private SqlConnection _conexion;
         private string _cadenaConexion;
         public string CadenaConexion => _cadenaConexion;
 
-        public GEEMSHorasRepo()
+        public HorasRepo()
         {
             var builder = WebApplication.CreateBuilder();
             _cadenaConexion = builder.Configuration.GetConnectionString("DefaultConnection");

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "./config";
 import { createApp } from "vue";
 import App from "./components/App.vue";
 import { createRouter, createWebHistory } from "vue-router";
@@ -83,6 +84,7 @@ const router = createRouter({
 const app = createApp(App);
 app.use(createPinia());
 app.use(router);
+app.config.globalProperties.$apiBaseUrl = API_BASE_URL;
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
   const isAuthenticated = userStore.usuario !== null;

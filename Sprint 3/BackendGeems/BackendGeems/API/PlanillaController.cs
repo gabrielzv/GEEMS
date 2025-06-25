@@ -9,11 +9,11 @@ namespace BackendGeems.API
     [ApiController]
     public class PlanillaController : ControllerBase
     {
-        private readonly GEEMSRepo _repo;
+        private readonly GeneralRepo _repo;
 
         public PlanillaController()
         {
-            _repo = new GEEMSRepo();
+            _repo = new GeneralRepo();
         }
 
     [HttpGet("listar")]
