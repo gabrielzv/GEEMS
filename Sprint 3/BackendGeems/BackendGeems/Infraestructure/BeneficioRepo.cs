@@ -212,7 +212,7 @@ namespace BackendGeems.Infraestructure
 
                 foreach (DataRow fila in tablaConsulta.Rows)
                 {
-                    beneficios.Add(new 
+                    beneficios.Add(new
                     {
                         Id = fila["Id"].ToString(),
                         Nombre = fila["Nombre"]?.ToString(),
@@ -262,7 +262,7 @@ namespace BackendGeems.Infraestructure
 
                 foreach (DataRow fila in tablaConsulta.Rows)
                 {
-                    beneficios.Add(new 
+                    beneficios.Add(new
                     {
                         Id = fila["Id"].ToString(),
                         Nombre = fila["Nombre"].ToString(),
@@ -302,6 +302,29 @@ namespace BackendGeems.Infraestructure
                 }
             }
             return beneficios;
+        }
+
+        public void MatricularBeneficio(BeneficiosEmpleado beneficioEmpleado)
+        {
+            if (beneficioEmpleado == null ||
+            string.IsNullOrWhiteSpace(beneficioEmpleado.IdEmpleado) ||
+            string.IsNullOrWhiteSpace(beneficioEmpleado.IdBeneficio))
+            {
+                throw new Exception("Los datos del beneficio y el empleado son obligatorios.");
+            }
+
+            string query = @"
+                    INSERT INTO BeneficiosEmpleado (IdEmpleado, IdBeneficio)
+                    VALUES (@IdEmpleado, @IdBeneficio);";
+            using (var command = new SqlCommand(query, _conexion))
+            {
+                command.Parameters.AddWithValue("@IdEmpleado", beneficioEmpleado.IdEmpleado);
+                command.Parameters.AddWithValue("@IdBeneficio", beneficioEmpleado.IdBeneficio);
+
+                _conexion.Open();
+                command.ExecuteNonQuery();
+                _conexion.Close();
+            }
         }
     }
 }

@@ -40,5 +40,10 @@ namespace BackendGeems.Application
         {
             return _repoBeneficio.GetEmployeeBenefits(IdEmpleado);
         }
+
+        public void MatricularBeneficio(BeneficiosEmpleado beneficioEmpleado)
+        {
+            _repoBeneficio.MatricularBeneficio(beneficioEmpleado);
+        }
     }
 }

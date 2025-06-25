@@ -9,5 +9,6 @@ namespace BackendGeems.Application
         List<object> GetCompanyBenefits(string CedulaJuridica);
         List<object> GetBenefitsEmployeeContract(string CedulaJuridica, string IdEmpleado);
         List<object> GetEmployeeBenefits(string IdEmpleado);
+        void MatricularBeneficio(BeneficiosEmpleado beneficioEmpleado);
     }
 }

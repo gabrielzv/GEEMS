@@ -164,7 +164,7 @@ export default {
         }
 
         // Se hace el post para poder matricular el beneficio
-        const url = `${API_BASE_URL}SetBeneficioPorEmpleado/matricularBeneficio`;
+        const url = `${API_BASE_URL}Beneficio/matricularBeneficio`;
         const response = await axios.post(
           url,
           {

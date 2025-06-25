@@ -109,5 +109,23 @@ namespace BackendGeems.Controllers
                 return StatusCode(500, $"Error al obtener los beneficios del empleado: {ex.Message}");
             }
         }
+
+        [HttpPost("matricularBeneficio")]
+        public IActionResult MatricularBeneficio([FromBody] BeneficiosEmpleado beneficioEmpleado)
+        {
+            try
+            {
+                _queryBeneficio.MatricularBeneficio(beneficioEmpleado);
+                return Ok("Beneficio matriculado exitosamente.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al matricular el beneficio: {ex.Message}");
+            }
+        }
     }
 }
