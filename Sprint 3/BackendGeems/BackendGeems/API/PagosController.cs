@@ -13,16 +13,18 @@ namespace BackendGeems.API
     {
         private readonly GeneralRepo _repoInfrastructure;
         private readonly PagoRepo _pagoInfrastructure;
+        private readonly GestorPagosService _gestorPagosService;
         private readonly IQueryPago _queryPago;
         private readonly IGenerarPago _GenerarPago;
 
-        public PagosController(IQueryPago queryPago, IGenerarPago generarPago)
+        public PagosController(IQueryPago queryPago, IGenerarPago generarPago, GestorPagosService gestorPagosService)
         {
             _queryPago = queryPago;
 
             _repoInfrastructure = new GeneralRepo();
             _pagoInfrastructure = new PagoRepo();
             _GenerarPago = generarPago;
+            _gestorPagosService = gestorPagosService;
         }
         [HttpGet]
         public List<Pago> Get(DateTime fechaInicio, DateTime fechaFin)
@@ -50,13 +52,13 @@ namespace BackendGeems.API
                     try
                     {
                         // Obtener salario bruto antes de intentar generar el pago
-                        int salarioBruto = _pagoInfrastructure.ObtenerSalarioBruto(empleado.Id, fechaInicio, fechaFinal);
+                        double salarioBruto = _pagoInfrastructure.ObtenerSalarioBruto(empleado.Id, fechaInicio, fechaFinal);
                         if (salarioBruto <= 0)
                         {
                             // Saltar empleados sin horas o salario
                             continue;
                         }
-                        _pagoInfrastructure.GenerarPagoEmpleado(empleado.Id, idPlanilla, fechaInicio, fechaFinal);
+                        _gestorPagosService.GenerarPagoEmpleado(empleado.Id, idPlanilla, fechaInicio, fechaFinal);
                         pagosGenerados++;
                     }
                     catch (Exception ex)

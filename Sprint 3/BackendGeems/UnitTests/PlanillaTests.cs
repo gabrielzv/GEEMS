@@ -56,10 +56,14 @@ namespace UnitTests
             DateTime fechaFin = new DateTime(2025, 4, 30);
 
             var repo = new PagoRepo();
-            var queryPago = new QueryPago(repo);
-            var generarPago = new GenerarPago(repo);
 
-            var controller = new PagosController(queryPago, generarPago);
+           
+            var queryPago = new QueryPago(repo);
+            var servicioDeCalculo = new ServicioCalculoPago(repo);
+            var gestorPagos = new GestorPagosService(repo, servicioDeCalculo);
+            var generarPago = new GenerarPago(repo,gestorPagos);
+
+            var controller = new PagosController(queryPago, generarPago,gestorPagos);
 
             // Act
             var result = controller.ResumenPlanilla(nombreEmpresa, fechaInicio, fechaFin) as OkObjectResult;

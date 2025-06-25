@@ -7,7 +7,7 @@
         {
             _repoInfrastructure = repo;
         }
-        public int ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal)
+        public double ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal)
         {
             var salarioBruto = _repoInfrastructure.ObtenerSalarioBruto(idEmpleado, fechaInicio, fechaFinal);
             return salarioBruto;
