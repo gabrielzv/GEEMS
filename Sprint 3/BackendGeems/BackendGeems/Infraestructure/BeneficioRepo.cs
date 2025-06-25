@@ -164,7 +164,7 @@ namespace BackendGeems.Infraestructure
 
         public Beneficio GetBeneficio(Guid id)
         {
-            Beneficio beneficio = null;
+            Beneficio? beneficio = null;
 
             string query = @"SELECT Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual
                              FROM Beneficio WHERE Id = @Id";
@@ -192,8 +192,116 @@ namespace BackendGeems.Infraestructure
                     };
                 }
             }
-
             return beneficio;
+        }
+
+        public List<object> GetCompanyBenefits(string CedulaJuridica)
+        {
+            List<object> beneficios = new List<object>();
+
+            string query = @"
+                SELECT b.Id, b.Nombre, b.Descripcion, b.Costo, b.TiempoMinimoEnEmpresa
+                FROM Beneficio b
+                INNER JOIN DuenoEmpresa de ON b.CedulaJuridica = de.CedulaEmpresa
+                WHERE de.CedulaEmpresa = @CedulaJuridica;";
+
+            using (var command = new SqlCommand(query, _conexion))
+            {
+                command.Parameters.AddWithValue("@CedulaJuridica", CedulaJuridica);
+                DataTable tablaConsulta = CrearTablaConsulta(command);
+
+                foreach (DataRow fila in tablaConsulta.Rows)
+                {
+                    beneficios.Add(new 
+                    {
+                        Id = fila["Id"].ToString(),
+                        Nombre = fila["Nombre"]?.ToString(),
+                        Descripcion = fila["Descripcion"]?.ToString(),
+                        Costo = fila["Costo"] == DBNull.Value ? 0 : Convert.ToDecimal(fila["Costo"]),
+                        TiempoMinimo = fila["TiempoMinimoEnEmpresa"] == DBNull.Value ? 0 : Convert.ToInt32(fila["TiempoMinimoEnEmpresa"])
+                    });
+                }
+            }
+            return beneficios;
+        }
+
+        public List<object> GetBenefitsEmployeeContract(string CedulaJuridica, string IdEmpleado)
+        {
+            List<object> beneficios = new List<object>();
+
+            // Obtener el contrato del empleado
+            string employeeQuery = "SELECT Contrato FROM Empleado WHERE Id = @IdEmpleado;";
+            string? employeeContract = null;
+            using (SqlCommand employeeCommand = new SqlCommand(employeeQuery, _conexion))
+            {
+                employeeCommand.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
+                _conexion.Open();
+                employeeContract = employeeCommand.ExecuteScalar()?.ToString();
+                _conexion.Close();
+            }
+
+            if (string.IsNullOrWhiteSpace(employeeContract))
+            {
+                throw new Exception("Empleado no encontrado o sin contrato.");
+            }
+
+            // Obtener los beneficios asociados al contrato del empleado
+            string query = @"
+                SELECT b.Id, b.Nombre, b.Descripcion, b.Costo, b.TiempoMinimoEnEmpresa
+                FROM Beneficio b
+                INNER JOIN DuenoEmpresa de ON b.CedulaJuridica = de.CedulaEmpresa
+                LEFT JOIN BeneficioContratoElegible bce ON b.Id = bce.IdBeneficio
+                WHERE de.CedulaEmpresa = @CedulaJuridica
+                AND (bce.IdBeneficio IS NULL OR bce.ContratoEmpleado = @EmployeeContract);";
+
+            using (SqlCommand command = new SqlCommand(query, _conexion))
+            {
+                command.Parameters.AddWithValue("@CedulaJuridica", CedulaJuridica);
+                command.Parameters.AddWithValue("@EmployeeContract", employeeContract);
+                DataTable tablaConsulta = CrearTablaConsulta(command);
+
+                foreach (DataRow fila in tablaConsulta.Rows)
+                {
+                    beneficios.Add(new 
+                    {
+                        Id = fila["Id"].ToString(),
+                        Nombre = fila["Nombre"].ToString(),
+                        Descripcion = fila["Descripcion"].ToString(),
+                        Costo = Convert.ToDecimal(fila["Costo"]),
+                        TiempoMinimo = Convert.ToInt32(fila["TiempoMinimoEnEmpresa"]),
+                    });
+                }
+            }
+            return beneficios;
+        }
+
+        public List<object> GetEmployeeBenefits(string IdEmpleado)
+        {
+            List<object> beneficios = new List<object>();
+
+            string query = @"
+                SELECT b.Nombre AS NombreBeneficio, b.Descripcion, b.Costo, b.Frecuencia
+                FROM BeneficiosEmpleado be
+                JOIN Beneficio b ON be.IdBeneficio = b.Id
+                WHERE be.IdEmpleado = @IdEmpleado;";
+
+            using (SqlCommand command = new SqlCommand(query, _conexion))
+            {
+                command.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
+                DataTable tablaConsulta = CrearTablaConsulta(command);
+
+                foreach (DataRow fila in tablaConsulta.Rows)
+                {
+                    beneficios.Add(new
+                    {
+                        Nombre = fila["NombreBeneficio"].ToString(),
+                        Descripcion = fila["Descripcion"].ToString(),
+                        Costo = Convert.ToDecimal(fila["Costo"]),
+                        Frecuencia = fila["Frecuencia"].ToString(),
+                    });
+                }
+            }
+            return beneficios;
         }
     }
 }

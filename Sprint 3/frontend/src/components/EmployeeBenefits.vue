@@ -93,7 +93,7 @@ export default {
           const idEmpleado = userStore.empleado.id;
 
           // Se hace el get para obtener los beneficios que tiene matriculados el empleado
-          const url = `${API_BASE_URL}GetEmployeeBenefits/${idEmpleado}`;
+          const url = `${API_BASE_URL}Beneficio/Employee/${idEmpleado}`;
           const response = await axios.get(
             url
           );

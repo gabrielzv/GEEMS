@@ -25,5 +25,20 @@ namespace BackendGeems.Application
         {
             return _repoBeneficio.GetBeneficio(id);
         }
+
+        public List<object> GetCompanyBenefits(string CedulaJuridica)
+        {
+            return _repoBeneficio.GetCompanyBenefits(CedulaJuridica);
+        }
+
+        public List<object> GetBenefitsEmployeeContract(string CedulaJuridica, string IdEmpleado)
+        {
+            return _repoBeneficio.GetBenefitsEmployeeContract(CedulaJuridica, IdEmpleado);
+        }
+
+        public List<object> GetEmployeeBenefits(string IdEmpleado)
+        {
+            return _repoBeneficio.GetEmployeeBenefits(IdEmpleado);
+        }
     }
 }

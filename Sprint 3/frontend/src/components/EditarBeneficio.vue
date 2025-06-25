@@ -331,6 +331,7 @@ export default {
       contratosElegibles: [],
       nombreDeAPI: null,
       esApi: null,
+      esPorcentual: null,
     });
 
     // Estados para errores
@@ -355,6 +356,10 @@ export default {
         beneficioAnterior.value = response.data;
         // Se copian todos los datos al formulario para editar
         Object.assign(form.value, response.data);
+        // Se asegura que contratosElegibles siempre sea un array
+        form.value.contratosElegibles = Array.isArray(response.data.contratosElegibles)
+          ? response.data.contratosElegibles
+          : [];
       } catch (error) {
         alert("Error al obtener los datos del beneficio.");
       }

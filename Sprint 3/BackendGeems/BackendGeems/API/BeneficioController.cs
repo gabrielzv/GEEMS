@@ -61,5 +61,53 @@ namespace BackendGeems.Controllers
                 return StatusCode(500, $"Error al obtener el beneficio: {ex.Message}");
             }
         }
+
+        [HttpGet("Company/{CedulaJuridica}")]
+        public IActionResult GetCompanyBenfits(string CedulaJuridica)
+        {
+            try
+            {
+                var beneficios = _queryBeneficio.GetCompanyBenefits(CedulaJuridica);
+                if (beneficios == null || beneficios.Count == 0)
+                    return NotFound("No se encontraron beneficios para esta empresa.");
+                return Ok(beneficios);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener los beneficios de la empresa: {ex.Message}");
+            }
+        }
+
+        [HttpGet("BenefitsEmployeeContract/{CedulaJuridica}/{IdEmpleado}")]
+        public IActionResult GetBenefitsEmployeeContract(string CedulaJuridica, string IdEmpleado)
+        {
+            try
+            {
+                var beneficios = _queryBeneficio.GetBenefitsEmployeeContract(CedulaJuridica, IdEmpleado);
+                if (beneficios == null || beneficios.Count == 0)
+                    return NotFound("No se encontraron beneficios para el contrato de este empleado.");
+                return Ok(beneficios);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener los beneficios del contrato del empleado: {ex.Message}");
+            }
+        }
+
+        [HttpGet("Employee/{IdEmpleado}")]
+        public IActionResult GetEmployeeBenefits(string IdEmpleado)
+        {
+            try
+            {
+                var beneficios = _queryBeneficio.GetEmployeeBenefits(IdEmpleado);
+                if (beneficios == null || beneficios.Count == 0)
+                    return NotFound("No se encontraron beneficios matriculados.");
+                return Ok(beneficios);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener los beneficios del empleado: {ex.Message}");
+            }
+        }
     }
 }
