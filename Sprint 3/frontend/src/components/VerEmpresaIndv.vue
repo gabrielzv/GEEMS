@@ -102,6 +102,7 @@
           Modificar
         </button>
         <button
+          @click="goToEmpresaEliminada"
           class="bg-red-600 text-white font-semibold py-2 px-4 rounded hover:bg-red-700"
         >
           Eliminar
@@ -115,7 +116,8 @@
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-
+import axios from "axios";
+import { API_BASE_URL } from "../config";
 export default {
   setup() {
     const router = useRouter();
@@ -157,6 +159,17 @@ export default {
       router.push("/editarEmpresa/" + userStore.usuario.cedulaPersona);
     };
 
+    const goToEmpresaEliminada = async () => {
+      const cedula = empresa.value?.cedulaJuridica;
+      const url = `${API_BASE_URL}Empresas/borrar?cedula=${cedula}`;
+      try {
+        await axios.delete(url);
+        router.push("/empresaEliminada");
+      } catch (error) {
+        console.error("Error al eliminar la empresa:", error);
+      }
+    };
+
     return {
       empresa,
       empleadosEmpresa,
@@ -164,6 +177,7 @@ export default {
       goToCrearBeneficios,
       goToVerListaBeneficios,
       goToCrearEditarEmpresa,
+      goToEmpresaEliminada,
     };
   },
 };
