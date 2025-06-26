@@ -11,7 +11,7 @@
 
     <!-- Contenedor principal -->
     <div class="flex gap-6 w-full mt-2">
-      <!-- Panel izquierdo: Dropdown -->
+      <!-- Dropdown -->
       <div class="w-1/3 p-4 border rounded-xl shadow-md">
         <h2 class="text-lg font-semibold mb-2">Pagos disponibles</h2>
         <select
@@ -30,7 +30,7 @@
         </select>
       </div>
 
-      <!-- Panel derecho: Detalles del pago -->
+      <!-- Detalles del pago -->
       <div class="flex-1 p-6 border rounded-xl shadow-md">
         <div v-if="selectedPago">
           <!-- Detalles generales -->
@@ -88,6 +88,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/store/user'
 import axios from 'axios'
 import { API_BASE_URL } from '@/config'
+import jsPDF from 'jspdf'
 
 const userStore = useUserStore()
 const pagos = ref([])
@@ -188,8 +189,87 @@ function goBack() {
   window.history.back()
 }
 
-// Si tienes la función descargarPDF, agrégala aquí
+
 function descargarPDF() {
-  // Implementación pendiente
+  if (!selectedPago.value) return
+
+  const doc = new jsPDF()
+  doc.setFontSize(18)
+  doc.text('Recibo de Pago', 105, 18, { align: 'center' })
+
+  doc.setFontSize(12)
+  let y = 35
+
+  // Nombre de la empresa (negrita)
+  doc.setFont(undefined, 'bold')
+  doc.text('Nombre de la empresa:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${userStore.empleado.nombreEmpresa}`, 70, y)
+  y += 10
+
+  // Empleado (negrita)
+  doc.setFont(undefined, 'bold')
+  doc.text('Empleado:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${persona.value?.fullName || ''}`, 70, y)
+  y += 10
+
+  // Tipo de contrato (negrita)
+  doc.setFont(undefined, 'bold')
+  doc.text('Tipo de contrato:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${userStore.empleado.contrato}`, 70, y)
+  y += 10
+
+  // Fecha de pago (negrita)
+  doc.setFont(undefined, 'bold')
+  doc.text('Fecha de pago:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${formatFecha(selectedPago.value.fechaRealizada)}`, 70, y)
+  y += 15
+
+  // Resumen de Pago (sección)
+  doc.setFontSize(14)
+  doc.setFont(undefined, 'bold')
+  doc.text('Resumen de Pago', 20, y)
+  y += 10
+
+  // Salario Bruto (negrita)
+  doc.setFontSize(12)
+  doc.setFont(undefined, 'bold')
+  doc.text('Salario Bruto:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${selectedPago.value.montoBruto?.toLocaleString('en-US')}`, 60, y)
+  y += 10
+
+  // Deducciones
+  doc.setFont(undefined, 'bold')
+  doc.text('Deducciones:', 20, y)
+  y += 8
+  deducciones.value.forEach(d => {
+    doc.setFont(undefined, 'normal')
+    doc.text(`${d.nombre}: -${d.monto?.toLocaleString('en-US')}`, 25, y)
+    y += 8
+  })
+  y += 2
+
+  // Total deducciones (negrita)
+  doc.setFont(undefined, 'bold')
+  doc.text('Total deducciones:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`-${totalDeducciones.value?.toLocaleString('en-US')}`, 65, y)
+  y += 12
+
+  // Salario Neto (negrita)
+  doc.setFontSize(14)
+  doc.setFont(undefined, 'bold')
+  doc.text('Salario Neto:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${selectedPago.value.montoPago?.toLocaleString('en-US')}`, 60, y)
+
+  // Abrir en nueva pestaña
+  const pdfBlob = doc.output('blob')
+  const url = URL.createObjectURL(pdfBlob)
+  window.open(url, '_blank')
 }
 </script>
