@@ -6,6 +6,10 @@ namespace BackendGeems.Application
     {
         public List<Empleado> ObtenerEmpleadosPorEmpresa(string nombreEmpresa);
         public List<Planilla> ObtenerPlanillasPorEmpresa(string nombreEmpresa);
+        public bool VerificarRelacionEmpleadoPlanilla(string cedula);
+        public void BorrarLogicoEmpleado(string cedula);
+        public void BorrarPermanenteEmpleado(string cedula);
     }
+
 
 }

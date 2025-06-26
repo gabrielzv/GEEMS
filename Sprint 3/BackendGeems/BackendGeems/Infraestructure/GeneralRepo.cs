@@ -102,5 +102,114 @@ namespace BackendGeems.Infraestructure
                 }
             }
         }
+
+        public bool VerificarRelacionEmpleadoPlanilla(string cedula)
+        {
+
+            Guid empleadoId = Guid.Empty;
+            string queryEmpleado = "SELECT Id FROM Empleado WHERE CedulaPersona = @Cedula";
+            using (SqlCommand cmdEmpleado = new SqlCommand(queryEmpleado, _conexion))
+            {
+                cmdEmpleado.Parameters.AddWithValue("@Cedula", cedula);
+                _conexion.Open();
+                var result = cmdEmpleado.ExecuteScalar();
+                _conexion.Close();
+                if (result == null || result == DBNull.Value)
+                    return false;
+                empleadoId = Guid.Parse(result.ToString());
+            }
+
+            string queryPago = "SELECT COUNT(*) FROM Pago WHERE EmpleadoId = @EmpleadoId";
+            using (SqlCommand cmdPago = new SqlCommand(queryPago, _conexion))
+            {
+                cmdPago.Parameters.AddWithValue("@EmpleadoId", empleadoId);
+                _conexion.Open();
+                int countPago = (int)cmdPago.ExecuteScalar();
+                _conexion.Close();
+                if (countPago > 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void BorrarLogicoEmpleado(string cedula)
+        {
+            try
+            {
+                string queryEmpleado = "UPDATE Empleado SET EstaBorrado = 1 WHERE CedulaPersona = @Cedula";
+                using (SqlCommand cmdEmpleado = new SqlCommand(queryEmpleado, _conexion))
+                {
+                    cmdEmpleado.Parameters.AddWithValue("@Cedula", cedula);
+                    _conexion.Open();
+                    cmdEmpleado.ExecuteNonQuery();
+                    _conexion.Close();
+                }
+
+                
+                string queryPersona = "UPDATE Persona SET EstaBorrado = 1 WHERE Cedula = @Cedula";
+                using (SqlCommand cmdPersona = new SqlCommand(queryPersona, _conexion))
+                {
+                    cmdPersona.Parameters.AddWithValue("@Cedula", cedula);
+                    _conexion.Open();
+                    cmdPersona.ExecuteNonQuery();
+                    _conexion.Close();
+                }
+
+                
+                string queryUsuario = "UPDATE Usuario SET EstaBorrado = 1 WHERE CedulaPersona = @Cedula";
+                using (SqlCommand cmdUsuario = new SqlCommand(queryUsuario, _conexion))
+                {
+                    cmdUsuario.Parameters.AddWithValue("@Cedula", cedula);
+                    _conexion.Open();
+                    cmdUsuario.ExecuteNonQuery();
+                    _conexion.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
+            }
+        }
+
+        public void BorrarPermanenteEmpleado(string cedula)
+        {
+            try
+            {
+                string queryEmpleado = "DELETE Empleado  WHERE CedulaPersona = @Cedula";
+                using (SqlCommand cmdEmpleado = new SqlCommand(queryEmpleado, _conexion))
+                {
+                    cmdEmpleado.Parameters.AddWithValue("@Cedula", cedula);
+                    _conexion.Open();
+                    cmdEmpleado.ExecuteNonQuery();
+                    _conexion.Close();
+                }
+
+
+                string queryPersona = "DELETE Persona  WHERE Cedula = @Cedula";
+                using (SqlCommand cmdPersona = new SqlCommand(queryPersona, _conexion))
+                {
+                    cmdPersona.Parameters.AddWithValue("@Cedula", cedula);
+                    _conexion.Open();
+                    cmdPersona.ExecuteNonQuery();
+                    _conexion.Close();
+                }
+
+
+                string queryUsuario = "DELETE Usuario  WHERE CedulaPersona = @Cedula";
+                using (SqlCommand cmdUsuario = new SqlCommand(queryUsuario, _conexion))
+                {
+                    cmdUsuario.Parameters.AddWithValue("@Cedula", cedula);
+                    _conexion.Open();
+                    cmdUsuario.ExecuteNonQuery();
+                    _conexion.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException(ex.Message);
+            }
+        }
+
     }
 }
