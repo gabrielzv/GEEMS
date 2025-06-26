@@ -17,7 +17,7 @@ namespace BackendGeems.Application
         public double ObtenerMontoAPI(Guid idEmpleado, string nombreAPI, double salarioBruto);
         public List<DeduccionVoluntaria> ObtenerDeduccionesVoluntarias(Guid idEmpleado);
         public void InsertPago(Guid idPago, Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal, double montoBruto, double montoPago);
-
+        public int ContarPagos(Guid idEmpleado);
     }
 
 }
