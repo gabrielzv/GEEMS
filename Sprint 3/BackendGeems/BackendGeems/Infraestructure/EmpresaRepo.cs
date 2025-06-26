@@ -45,6 +45,127 @@ namespace BackendGeems.Infraestructure
             }
             return null;
         }
+        public List<Empleado> GetEmpleados(string cedula)
+        {
+            List<Empleado> empleados = new List<Empleado>();
+
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+
+            string query = @"SELECT * FROM Empleado WHERE NombreEmpresa = (
+                        SELECT Nombre FROM Empresa WHERE CedulaJuridica = @CedulaJuridica
+                     )";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@CedulaJuridica", cedula);
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                empleados.Add(new Empleado
+                {
+                    Id = Guid.Parse(reader["Id"].ToString()),
+                    CedulaPersona = Convert.ToInt32(reader["CedulaPersona"]),
+                    Contrato = reader["Contrato"].ToString(),
+                    NumHorasTrabajadas = Convert.ToInt32(reader["NumHorasTrabajadas"]),
+                    Genero = reader["Genero"].ToString(),
+                    EstadoLaboral = reader["EstadoLaboral"].ToString(),
+                    SalarioBruto = Convert.ToInt32(reader["SalarioBruto"]),
+                    Tipo = reader["Tipo"].ToString(),
+                    FechaIngreso = reader["FechaIngreso"].ToString(),
+                    NombreEmpresa = reader["NombreEmpresa"].ToString(),
+                    CantidadDependientes = Convert.ToInt32(reader["CantidadDependientes"]),
+                    fechaNacimiento = Convert.ToDateTime(reader["fechaNacimiento"])
+                });
+            }
+
+            return empleados;
+        }
+        public void BorradoLogico(string cedula)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+
+            string query = @"UPDATE Empresa 
+                     SET EstaBorrado = 1 
+                     WHERE CedulaJuridica = @CedulaJuridica";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@CedulaJuridica", cedula);
+
+            cmd.ExecuteNonQuery();
+        }
+        public bool GetEstadoEliminadoEmpresaEmpleado(int cedulaPersona)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+
+            string query = @"
+                SELECT e.EstaBorrado
+                FROM Empleado em
+                JOIN Empresa e ON em.NombreEmpresa = e.Nombre
+                WHERE em.CedulaPersona = @CedulaPersona";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@CedulaPersona", cedulaPersona);
+
+            object result = cmd.ExecuteScalar();
+
+            if (result != null && result != DBNull.Value)
+            {
+                return Convert.ToBoolean(result);
+            }
+
+            throw new Exception($"No se encontró empresa para la persona con cédula {cedulaPersona}");
+        }
+        public bool GetEstadoEliminadoEmpresaDueno(int cedulaPersona)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+
+            string query = @"
+                SELECT e.EstaBorrado
+                FROM DuenoEmpresa d
+                JOIN Empresa e ON d.CedulaEmpresa = e.CedulaJuridica
+                WHERE d.CedulaPersona = @CedulaPersona";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@CedulaPersona", cedulaPersona);
+
+            object result = cmd.ExecuteScalar();
+
+            if (result != null && result != DBNull.Value)
+            {
+                return Convert.ToBoolean(result);
+            }
+
+            throw new Exception($"No se encontró empresa asociada al dueño con cédula {cedulaPersona}");
+        }
+
+        public string GetTipo(int cedulaPersona)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+
+            string query = @"
+                SELECT Tipo
+                FROM Usuario
+                WHERE CedulaPersona = @CedulaPersona";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@CedulaPersona", cedulaPersona);
+
+            object result = cmd.ExecuteScalar();
+
+            if (result != null && result != DBNull.Value)
+            {
+                return result.ToString();
+            }
+
+            throw new Exception($"No se encontró el tipo para la persona con cédula {cedulaPersona}");
+        }
+
 
     }
 }

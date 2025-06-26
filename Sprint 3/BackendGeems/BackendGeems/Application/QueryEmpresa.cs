@@ -1,12 +1,15 @@
 ﻿using BackendGeems.Domain;
+using BackendGeems.Infraestructure;
+using System.Reflection.Metadata.Ecma335;
 namespace BackendGeems.Application
 {
     public class QueryEmpresa : IQueryEmpresa
     {
         private readonly IEmpresaRepo _empresaRepo;
-        
-        public QueryEmpresa(IEmpresaRepo empresaRepo)
+        private readonly IPagoRepo _pagoRepo;
+        public QueryEmpresa(IEmpresaRepo empresaRepo, IPagoRepo pagoRepo)
         {
+            _pagoRepo = pagoRepo;
             _empresaRepo = empresaRepo;
         }
         public void EliminarEmpresa(string cedula)
@@ -16,18 +19,42 @@ namespace BackendGeems.Application
             {
                 return;
             }
-            Console.WriteLine($"Cédula Jurídica: {empresa.CedulaJuridica}");
-            Console.WriteLine($"Nombre: {empresa.Nombre}");
-            Console.WriteLine($"Descripción: {empresa.Descripcion}");
-            Console.WriteLine($"Teléfono: {empresa.Telefono}");
-            Console.WriteLine($"Correo: {empresa.Correo}");
-            Console.WriteLine($"Provincia: {empresa.Provincia}");
-            Console.WriteLine($"Cantón: {empresa.Canton}");
-            Console.WriteLine($"Distrito: {empresa.Distrito}");
-            Console.WriteLine($"Señas: {empresa.Senas}");
-            Console.WriteLine($"Modalidad de Pago: {empresa.ModalidadPago}");
-            Console.WriteLine($"Máx. Beneficios por Empleado: {empresa.MaxBeneficiosXEmpleado}");
-            Console.WriteLine($"¿Está Borrado?: {empresa.EstaBorrado}");
+            Console.WriteLine($"Eliminando empresa: {empresa.Nombre}");
+            List<Empleado> empleados = _empresaRepo.GetEmpleados(cedula);
+            int totalPagos = 0;
+
+            foreach (var empleado in empleados)
+            {
+                totalPagos += _pagoRepo.ContarPagos(empleado.Id);
+            }
+
+            Console.WriteLine($"Total de pagos para la empresa {empresa.Nombre}: {totalPagos}");
+            if (totalPagos > 0)
+            {
+                Console.WriteLine("Borrado fisico");
+                _empresaRepo.BorradoLogico(cedula);
+            }
+            else
+            {
+
+                Console.WriteLine("Borrado logico");
+            }
+
         }
+        public bool GetEstadoEliminadoEmpresaPersona(int cedulaPersona)
+        {
+            string tipo = _empresaRepo.GetTipo(cedulaPersona);
+            bool estado = false;
+            if( tipo == "Empleado")
+            {
+                estado = _empresaRepo.GetEstadoEliminadoEmpresaEmpleado(cedulaPersona);
+            }
+            else if( tipo == "DuenoEmpresa" )
+            {
+                estado = _empresaRepo.GetEstadoEliminadoEmpresaDueno(cedulaPersona);
+            }
+            return estado;
+        }
+
     }
 }

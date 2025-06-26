@@ -18,7 +18,7 @@
 
         
         <button
-          @click="handleLogout"
+          @click="handleExit"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50"
         >
           Salir
@@ -34,8 +34,8 @@ import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
 const router = useRouter();
 const userStore = useUserStore();
-const handleLogout = () => {
-    userStore.logout();
+userStore.logout();
+const handleExit = () => {
     router.push("/login");
 }
 </script>
