@@ -529,11 +529,19 @@ export default {
 
       isSubmitting.value = true;
       mensaje.value = "";
+
+      let payload = { ...form.value };
+
+      // Si el beneficio es porcentual, se convierte el costo a decimal
+      if (payload.esPorcentual === true || payload.esPorcentual === "true") {
+        payload.costo = Number(payload.costo) * 0.01;
+      }
+
       const url = `${API_BASE_URL}Beneficio/editarBeneficio`;
       try {
         const response = await axios.post(
           url,
-          form.value
+          payload
         );
         mensaje.value = response.data;
         alert(response.data);
