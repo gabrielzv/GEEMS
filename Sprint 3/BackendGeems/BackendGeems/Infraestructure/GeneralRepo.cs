@@ -84,6 +84,29 @@ namespace BackendGeems.Infraestructure
             return planillas;
         }
 
+        public Planilla ObtenerPlanillaPorId(Guid id)
+        {
+            Planilla planilla = null;
+            string query = @"SELECT * FROM Planilla WHERE Id = @Id";
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@Id", id);
+                DataTable tabla = CrearTablaConsulta(comando);
+                if (tabla.Rows.Count > 0)
+                {
+                    DataRow fila = tabla.Rows[0];
+                    planilla = new Planilla
+                    {
+                        Id = Guid.Parse(fila["Id"].ToString()),
+                        FechaInicio = Convert.ToDateTime(fila["FechaInicio"]),
+                        FechaFinal = Convert.ToDateTime(fila["FechaFinal"]),
+                        IdPayroll = Guid.Parse(fila["IdPayroll"].ToString())
+                    };
+                }
+            }
+            return planilla;
+        }
+
         public void CrearPlanilla(Planilla planilla)
         {
             using (var connection = new SqlConnection(CadenaConexion))
@@ -102,5 +125,11 @@ namespace BackendGeems.Infraestructure
                 }
             }
         }
+
+        
+
+
+
+
     }
 }

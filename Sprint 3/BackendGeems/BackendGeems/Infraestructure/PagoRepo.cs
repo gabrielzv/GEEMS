@@ -64,6 +64,36 @@ namespace BackendGeems.Infraestructure
             return pagos;
         }
 
+        public List<Pago> ObtenerPagosPorEmpleado(Guid idEmpleado)
+        {
+            var pagos = new List<Pago>();
+            using (var connection = new SqlConnection(CadenaConexion))
+            {
+                var cmd = new SqlCommand("SELECT * FROM Pago     WHERE IdEmpleado = @idEmpleado", connection);
+                cmd.Parameters.AddWithValue("@idEmpleado", idEmpleado);
+                connection.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        pagos.Add(new Pago
+                        {
+                            Id = reader["Id"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("Id")) : Guid.Empty,
+                            FechaRealizada = reader["FechaRealizada"] != DBNull.Value ? reader.GetDateTime(reader.GetOrdinal("FechaRealizada")) : DateTime.MinValue,
+                            MontoPago = reader["MontoPago"] != DBNull.Value ? Convert.ToDouble(reader["MontoPago"]) : 0,
+                            IdEmpleado = reader["IdEmpleado"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("IdEmpleado")) : Guid.Empty,
+                            IdPayroll = reader["IdPayroll"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("IdPayroll")) : Guid.Empty,
+                            IdPlanilla = reader["IdPlanilla"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("IdPlanilla")) : Guid.Empty,
+                            MontoBruto = reader["MontoBruto"] != DBNull.Value ? Convert.ToDouble(reader["MontoBruto"]) : 0,
+                            FechaInicio = reader["FechaInicio"] != DBNull.Value ? reader.GetDateTime(reader.GetOrdinal("FechaInicio")) : DateTime.MinValue,
+                            FechaFinal = reader["FechaFinal"] != DBNull.Value ? reader.GetDateTime(reader.GetOrdinal("FechaFinal")) : DateTime.MinValue
+                        });
+                    }
+                }
+            }
+            return pagos;
+        }
+
         public double ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal)
         {
             double salarioBruto = 0;
@@ -105,6 +135,32 @@ namespace BackendGeems.Infraestructure
             return salarioBruto;
         }
 
+        public List<Deduccion> ObtenerDeduccionesPorPago(Guid idPago)
+        {
+            var deducciones = new List<Deduccion>();
+            using (var connection = new SqlConnection(CadenaConexion))
+            {
+                var cmd = new SqlCommand("SELECT * FROM Deducciones WHERE IdPago = @idPago", connection);
+                cmd.Parameters.AddWithValue("@idPago", idPago);
+                connection.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        deducciones.Add(new Deduccion
+                        {
+                            Id = reader["Id"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("Id")) : Guid.Empty,
+                            IdPago = reader["IdPago"] != DBNull.Value ? reader.GetGuid(reader.GetOrdinal("IdPago")) : Guid.Empty,
+                            TipoDeduccion = reader["TipoDeduccion"] != DBNull.Value ? reader.GetString(reader.GetOrdinal("TipoDeduccion")) : string.Empty,
+                            IdBeneficio = reader["IdBeneficio"] != DBNull.Value ? (Guid?)reader.GetGuid(reader.GetOrdinal("IdBeneficio")) : null,
+                            Monto = reader["Monto"] != DBNull.Value ? Convert.ToDouble(reader["Monto"]) : 0,
+                            Nombre = reader["Nombre"] != DBNull.Value ? reader.GetString(reader.GetOrdinal("Nombre")) : string.Empty
+                        });
+                    }
+                }
+            }
+            return deducciones;
+        }
 
         public double CalcularImpuestoRenta(double ingresoMensual)
         {
@@ -592,5 +648,36 @@ namespace BackendGeems.Infraestructure
             }
             return deduccionesVoluntarias;
         }
+        public int ContarPagos(Guid idEmpleado)
+        {
+            int cantidadPagos = 0;
+            string query = "SELECT COUNT(*) FROM Pago WHERE IdEmpleado = @IdEmpleado";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
+                try
+                {
+                    _conexion.Open();
+                    var result = comando.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        cantidadPagos = Convert.ToInt32(result);
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al contar los pagos del empleado: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+
+            return cantidadPagos;
+        }
+
     }
 }

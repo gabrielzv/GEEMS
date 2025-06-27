@@ -32,7 +32,7 @@ import Reporte2Pagos from "./components/Reporte2Pagos.vue";
 import Reporte3Historico from "./components/Reporte3Historico.vue";
 import Reporte4Desglose from "./components/Reporte4Desglose.vue";
 import Reporte5Pagos from "./components/Reporte5Pagos.vue";
-
+import EmpresaEliminada from "./components/EmpresaEliminada.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -44,7 +44,7 @@ const router = createRouter({
     {path: "/login", name: "Login", component: Login},
     { path: "/registroEmpresa", name: "RegistroEmprea", component: RegistroEmpresa },
     { path: "/register", name: "Register", component: Register },
-    
+    { path: "/empresaEliminada", name: "EmpresaEliminada", component: EmpresaEliminada},
     // Rutas que requieren autenticación (con header)
     {
       path: "/",
@@ -75,7 +75,6 @@ const router = createRouter({
         { path: "/reporte3", name: "Reporte3Historico", component: Reporte3Historico, meta: {requiresAuth: true} },
         { path: "/reporte4", name: "Reporte4Desglose", component: Reporte4Desglose, meta: {requiresAuth: true} },
         { path: "/reporte5", name: "Reporte5Pagos", component: Reporte5Pagos, meta: {requiresAuth: true} },
-
       ]
     }
   ],

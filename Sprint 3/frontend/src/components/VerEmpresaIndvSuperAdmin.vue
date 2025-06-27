@@ -67,6 +67,7 @@
             Modificar
           </button>
           <button
+            @click="goToEmpresaEliminada"
             class="bg-red-600 text-white font-semibold py-2 px-4 rounded hover:bg-red-700"
           >
             Eliminar
@@ -79,11 +80,12 @@
   <script>
   import { ref, onMounted } from "vue";
   import axios from "axios";
-  import { useRoute } from "vue-router";
+  import { useRoute, useRouter } from "vue-router";
   import { API_BASE_URL } from "../config";
   export default {
     setup() {
       const route = useRoute();
+      const router = useRouter();
       const empresa = ref(null);
       const empleadosEmpresa = ref([]);
   
@@ -107,8 +109,20 @@
       onMounted(() => {
         fetchEmpresaData();
       });
-  
-      return { empresa, empleadosEmpresa };
+      
+      const goToEmpresaEliminada = async () => {
+        const empresaId = route.params.empresaId;
+        const url = `${API_BASE_URL}Empresas/borrar?cedula=${empresaId}`;
+        try {
+          await axios.delete(url);
+          alert("Empresa eliminada");
+          router.push("/ConsulEmpresa");
+        } catch (error) {
+          console.error("Error al eliminar la empresa:", error);
+        }
+      };
+
+      return { empresa, empleadosEmpresa, goToEmpresaEliminada };
     },
   };
   </script>

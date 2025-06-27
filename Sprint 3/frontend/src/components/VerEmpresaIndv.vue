@@ -84,6 +84,7 @@
                 </router-link>
                 <button
                   class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  @click="eliminarEmpleado(empleado.cedula)"
                 >
                   Eliminar
                 </button>
@@ -102,6 +103,7 @@
           Modificar
         </button>
         <button
+          @click="goToEmpresaEliminada"
           class="bg-red-600 text-white font-semibold py-2 px-4 rounded hover:bg-red-700"
         >
           Eliminar
@@ -115,7 +117,8 @@
 import { useUserStore } from "../store/user";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-
+import axios from "axios";
+import { API_BASE_URL } from "../config";
 export default {
   setup() {
     const router = useRouter();
@@ -123,13 +126,34 @@ export default {
     const empresa = ref(null);
     const empleadosEmpresa = ref([]);
     const pagosPendientes = ref(0);
+    async function eliminarEmpleado(cedula) {
+      const confirmado = confirm(
+        "¿Estás seguro que deseas eliminar este empleado?"
+      );
 
+      if (confirmado) {
+        try {
+          const respuesta = await fetch(
+            `${API_BASE_URL}Empleado?cedula=${cedula}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (!respuesta.ok) throw new Error("Error al eliminar el empleado.");
+
+          alert("Empleado eliminado correctamente.");
+          location.reload();
+        } catch (error) {
+          console.error(error);
+          alert("Ocurrió un error al eliminar el empleado.");
+        }
+      }
+    }
     const fetchEmpresaData = async () => {
       try {
-        // Llama al método fetchEmpresa del store
         await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
 
-        // Asigna los datos obtenidos al estado local
         empresa.value = userStore.empresa;
         empleadosEmpresa.value = userStore.empleadosEmpresa;
       } catch (error) {
@@ -157,6 +181,17 @@ export default {
       router.push("/editarEmpresa/" + userStore.usuario.cedulaPersona);
     };
 
+    const goToEmpresaEliminada = async () => {
+      const cedula = empresa.value?.cedulaJuridica;
+      const url = `${API_BASE_URL}Empresas/borrar?cedula=${cedula}`;
+      try {
+        await axios.delete(url);
+        router.push("/empresaEliminada");
+      } catch (error) {
+        console.error("Error al eliminar la empresa:", error);
+      }
+    };
+
     return {
       empresa,
       empleadosEmpresa,
@@ -164,6 +199,8 @@ export default {
       goToCrearBeneficios,
       goToVerListaBeneficios,
       goToCrearEditarEmpresa,
+      goToEmpresaEliminada,
+      eliminarEmpleado,
     };
   },
 };

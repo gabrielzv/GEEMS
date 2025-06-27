@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using BackendGeems.Domain;
+using BackendGeems.Application;
 
 namespace BackendGeems.Controllers
 {
@@ -9,10 +10,14 @@ namespace BackendGeems.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IEmpleadoRepo _EmpleadoRepo;
+        private readonly BorradoDeEmpleados _borradoDeEmpleados;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration,IEmpleadoRepo EmpleadoRepo,BorradoDeEmpleados borradoDeEmpleados)
         {
             _configuration = configuration;
+            _borradoDeEmpleados = borradoDeEmpleados;
+            _EmpleadoRepo = EmpleadoRepo;
         }
 
         [HttpPost("login")]
@@ -40,14 +45,16 @@ namespace BackendGeems.Controllers
 
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
-
+                
                 if (reader.Read())
                 {
                     string contrasenaDB = reader["Contrasena"].ToString();
 
                     if (request.Contrasena == contrasenaDB)
                     {
-                        return Ok(new
+                        if(_borradoDeEmpleados.UsuarioActivo(Convert.ToString(reader["CedulaPersona"])))
+                        {
+                             return Ok(new
                         {
                             message = "Inicio de sesión exitoso",
                             usuario = new
@@ -59,6 +66,12 @@ namespace BackendGeems.Controllers
                                 contrasena = reader["Contrasena"].ToString()
                             }
                         });
+                        }
+                        else
+                        {
+                            return Unauthorized(new { message = "Usuario o contraseña incorrecta" });
+                        }
+                       
                     }
                     else
                     {
