@@ -84,6 +84,7 @@
                 </router-link>
                 <button
                   class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  @click="eliminarEmpleado(empleado.cedula)"
                 >
                   Eliminar
                 </button>
@@ -125,13 +126,34 @@ export default {
     const empresa = ref(null);
     const empleadosEmpresa = ref([]);
     const pagosPendientes = ref(0);
+    async function eliminarEmpleado(cedula) {
+      const confirmado = confirm(
+        "¿Estás seguro que deseas eliminar este empleado?"
+      );
 
+      if (confirmado) {
+        try {
+          const respuesta = await fetch(
+            `${API_BASE_URL}Empleado?cedula=${cedula}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (!respuesta.ok) throw new Error("Error al eliminar el empleado.");
+
+          alert("Empleado eliminado correctamente.");
+          location.reload();
+        } catch (error) {
+          console.error(error);
+          alert("Ocurrió un error al eliminar el empleado.");
+        }
+      }
+    }
     const fetchEmpresaData = async () => {
       try {
-        // Llama al método fetchEmpresa del store
         await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
 
-        // Asigna los datos obtenidos al estado local
         empresa.value = userStore.empresa;
         empleadosEmpresa.value = userStore.empleadosEmpresa;
       } catch (error) {
@@ -178,6 +200,7 @@ export default {
       goToVerListaBeneficios,
       goToCrearEditarEmpresa,
       goToEmpresaEliminada,
+      eliminarEmpleado,
     };
   },
 };
