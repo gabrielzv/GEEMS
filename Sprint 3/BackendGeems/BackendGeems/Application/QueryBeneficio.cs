@@ -45,5 +45,10 @@ namespace BackendGeems.Application
         {
             _repoBeneficio.MatricularBeneficio(beneficioEmpleado);
         }
+
+        public void EliminarBeneficio(string IdBeneficio)
+        {
+            _repoBeneficio.EliminarBeneficio(IdBeneficio);
+        }
     }
 }

@@ -320,6 +320,8 @@ export default {
       nombreDeAPI: "BeneficioNormal",
       esApi: false,
       esPorcentual: "",
+      estado: "Activo",
+      estaBorrado: false,
     });
 
     // Estados para errores
