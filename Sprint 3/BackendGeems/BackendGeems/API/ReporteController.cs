@@ -15,7 +15,7 @@ namespace BackendGeems.API
             _reporteService = reporteService;
         }
 
-        [HttpPost("enviar")]
+        [HttpPost("Reporte")]
         public async Task<IActionResult> EnviarReporte([FromForm] EnviarReporteRequest request)
         {
             if (request.Archivo == null || request.Archivo.Length == 0)
