@@ -128,7 +128,7 @@ export default {
       if (confirmacion) {
         try {
           // Se hace el delete para borrar el beneficio en la base de datos
-          const url = `${API_BASE_URL}Beneficio/eliminarBeneficio/${id}`;
+          const url = `${API_BASE_URL}Beneficio/${id}`;
           const response = axios.delete(url);
           beneficios.value = response.data;
           // Se actualiza la lista de beneficios después de una eliminación

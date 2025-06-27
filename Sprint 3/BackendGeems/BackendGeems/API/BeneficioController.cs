@@ -128,7 +128,7 @@ namespace BackendGeems.Controllers
             }
         }
 
-        [HttpDelete("eliminarBeneficio/{IdBeneficio}")]
+        [HttpDelete("{IdBeneficio}")]
         public IActionResult EliminarBeneficio(string IdBeneficio)
         {
             try
