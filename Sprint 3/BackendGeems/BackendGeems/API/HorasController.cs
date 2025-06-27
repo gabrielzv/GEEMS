@@ -42,7 +42,6 @@ namespace BackendGeems.API
         {
             _queryHoras.EditRegister(editing, oldId);
         }
-        // GET: api/Horas/getRegister/{IdEmpleado}
         [HttpGet("getRegister/{IdEmpleado}")]
         public ActionResult<List<Registro>> GetRegisterByEmpleado(Guid IdEmpleado)
         {
