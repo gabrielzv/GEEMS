@@ -9,6 +9,7 @@ namespace BackendGeems.Tests
     public class BorradoDeEmpleadosTests
     {
         private Mock<IEmpleadoRepo> _mockRepo;
+        private Mock<IReporteService> _mockReporteService;
         private BorradoDeEmpleados _servicio;
         private string _cedula;
 
@@ -16,7 +17,8 @@ namespace BackendGeems.Tests
         public void Setup()
         {
             _mockRepo = new Mock<IEmpleadoRepo>();
-            _servicio = new BorradoDeEmpleados(_mockRepo.Object);
+            _mockReporteService = new Mock<IReporteService>();
+            _servicio = new BorradoDeEmpleados(_mockRepo.Object,_mockReporteService.Object);
             _cedula = "123456789";
         }
 
@@ -75,5 +77,7 @@ namespace BackendGeems.Tests
             
             Assert.AreEqual(esperado, resultado);
         }
+        [Test]
+        public void 
     }
 }

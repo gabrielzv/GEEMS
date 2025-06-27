@@ -134,7 +134,7 @@ export default {
       if (confirmado) {
         try {
           const respuesta = await fetch(
-            `${API_BASE_URL}BorradoDeEmpleado?cedula=${cedula}`,
+            `${API_BASE_URL}Empleado?cedula=${cedula}`,
             {
               method: "DELETE",
             }
@@ -143,7 +143,7 @@ export default {
           if (!respuesta.ok) throw new Error("Error al eliminar el empleado.");
 
           alert("Empleado eliminado correctamente.");
-          location.reload(); // Recargar la página
+          location.reload();
         } catch (error) {
           console.error(error);
           alert("Ocurrió un error al eliminar el empleado.");
@@ -152,10 +152,8 @@ export default {
     }
     const fetchEmpresaData = async () => {
       try {
-        // Llama al método fetchEmpresa del store
         await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
 
-        // Asigna los datos obtenidos al estado local
         empresa.value = userStore.empresa;
         empleadosEmpresa.value = userStore.empleadosEmpresa;
       } catch (error) {

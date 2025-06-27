@@ -7,12 +7,12 @@ namespace BackendGeems.API
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BorradoDeEmpleadoController : ControllerBase
+    public class EmpleadoController : ControllerBase
     {
         private readonly IGeneralRepo _generalRepo;
         private readonly BorradoDeEmpleados _borradoDeEmpleados;
 
-        public BorradoDeEmpleadoController(IGeneralRepo generalRepo, BorradoDeEmpleados borradoDeEmpleados)
+        public EmpleadoController(IGeneralRepo generalRepo, BorradoDeEmpleados borradoDeEmpleados)
         {
             _generalRepo = generalRepo;
             _borradoDeEmpleados = borradoDeEmpleados;
