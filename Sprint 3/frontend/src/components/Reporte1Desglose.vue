@@ -67,7 +67,7 @@
             </button>
             <button
               class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
-              disabled
+              @click="enviarPorCorreo"
             >
               Enviar por correo
             </button>
@@ -138,7 +138,7 @@ onMounted(async () => {
 async function fetchPagos(empleadoId) {
   try {
     const res = await axios.get(`${API_BASE_URL}Pagos/${empleadoId}`)
-    // Para cada pago, obtener la fecha de inicio de la planilla asociada
+    // Obtener la fecha de inicio de la planilla asociada
     const pagosConPlanilla = await Promise.all(
       res.data.map(async pago => {
         try {
@@ -155,6 +155,8 @@ async function fetchPagos(empleadoId) {
         }
       })
     )
+    // Ordenar por pago más reciente primero
+    pagosConPlanilla.sort((a, b) => new Date(b.planillaFechaInicio) - new Date(a.planillaFechaInicio))
     pagos.value = pagosConPlanilla
   } catch (e) {
     pagos.value = []
@@ -271,5 +273,88 @@ function descargarPDF() {
   const pdfBlob = doc.output('blob')
   const url = URL.createObjectURL(pdfBlob)
   window.open(url, '_blank')
+}
+
+async function enviarPorCorreo() {
+
+  console.log(persona.value);
+  if (!selectedPago.value || !persona.value?.email) {
+    alert('No se puede enviar el correo: falta información del usuario.');
+    return
+  }
+
+  // Generar el PDF como blob
+  const doc = new jsPDF()
+  doc.setFontSize(18)
+  doc.text('Recibo de Pago', 105, 18, { align: 'center' })
+
+  doc.setFontSize(12)
+  let y = 35
+  doc.setFont(undefined, 'bold')
+  doc.text('Nombre de la empresa:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${userStore.empleado.nombreEmpresa}`, 70, y)
+  y += 10
+  doc.setFont(undefined, 'bold')
+  doc.text('Empleado:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${persona.value?.fullName || ''}`, 70, y)
+  y += 10
+  doc.setFont(undefined, 'bold')
+  doc.text('Tipo de contrato:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${userStore.empleado.contrato}`, 70, y)
+  y += 10
+  doc.setFont(undefined, 'bold')
+  doc.text('Fecha de pago:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${formatFecha(selectedPago.value.fechaRealizada)}`, 70, y)
+  y += 15
+  doc.setFontSize(14)
+  doc.setFont(undefined, 'bold')
+  doc.text('Resumen de Pago', 20, y)
+  y += 10
+  doc.setFontSize(12)
+  doc.setFont(undefined, 'bold')
+  doc.text('Salario Bruto:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${selectedPago.value.montoBruto?.toLocaleString('en-US')}`, 60, y)
+  y += 10
+  doc.setFont(undefined, 'bold')
+  doc.text('Deducciones:', 20, y)
+  y += 8
+  deducciones.value.forEach(d => {
+    doc.setFont(undefined, 'normal')
+    doc.text(`${d.nombre}: -${d.monto?.toLocaleString('en-US')}`, 25, y)
+    y += 8
+  })
+  y += 2
+  doc.setFont(undefined, 'bold')
+  doc.text('Total deducciones:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`-${totalDeducciones.value?.toLocaleString('en-US')}`, 65, y)
+  y += 12
+  doc.setFontSize(14)
+  doc.setFont(undefined, 'bold')
+  doc.text('Salario Neto:', 20, y)
+  doc.setFont(undefined, 'normal')
+  doc.text(`${selectedPago.value.montoPago?.toLocaleString('en-US')}`, 60, y)
+
+  const pdfBlob = doc.output('blob')
+  const file = new File([pdfBlob], 'reporte_pago.pdf', { type: 'application/pdf' })
+
+  // Preparar FormData
+  const formData = new FormData()
+  formData.append('Correo', persona.value.email)
+  formData.append('Archivo', file)
+  formData.append('NombreUsuario', persona.value.fullName || '')
+
+  // Enviar al backend
+  try {
+    await axios.post(`${API_BASE_URL}Reporte/Reporte`, formData)
+    alert('Correo enviado correctamente.')
+  } catch (e) {
+    alert('Error al enviar el correo.')
+  }
 }
 </script>
