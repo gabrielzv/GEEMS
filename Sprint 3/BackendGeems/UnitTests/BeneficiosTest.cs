@@ -35,7 +35,9 @@ namespace UnitTests
                 ContratosElegibles = new List<string> { "Tiempo Completo" },
                 NombreDeAPI = "MediSeguro",
                 EsApi = true,
-                EsPorcentual = false
+                EsPorcentual = false,
+                Estado = "Activo",
+                EstaBorrado = false
             };
 
             // Act
@@ -60,7 +62,9 @@ namespace UnitTests
                 ContratosElegibles = new List<string> { "Tiempo Completo" },
                 NombreDeAPI = "MediSeguro",
                 EsApi = true,
-                EsPorcentual = false
+                EsPorcentual = false,
+                Estado = "Activo",
+                EstaBorrado = false
             };
 
             // Act
@@ -84,7 +88,9 @@ namespace UnitTests
                 ContratosElegibles = new List<string> { "Tiempo Completo" },
                 NombreDeAPI = "MediSeguro",
                 EsApi = true,
-                EsPorcentual = false
+                EsPorcentual = false,
+                Estado = "Activo",
+                EstaBorrado = false
             };
             _mockQueryBeneficio.Setup(q => q.GetBeneficio(It.IsAny<System.Guid>())).Returns(beneficio);
 
@@ -123,7 +129,9 @@ namespace UnitTests
                 ContratosElegibles = new List<string> { "Tiempo Completo", "Medio Tiempo", "Servicios Profesionales", "Por Horas" },
                 NombreDeAPI = "BeneficioNormal",
                 EsApi = false,
-                EsPorcentual = true
+                EsPorcentual = true,
+                Estado = "Activo",
+                EstaBorrado = false
             };
             _mockQueryBeneficio.Setup(q => q.GetBeneficio(It.IsAny<System.Guid>())).Returns(beneficio);
 
@@ -152,7 +160,9 @@ namespace UnitTests
                 ContratosElegibles = new List<string> { "Tiempo Completo", "Medio Tiempo", "Servicios Profesionales", "Por Horas" },
                 NombreDeAPI = "BeneficioNormal",
                 EsApi = false,
-                EsPorcentual = false
+                EsPorcentual = false,
+                Estado = "Activo",
+                EstaBorrado = false
             };
             _mockQueryBeneficio.Setup(q => q.GetBeneficio(It.IsAny<System.Guid>())).Returns(beneficio);
 
@@ -164,6 +174,36 @@ namespace UnitTests
             var beneficioResult = result.Value as Beneficio;
             Assert.IsNotNull(beneficioResult);
             Assert.IsFalse(beneficioResult.EsPorcentual);
+        }
+
+        [Test]
+        public void EliminarBeneficio_SinMatricula_RealizaEliminacion_RetornaOk()
+        {
+            // Arrange
+            var beneficioId = "EliminarBeneficio001";
+            _mockQueryBeneficio.Setup(q => q.EliminarBeneficio(beneficioId));
+
+            // Act
+            var result = _controller.EliminarBeneficio(beneficioId);
+
+            // Assert
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            _mockQueryBeneficio.Verify(q => q.EliminarBeneficio(beneficioId), Times.Once);
+        }
+
+        [Test]
+        public void EliminarBeneficio_ConMatriculaYPlanillaPagada_RealizaBorradoLogico_RetornaOk()
+        {
+            // Arrange
+            var beneficioId = "EliminarBeneficio002";
+            _mockQueryBeneficio.Setup(q => q.EliminarBeneficio(beneficioId));
+
+            // Act
+            var result = _controller.EliminarBeneficio(beneficioId);
+
+            // Assert
+            Assert.IsInstanceOf<OkObjectResult>(result);
+            _mockQueryBeneficio.Verify(q => q.EliminarBeneficio(beneficioId), Times.Once);
         }
     }
 }

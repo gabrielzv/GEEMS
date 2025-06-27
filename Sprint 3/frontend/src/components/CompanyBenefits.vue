@@ -31,6 +31,7 @@
               Tiempo mínimo en empresa (meses)
             </th>
             <th
+              colspan="2"
               class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
             >
               Acciones
@@ -60,7 +61,15 @@
                 @click="EditarBeneficio(beneficio.id)"
                 class="text-blue-600 hover:text-blue-800"
               >
-                Editar beneficio
+                Editar
+              </button>
+            </td>
+            <td class="px-6 py-4 text-sm font-medium">
+              <button
+                @click="EliminarBeneficio(beneficio.id)"
+                class="text-red-600 hover:text-red-800"
+              >
+                Eliminar
               </button>
             </td>
           </tr>
@@ -95,9 +104,7 @@ export default {
 
           // Se hace el get para obtener los beneficios creados de la empresa
           const url = `${API_BASE_URL}Beneficio/Company/${cedulaJuridica}`;
-          const response = await axios.get(
-            url
-          );
+          const response = await axios.get(url);
           beneficios.value = response.data;
         } else {
           error.value = "No se pudo obtener la información de la empresa.";
@@ -110,9 +117,30 @@ export default {
       }
     };
 
-    // Método para editar el beneficio
     const EditarBeneficio = (id) => {
       router.push({ name: "EditarBeneficio", params: { id } });
+    };
+
+    const EliminarBeneficio = (id) => {
+      const confirmacion = window.confirm(
+        `¿Estás seguro que deseas eliminar el beneficio ${id}?`
+      );
+      if (confirmacion) {
+        try {
+          // Se hace el delete para borrar el beneficio en la base de datos
+          const url = `${API_BASE_URL}Beneficio/${id}`;
+          const response = axios.delete(url);
+          beneficios.value = response.data;
+          // Se actualiza la lista de beneficios después de una eliminación
+          fetchBeneficios();
+        } catch (err) {
+          console.error("Error al eliminar el beneficio:", err);
+          error.value =
+            err.response?.data?.message ||
+            "Ocurrió un error al intentar eliminar el beneficio.";
+        }
+        alert(`El beneficio ${id} se ha eliminado con éxito.`);
+      }
     };
 
     // Se llama a la función al montar el componente
@@ -128,6 +156,7 @@ export default {
       beneficios,
       error,
       EditarBeneficio,
+      EliminarBeneficio,
     };
   },
 };

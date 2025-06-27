@@ -13,5 +13,7 @@ namespace BackendGeems.Domain
         public bool EsApi { get; set; } = true;
         public string? Id { get; set; }
         public bool EsPorcentual { get; set; } = false;
+        public required string Estado { get; set; }
+        public bool EstaBorrado{ get; set; } = false;
     }
 }
