@@ -15,8 +15,6 @@ public class EmpresaController : ControllerBase
     [HttpGet("{cedula}")]
     public IActionResult GetEmpresa(int cedula)
     {
-        Console.WriteLine($"Cédula recibida: {cedula}");
-
         try
         {
             using SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));

@@ -53,7 +53,7 @@
               {{ beneficio.costo }}
             </td>
             <td class="px-6 py-4 text-sm text-gray-500">
-              {{ beneficio.tiempoMinimoEnEmpresa }}
+              {{ beneficio.tiempoMinimo }}
             </td>
             <td class="px-6 py-4 text-sm font-medium">
               <button
@@ -94,7 +94,7 @@ export default {
           const cedulaJuridica = userStore.empresa.cedulaJuridica;
 
           // Se hace el get para obtener los beneficios creados de la empresa
-          const url = `${API_BASE_URL}GetCompanyBenefits/${cedulaJuridica}`;
+          const url = `${API_BASE_URL}Beneficio/Company/${cedulaJuridica}`;
           const response = await axios.get(
             url
           );

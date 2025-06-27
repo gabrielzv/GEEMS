@@ -319,7 +319,7 @@ export default {
       contratosElegibles: [],
       nombreDeAPI: "BeneficioNormal",
       esApi: false,
-      esPorcentual: "",
+      esPorcentual: false,
     });
     const beneficioAnterior = ref({
       nombre: null,
@@ -331,6 +331,7 @@ export default {
       contratosElegibles: [],
       nombreDeAPI: null,
       esApi: null,
+      esPorcentual: null,
     });
 
     // Estados para errores
@@ -355,6 +356,15 @@ export default {
         beneficioAnterior.value = response.data;
         // Se copian todos los datos al formulario para editar
         Object.assign(form.value, response.data);
+        // Se asegura que contratosElegibles siempre sea un array
+        form.value.contratosElegibles = Array.isArray(response.data.contratosElegibles)
+          ? response.data.contratosElegibles
+          : [];
+        // Se asegura que esPorcentual siempre sea un booleano
+        form.value.esPorcentual =
+          response.data.esPorcentual === true || response.data.esPorcentual === "true"
+            ? true
+            : false;
       } catch (error) {
         alert("Error al obtener los datos del beneficio.");
       }
@@ -479,7 +489,8 @@ export default {
     };
 
     const validateDeduction = () => {
-      seleccionDeduccionError.value = form.value.esPorcentual
+      seleccionDeduccionError.value =
+        form.value.esPorcentual === true || form.value.esPorcentual === false
         ? ""
         : "Debe seleccionar un tipo de deducción.";
       return !seleccionDeduccionError.value;
@@ -518,11 +529,19 @@ export default {
 
       isSubmitting.value = true;
       mensaje.value = "";
+
+      let payload = { ...form.value };
+
+      // Si el beneficio es porcentual, se convierte el costo a decimal
+      if (payload.esPorcentual === true || payload.esPorcentual === "true") {
+        payload.costo = Number(payload.costo) * 0.01;
+      }
+
       const url = `${API_BASE_URL}Beneficio/editarBeneficio`;
       try {
         const response = await axios.post(
           url,
-          form.value
+          payload
         );
         mensaje.value = response.data;
         alert(response.data);

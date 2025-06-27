@@ -648,5 +648,36 @@ namespace BackendGeems.Infraestructure
             }
             return deduccionesVoluntarias;
         }
+        public int ContarPagos(Guid idEmpleado)
+        {
+            int cantidadPagos = 0;
+            string query = "SELECT COUNT(*) FROM Pago WHERE IdEmpleado = @IdEmpleado";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
+                try
+                {
+                    _conexion.Open();
+                    var result = comando.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        cantidadPagos = Convert.ToInt32(result);
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al contar los pagos del empleado: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+
+            return cantidadPagos;
+        }
+
     }
 }
