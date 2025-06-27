@@ -6,6 +6,8 @@ namespace BackendGeems.Application
     {
         public List<Empleado> ObtenerEmpleadosPorEmpresa(string nombreEmpresa);
         public List<Planilla> ObtenerPlanillasPorEmpresa(string nombreEmpresa);
+
+        public Planilla ObtenerPlanillaPorId(Guid id);
     }
 
 }
