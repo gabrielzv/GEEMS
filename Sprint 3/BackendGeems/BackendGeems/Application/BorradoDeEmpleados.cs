@@ -9,7 +9,7 @@
             _generalRepo = generalRepo;
         }
 
-        public void BorrarEmpleado(string Cedula)
+        public string BorrarEmpleado(string Cedula)
         {
             try
             {
@@ -19,16 +19,30 @@
                 if (tienePagos)
                 {
                     _generalRepo.BorrarLogicoEmpleado(Cedula);
+                    string message = "Borrado logico completado";
+                    return message;
                 }
                 else
                 {
                     _generalRepo.BorrarPermanenteEmpleado(Cedula);
+                    string message = "Borrado Permanente completado";
+                    return message;
                 }
             }
             catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message);
             }
+        }
+
+        public bool UsuarioActivo(string cedula)
+        {
+            bool resultado = _generalRepo.UsuarioEstaBorrado(cedula);
+            if (resultado)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

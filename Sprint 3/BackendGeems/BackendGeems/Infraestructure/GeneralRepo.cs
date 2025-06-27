@@ -119,14 +119,24 @@ namespace BackendGeems.Infraestructure
                 empleadoId = Guid.Parse(result.ToString());
             }
 
-            string queryPago = "SELECT COUNT(*) FROM Pago WHERE EmpleadoId = @EmpleadoId";
+            string queryPago = "SELECT COUNT(*) FROM Pago WHERE IdEmpleado = @IdEmpleado";
             using (SqlCommand cmdPago = new SqlCommand(queryPago, _conexion))
             {
-                cmdPago.Parameters.AddWithValue("@EmpleadoId", empleadoId);
+                cmdPago.Parameters.AddWithValue("@IdEmpleado", empleadoId);
                 _conexion.Open();
                 int countPago = (int)cmdPago.ExecuteScalar();
                 _conexion.Close();
                 if (countPago > 0)
+                    return true;
+            }
+            string queryPlanilla = "SELECT COUNT(*) FROM Planilla WHERE IdPayroll = @IdEmpleado";
+            using (SqlCommand cmdPlanilla = new SqlCommand (queryPlanilla,_conexion))
+            {
+                cmdPlanilla.Parameters.AddWithValue("@IdEmpleado", empleadoId);
+                _conexion.Open();
+                int countPlanilla = (int)cmdPlanilla.ExecuteScalar();
+                _conexion.Close();
+                if (countPlanilla > 0)
                     return true;
             }
 
@@ -175,7 +185,16 @@ namespace BackendGeems.Infraestructure
         public void BorrarPermanenteEmpleado(string cedula)
         {
             try
-            {
+            { 
+                string queryUsuario = "DELETE Usuario  WHERE CedulaPersona = @Cedula";
+                using (SqlCommand cmdUsuario = new SqlCommand(queryUsuario, _conexion))
+                {
+                    cmdUsuario.Parameters.AddWithValue("@Cedula", cedula);
+                    _conexion.Open();
+                    cmdUsuario.ExecuteNonQuery();
+                    _conexion.Close();
+                }
+
                 string queryEmpleado = "DELETE Empleado  WHERE CedulaPersona = @Cedula";
                 using (SqlCommand cmdEmpleado = new SqlCommand(queryEmpleado, _conexion))
                 {
@@ -196,20 +215,32 @@ namespace BackendGeems.Infraestructure
                 }
 
 
-                string queryUsuario = "DELETE Usuario  WHERE CedulaPersona = @Cedula";
-                using (SqlCommand cmdUsuario = new SqlCommand(queryUsuario, _conexion))
-                {
-                    cmdUsuario.Parameters.AddWithValue("@Cedula", cedula);
-                    _conexion.Open();
-                    cmdUsuario.ExecuteNonQuery();
-                    _conexion.Close();
-                }
+              
             }
             catch (Exception ex)
             {
                 throw new ArgumentException(ex.Message);
             }
         }
+        public bool UsuarioEstaBorrado(string cedula)
+        {
+            string query = "SELECT EstaBorrado FROM Usuario WHERE CedulaPersona = @Cedula";
+            using (SqlCommand cmd = new SqlCommand(query, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@Cedula", cedula);
+                _conexion.Open();
+                var result = cmd.ExecuteScalar();
+                _conexion.Close();
+                if (result != null && result != DBNull.Value)
+                {
+                    return Convert.ToInt32(result) == 1;
+                }
+                return false;
+            }
+        }
+
+
+
 
     }
 }

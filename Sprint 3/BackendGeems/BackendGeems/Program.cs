@@ -33,7 +33,7 @@ builder.Services.AddScoped<ServicioCalculoPago>();
 builder.Services.AddScoped<GestorPagosService>();
 builder.Services.AddScoped<IQueryBeneficio, QueryBeneficio>();
 builder.Services.AddScoped<IBeneficioRepo, BeneficioRepo>();
-
+builder.Services.AddScoped<BorradoDeEmpleados>();
 
 var app = builder.Build();
 

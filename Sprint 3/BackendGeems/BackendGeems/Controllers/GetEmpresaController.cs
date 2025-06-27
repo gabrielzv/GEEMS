@@ -74,7 +74,7 @@ public class EmpresaController : ControllerBase
                     p.NombrePila + ' ' + p.Apellido1 + ' ' + p.Apellido2 AS NombreCompleto
                 FROM Empleado em
                 JOIN Persona p ON em.CedulaPersona = p.Cedula
-                WHERE em.NombreEmpresa = @NombreEmpresa;";
+                WHERE em.NombreEmpresa = @NombreEmpresa AND em.EstaBorrado = 0;";
 
             using SqlCommand cmdEmpleados = new SqlCommand(queryEmpleados, conn);
             cmdEmpleados.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
@@ -162,7 +162,7 @@ public class EmpresaController : ControllerBase
                 p.NombrePila + ' ' + p.Apellido1 + ' ' + p.Apellido2 AS NombreCompleto
             FROM Empleado em
             JOIN Persona p ON em.CedulaPersona = p.Cedula
-            WHERE em.NombreEmpresa = @NombreEmpresa;";
+            WHERE em.NombreEmpresa = @NombreEmpresa AND em.EstaBorrado = 0;";
 
             using SqlCommand cmdEmpleados = new SqlCommand(queryEmpleados, conn);
             cmdEmpleados.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);

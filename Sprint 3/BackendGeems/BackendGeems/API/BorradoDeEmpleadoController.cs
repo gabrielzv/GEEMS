@@ -9,22 +9,22 @@ namespace BackendGeems.API
     [ApiController]
     public class BorradoDeEmpleadoController : ControllerBase
     {
-        private readonly GeneralRepo _generalRepo;
-        private readonly BorradoDeEmpleados borradoDeEmpleados;
+        private readonly IGeneralRepo _generalRepo;
+        private readonly BorradoDeEmpleados _borradoDeEmpleados;
 
-        public BorradoDeEmpleadoController(GeneralRepo generalRepo, BorradoDeEmpleados borradoDeEmpleados)
+        public BorradoDeEmpleadoController(IGeneralRepo generalRepo, BorradoDeEmpleados borradoDeEmpleados)
         {
             _generalRepo = generalRepo;
-            this.borradoDeEmpleados = borradoDeEmpleados;
+            _borradoDeEmpleados = borradoDeEmpleados;
         }
 
-        [HttpPut]
+        [HttpDelete]
         public IActionResult BorrarEmpleado([FromQuery] string Cedula)
         {
             try
             {
-                borradoDeEmpleados.BorrarEmpleado(Cedula);
-                return Ok();
+                string message=_borradoDeEmpleados.BorrarEmpleado(Cedula);
+                return Ok(new { message  });
             }
             catch (Exception ex)
             {
