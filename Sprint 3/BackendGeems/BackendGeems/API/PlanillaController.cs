@@ -30,7 +30,24 @@ namespace BackendGeems.API
         }
     }
 
-        [HttpPost("crear")]
+    [HttpGet("{id}")]
+    public IActionResult ObtenerPlanillaPorId(Guid id)
+    {
+        try
+        {
+            var planilla = _repo.ObtenerPlanillaPorId(id);
+            if (planilla == null)
+                return NotFound(new { message = "Planilla no encontrada." });
+
+            return Ok(planilla);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error al obtener la planilla: " + ex.Message });
+        }
+    }
+
+    [HttpPost("crear")]
         public IActionResult CrearPlanilla([FromBody] CrearPlanillaDto dto)
         {
             try
