@@ -24,5 +24,9 @@ namespace BackendGeems.Application
             );
 
         }
+        public async Task EnviarCorreoAsync(string destinatario, string asunto, string mensaje)
+        {
+            await _correoSender.EnviarCorreoAsync(destinatario, asunto, mensaje);
+        }
     }
 }
