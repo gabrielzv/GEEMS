@@ -36,7 +36,7 @@ builder.Services.AddScoped<GestorPagosService>();
 builder.Services.AddScoped<IQueryBeneficio, QueryBeneficio>();
 builder.Services.AddScoped<IBeneficioRepo, BeneficioRepo>();
 builder.Services.AddScoped<CorreoSender>();
-builder.Services.AddScoped<ReporteService>();
+builder.Services.AddScoped<IReporteService, ReporteService>();
 
 
 
