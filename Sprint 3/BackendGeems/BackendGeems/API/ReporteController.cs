@@ -8,9 +8,9 @@ namespace BackendGeems.API
     [Route("api/[controller]")]
     public class ReporteController : ControllerBase
     {
-        private readonly ReporteService _reporteService;
+        private readonly IReporteService _reporteService;
 
-        public ReporteController(ReporteService reporteService)
+        public ReporteController(IReporteService reporteService)
         {
             _reporteService = reporteService;
         }

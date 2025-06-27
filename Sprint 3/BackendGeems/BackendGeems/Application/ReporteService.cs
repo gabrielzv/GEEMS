@@ -5,7 +5,7 @@ using BackendGeems.Infraestructure;
 
 namespace BackendGeems.Application
 {
-    public class ReporteService
+    public class ReporteService : IReporteService
     {
         private readonly CorreoSender _correoSender;
 
