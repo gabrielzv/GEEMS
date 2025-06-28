@@ -32,11 +32,10 @@ namespace BackendGeems.Application
             if (totalPagos > 0)
             {
                 Console.WriteLine("Borrado fisico");
-                _empresaRepo.BorradoLogico(cedula);
             }
             else
             {
-
+                _empresaRepo.BorradoLogico(cedula);
                 Console.WriteLine("Borrado logico");
             }
 
@@ -55,6 +54,9 @@ namespace BackendGeems.Application
             }
             return estado;
         }
-
+        public bool GetEstadoEliminadoEmpresa(string nombreEmpresa)
+        {
+            return _empresaRepo.GetEstadoEliminadoEmpresa(nombreEmpresa);
+        }
     }
 }

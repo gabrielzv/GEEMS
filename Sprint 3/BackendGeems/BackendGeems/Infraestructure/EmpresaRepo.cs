@@ -75,8 +75,8 @@ namespace BackendGeems.Infraestructure
                     Tipo = reader["Tipo"].ToString(),
                     FechaIngreso = reader["FechaIngreso"].ToString(),
                     NombreEmpresa = reader["NombreEmpresa"].ToString(),
-                    CantidadDependientes = Convert.ToInt32(reader["CantidadDependientes"]),
-                    fechaNacimiento = Convert.ToDateTime(reader["fechaNacimiento"])
+                    CantidadDependientes = Convert.ToInt32(reader["NumDependientes"]),
+                    fechaNacimiento = Convert.ToDateTime(reader["FechaNacimiento"])
                 });
             }
 
@@ -165,7 +165,28 @@ namespace BackendGeems.Infraestructure
 
             throw new Exception($"No se encontró el tipo para la persona con cédula {cedulaPersona}");
         }
+        public bool GetEstadoEliminadoEmpresa(string nombreEmpresa)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
 
+            string query = @"
+                SELECT e.EstaBorrado
+                FROM Empresa e
+                WHERE e.Nombre = @Nombre";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@Nombre", nombreEmpresa);
+
+            object result = cmd.ExecuteScalar();
+
+            if (result != null && result != DBNull.Value)
+            {
+                return Convert.ToBoolean(result);
+            }
+
+            throw new Exception($"No se encontró empresa asociada al dueño con cédula {nombreEmpresa}");
+        }
 
     }
 }

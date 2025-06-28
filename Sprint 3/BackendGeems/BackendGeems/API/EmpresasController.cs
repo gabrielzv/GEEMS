@@ -27,5 +27,10 @@ namespace BackendGeems.API
         {
             return _queryEmpresa.GetEstadoEliminadoEmpresaPersona(cedulaPersona);
         }
+        [HttpGet("Estado")]
+        public bool GetEstado(string NombreEmpresa)
+        {
+            return _queryEmpresa.GetEstadoEliminadoEmpresa(NombreEmpresa);
+        }
     }
 }

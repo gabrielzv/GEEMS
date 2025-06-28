@@ -10,5 +10,6 @@ namespace BackendGeems.Application
         bool GetEstadoEliminadoEmpresaEmpleado(int cedulaPersona);
         bool GetEstadoEliminadoEmpresaDueno(int cedulaPersona);
         string GetTipo(int cedulaPersona);
+        bool GetEstadoEliminadoEmpresa(string nombreEmpresa);
     }
 }
