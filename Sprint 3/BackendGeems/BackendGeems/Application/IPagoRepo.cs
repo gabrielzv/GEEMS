@@ -4,12 +4,12 @@ namespace BackendGeems.Application
 {
     public interface IPagoRepo
     {
-        
+
         List<Pago> ObtenerPagos(DateTime fechaInicio, DateTime fechaFinal);
         List<Pago> ObtenerPagosPorEmpleado(Guid idEmpleado);
         double ObtenerSalarioBruto(Guid idEmpleado, DateTime fechaInicio, DateTime fechaFinal);
-        
-        void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, double monto,string nombreBeneficio);
+
+        void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, double monto, string nombreBeneficio);
         List<Deduccion> ObtenerDeduccionesPorPago(Guid idPago);
         double CalcularImpuestoRenta(double salarioBruto);
         public string ObtenerTipoContratoEmpleado(Guid idEmpleado);
@@ -21,6 +21,7 @@ namespace BackendGeems.Application
         public void InsertPago(Guid idPago, Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal, double montoBruto, double montoPago);
         public int ContarPagos(Guid idEmpleado);
         public void InactivarBeneficiosPendientesPorEmpresa(string nombreEmpresa);
+        public List<Pago> ObtenerPagosPorPlanilla(Guid idPlanilla);
     }
 
 }

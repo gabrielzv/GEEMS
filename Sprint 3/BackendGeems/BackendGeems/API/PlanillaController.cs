@@ -10,10 +10,12 @@ namespace BackendGeems.API
     public class PlanillaController : ControllerBase
     {
         private readonly GeneralRepo _repo;
+        private readonly PagoRepo _pagoRepo;
 
         public PlanillaController()
         {
             _repo = new GeneralRepo();
+            _pagoRepo = new PagoRepo();
         }
 
     [HttpGet("listar")]
@@ -78,6 +80,24 @@ namespace BackendGeems.API
                 return StatusCode(500, new { message = "Error al crear la planilla: " + ex.Message });
             }
         }
+
+        [HttpGet("pagosPorPlanilla/{id}")]
+        public IActionResult ObtenerPagosPorPlanilla(Guid id)
+        {
+            try
+            {
+                var pagos = _pagoRepo.ObtenerPagosPorPlanilla(id);
+                if (pagos == null || !pagos.Any())
+                    return NotFound(new { message = "No se encontraron pagos para esta planilla." });
+
+                return Ok(pagos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener los pagos: " + ex.Message });
+            }
+        }
+
 
         // DTO para recibir los datos del frontend
         public class CrearPlanillaDto
