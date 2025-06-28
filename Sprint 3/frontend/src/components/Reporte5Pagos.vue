@@ -48,60 +48,46 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre empleado</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cédula</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de empleado</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Período de pago</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de pago</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salario Bruto</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargas sociales empleador</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deducciones voluntarias</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo empleador</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre empleado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cédula</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de empleado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Período de pago</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de pago</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salario Bruto</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargas sociales empleador</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deducciones voluntarias</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo empleador</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="empleado in empleados" :key="empleado.cedula">
+          <tr v-for="(registro, index) in pagos" :key="index">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ empleado.nombre }}</div>
+              <div class="text-sm font-medium text-gray-900">{{ registro.empleado.nombre }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ empleado.cedula }}</div>
+              <div class="text-sm text-gray-500">{{ registro.empleado.cedula }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ empleado.tipo }}</div>
+              <div class="text-sm text-gray-500">{{ registro.empleado.tipo }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-pre-wrap">
+              <div class="text-sm text-gray-500">
+                Del<br>{{ formatearFecha(registro.pago.fechaInicio) }}<br>al<br>{{ formatearFecha(registro.pago.fechaFin) }}
+              </div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ empleado.contrato || JSON.stringify(empleado) }}</div>
+              <div class="text-sm text-gray-500">{{ formatearFecha(registro.pago.fechaPago) }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500"></div>
+              <div class="text-sm text-gray-500">{{ registro.pago.salarioBruto }}</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500"></div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500"></div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500"></div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500"></div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500"></div>
-            </td>
+            <!-- Puedes rellenar las siguientes celdas con datos reales cuando estén disponibles -->
+            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">-</div></td>
+            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">-</div></td>
+            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">-</div></td>
           </tr>
         </tbody>
       </table>
-      
-      <!-- Mensaje cuando no hay empleados -->
-      <div 
-        v-if="empleados.length === 0" 
-        class="px-6 py-4 text-center text-gray-500"
-      >
-        No se encontraron empleados
-      </div>
     </div>
   </div>
 </template>
@@ -109,64 +95,94 @@
 <script>
 import { useUserStore } from '@/store/user'
 import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
+
+const pagos = ref([])
 
 export default {
   setup() {
     const userStore = useUserStore()
     const empleados = ref([])
     const loading = ref(true)
+    const baseUrl = 'https://localhost:7014'
 
-    // Obtener nombre de la empresa desde el store
     const nombreEmpresa = computed(() => {
       return userStore.empleado?.nombreEmpresa || 
              userStore.empresa?.nombre || 
              "Nombre de empresa"
     })
 
-    // Cargar empleados del store
-    const fetchEmpleados = () => {
-      try {
-        loading.value = true
-        
-        
-        if (userStore.empleadosEmpresa?.length > 0) {
-          empleados.value = userStore.empleadosEmpresa.map(e => ({
-          nombre: formatearNombre(e),
-          cedula: e.cedula || 'N/A',
-          tipo: e.contrato || 'No especificado'
-        }))
-        } else {
-          empleados.value = []
-        }
-      } catch (error) {
-        console.error("Error al cargar empleados:", error)
-        empleados.value = []
-      } finally {
-        loading.value = false
-      }
-    }
-
-    // Formatear nombre completo
     const formatearNombre = (empleado) => {
       if (empleado.nombreCompleto) return empleado.nombreCompleto
       return `${empleado.apellido1 || ''} ${empleado.apellido2 || ''}, ${empleado.nombre || ''}`.trim()
     }
 
-    // Cargar datos al montar el componente
+    const formatearFecha = (fechaStr) => {
+      const fecha = new Date(fechaStr)
+      if (isNaN(fecha)) return ''
+      return fecha.toLocaleDateString('es-CR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })
+    }
+
+    const fetchPagosGlobal = async () => {
+      loading.value = true
+      try {
+        const resultados = await Promise.all(
+          userStore.empleadosEmpresa.map(async (e) => {
+            try {
+              const resEmpleado = await axios.get(`${baseUrl}/api/GetEmpleado/${e.cedula}`)
+              const empleadoData = resEmpleado.data
+
+              const resPagos = await axios.get(`${baseUrl}/api/Pagos/${empleadoData.id}`)
+              const pagosEmpleado = resPagos.data
+
+              return pagosEmpleado.map(p => ({
+                empleado: {
+                  nombre: formatearNombre(e),
+                  cedula: empleadoData.cedulaPersona,
+                  tipo: empleadoData.contrato || 'No especificado',
+                  empresa: empleadoData.nombreEmpresa || '-'
+                },
+                pago: {
+                  idPago: p.id,
+                  fechaPago: p.fechaRealizada,
+                  fechaInicio: p.fechaInicio,
+                  fechaFin: p.fechaFinal,
+                  salarioBruto: p.montoBruto
+                }
+              }))
+            } catch (err) {
+              console.warn(`No se pudo procesar al empleado ${e.cedula}`, err)
+              return []
+            }
+          })
+        )
+
+        pagos.value = resultados.flat()
+      } catch (error) {
+        console.error("Error general al obtener pagos:", error)
+        pagos.value = []
+      } finally {
+        loading.value = false
+      }
+    }
+
     onMounted(async () => {
-      // Si no hay datos de empresa en el store, cargarlos
       if (!userStore.empresa && userStore.usuario?.cedulaPersona) {
         await userStore.fetchEmpresa(userStore.usuario.cedulaPersona)
       }
-      
-      // Cargar empleados desde el store
-      fetchEmpleados()
+      await fetchPagosGlobal()
     })
 
     return {
       nombreEmpresa,
       empleados,
-      loading
+      loading,
+      pagos,
+      formatearFecha
     }
   }
 }
