@@ -8,7 +8,10 @@
           <h2 class="text-xl font-semibold">{{ nombreEmpresa || "Nombre de la empresa" }}</h2>
           <p class="text-gray-600">Nombre del empleador</p>
         </div>
-        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+        <button 
+          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+          @click="exportarAExcel"
+        >
           Generar Excel
         </button>
       </div>
@@ -17,26 +20,44 @@
     <!-- Filtros -->
     <div class="bg-gray-100 p-4 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Por fecha</label>
-        <input type="date" class="w-full p-2 border rounded">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha desde</label>
+        <input 
+          type="date" 
+          class="w-full p-2 border rounded"
+          v-model="fechaDesde"
+          @change="aplicarFiltros"
+        >
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha hasta</label>
+        <input 
+          type="date" 
+          class="w-full p-2 border rounded"
+          v-model="fechaHasta"
+          @change="aplicarFiltros"
+        >
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de empleados</label>
-        <select class="w-full p-2 border rounded">
-          <option>Todos</option>
-          <option>Tiempo completo</option>
-          <option>Medio tiempo</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Por proyecto</label>
-        <select class="w-full p-2 border rounded">
-          <option>Todos</option>
+        <select 
+          class="w-full p-2 border rounded"
+          v-model="filtroTipo"
+          @change="aplicarFiltros"
+        >
+          <option value="">Todos</option>
+          <option value="Tiempo completo">Tiempo completo</option>
+          <option value="Medio tiempo">Medio tiempo</option>
         </select>
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label>
-        <input type="text" class="w-full p-2 border rounded" placeholder="Buscar por cédula">
+        <input 
+          type="text" 
+          class="w-full p-2 border rounded" 
+          placeholder="Buscar por cédula"
+          v-model="filtroCedula"
+          @input="aplicarFiltros"
+        >
       </div>
     </div>
 
@@ -60,7 +81,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(registro, index) in pagos" :key="index">
+          <tr v-for="(registro, index) in pagosFiltrados" :key="index">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm font-medium text-gray-900">{{ registro.empleado.nombre }}</div>
             </td>
@@ -79,12 +100,11 @@
               <div class="text-sm text-gray-500">{{ formatearFecha(registro.pago.fechaPago) }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ registro.pago.salarioBruto }}</div>
+              <div class="text-sm text-gray-500">{{ formatearColones(registro.pago.salarioBruto) }}</div>
             </td>
-            <!-- Puedes rellenar las siguientes celdas con datos reales cuando estén disponibles -->
-            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">-</div></td>
-            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">{{ registro.pago.totalDeduccionesVoluntarias }}</div></td>
-            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">-</div></td>
+            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500"> </div></td>
+            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">{{ formatearColones(registro.pago.totalDeduccionesVoluntarias) }}</div></td>
+            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500"> </div></td>
           </tr>
         </tbody>
       </table>
@@ -97,14 +117,20 @@ import { useUserStore } from '@/store/user'
 import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 
-const pagos = ref([])
-
 export default {
   setup() {
     const userStore = useUserStore()
     const empleados = ref([])
     const loading = ref(true)
     const baseUrl = 'https://localhost:7014'
+    
+    // Variables para los filtros
+    const fechaDesde = ref('')
+    const fechaHasta = ref('')
+    const filtroTipo = ref('')
+    const filtroCedula = ref('')
+    const pagos = ref([])
+    const pagosFiltrados = ref([])
 
     const nombreEmpresa = computed(() => {
       return userStore.empleado?.nombreEmpresa || 
@@ -139,15 +165,10 @@ export default {
               const resPagos = await axios.get(`${baseUrl}/api/Pagos/${empleadoData.id}`)
               const pagosEmpleado = resPagos.data
 
-              // const deducciones = await axios.get(`${baseUrl}/api/Deducciones/${pagosEmpleado.id}`)
-              // const deduccionesEmpleado = deducciones.data
-
               return await Promise.all(pagosEmpleado.map(async (p) => {
-                // Obtener deducciones para este pago
                 const resDeducciones = await axios.get(`${baseUrl}/api/Deducciones/${p.id}`)
                 const deducciones = resDeducciones.data
 
-                // Filtrar y sumar deducciones voluntarias
                 const totalVoluntarias = deducciones
                   .filter(d => d.tipoDeduccion === "Voluntaria")
                   .reduce((suma, d) => suma + d.monto, 0)
@@ -178,12 +199,107 @@ export default {
         )
 
         pagos.value = resultados.flat()
+        pagosFiltrados.value = [...pagos.value]
       } catch (error) {
         console.error("Error general al obtener pagos:", error)
         pagos.value = []
+        pagosFiltrados.value = []
       } finally {
         loading.value = false
       }
+    }
+
+    const formatearColones = (valor) => {
+      return new Intl.NumberFormat('es-CR', {
+        style: 'currency',
+        currency: 'CRC',
+        minimumFractionDigits: 0
+      }).format(valor)
+    }
+
+    const aplicarFiltros = () => {
+      let filtrados = [...pagos.value]
+      
+      if (fechaDesde.value || fechaHasta.value) {
+        const desde = fechaDesde.value ? new Date(fechaDesde.value) : null
+        const hasta = fechaHasta.value ? new Date(fechaHasta.value) : null
+        
+        filtrados = filtrados.filter(registro => {
+          const inicioPeriodo = new Date(registro.pago.fechaInicio)
+          const finPeriodo = new Date(registro.pago.fechaFin)
+          
+          if (desde && !hasta) {
+            return finPeriodo >= desde
+          }
+          else if (!desde && hasta) {
+            return inicioPeriodo <= hasta
+          }
+          else if (desde && hasta) {
+            return inicioPeriodo <= hasta && finPeriodo >= desde
+          }
+          return true
+        })
+      }
+      
+      if (filtroTipo.value) {
+        filtrados = filtrados.filter(registro => 
+          registro.empleado.tipo.toLowerCase().includes(filtroTipo.value.toLowerCase())
+        )
+      }
+      
+      if (filtroCedula.value) {
+        filtrados = filtrados.filter(registro => 
+          registro.empleado.cedula && String(registro.empleado.cedula).includes(String(filtroCedula.value))
+        )
+      }
+      
+      pagosFiltrados.value = filtrados
+    }
+
+    const exportarAExcel = () => {
+      // Crear el contenido CSV
+      let csvContent = "data:text/csv;charset=utf-8,"
+      
+      // Encabezados
+      const headers = [
+        "Nombre empleado",
+        "Cédula",
+        "Tipo de empleado",
+        "Fecha inicio período",
+        "Fecha fin período",
+        "Fecha de pago",
+        "Salario Bruto (₡)",
+        "Cargas sociales empleador (₡)",
+        "Deducciones voluntarias (₡)",
+        "Costo empleador (₡)"
+      ]
+      csvContent += headers.join(",") + "\n"
+      
+      // Datos
+      pagosFiltrados.value.forEach(registro => {
+        const row = [
+          `"${registro.empleado.nombre}"`,
+          `"${registro.empleado.cedula}"`,
+          `"${registro.empleado.tipo}"`,
+          `"${formatearFecha(registro.pago.fechaInicio)}"`,
+          `"${formatearFecha(registro.pago.fechaFin)}"`,
+          `"${formatearFecha(registro.pago.fechaPago)}"`,
+          registro.pago.salarioBruto,
+          "", 
+          registro.pago.totalDeduccionesVoluntarias,
+          "" 
+        ]
+        csvContent += row.join(",") + "\n"
+      })
+      
+      // Crear enlace de descarga
+      const encodedUri = encodeURI(csvContent)
+      const link = document.createElement("a")
+      link.setAttribute("href", encodedUri)
+      link.setAttribute("download", `reporte_pagos_${new Date().toISOString().slice(0,10)}.csv`)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     }
 
     onMounted(async () => {
@@ -198,7 +314,15 @@ export default {
       empleados,
       loading,
       pagos,
-      formatearFecha
+      pagosFiltrados,
+      fechaDesde,
+      fechaHasta,
+      filtroTipo,
+      filtroCedula,
+      aplicarFiltros,
+      exportarAExcel,
+      formatearFecha, 
+      formatearColones
     }
   }
 }
