@@ -83,7 +83,7 @@
             </td>
             <!-- Puedes rellenar las siguientes celdas con datos reales cuando estén disponibles -->
             <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">-</div></td>
-            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">-</div></td>
+            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">{{ registro.pago.totalDeduccionesVoluntarias }}</div></td>
             <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">-</div></td>
           </tr>
         </tbody>
@@ -139,21 +139,37 @@ export default {
               const resPagos = await axios.get(`${baseUrl}/api/Pagos/${empleadoData.id}`)
               const pagosEmpleado = resPagos.data
 
-              return pagosEmpleado.map(p => ({
-                empleado: {
-                  nombre: formatearNombre(e),
-                  cedula: empleadoData.cedulaPersona,
-                  tipo: empleadoData.contrato || 'No especificado',
-                  empresa: empleadoData.nombreEmpresa || '-'
-                },
-                pago: {
-                  idPago: p.id,
-                  fechaPago: p.fechaRealizada,
-                  fechaInicio: p.fechaInicio,
-                  fechaFin: p.fechaFinal,
-                  salarioBruto: p.montoBruto
+              // const deducciones = await axios.get(`${baseUrl}/api/Deducciones/${pagosEmpleado.id}`)
+              // const deduccionesEmpleado = deducciones.data
+
+              return await Promise.all(pagosEmpleado.map(async (p) => {
+                // Obtener deducciones para este pago
+                const resDeducciones = await axios.get(`${baseUrl}/api/Deducciones/${p.id}`)
+                const deducciones = resDeducciones.data
+
+                // Filtrar y sumar deducciones voluntarias
+                const totalVoluntarias = deducciones
+                  .filter(d => d.tipoDeduccion === "Voluntaria")
+                  .reduce((suma, d) => suma + d.monto, 0)
+
+                return {
+                  empleado: {
+                    nombre: formatearNombre(e),
+                    cedula: empleadoData.cedulaPersona,
+                    tipo: empleadoData.contrato || 'No especificado',
+                    empresa: empleadoData.nombreEmpresa || '-'
+                  },
+                  pago: {
+                    idPago: p.id,
+                    fechaPago: p.fechaRealizada,
+                    fechaInicio: p.fechaInicio,
+                    fechaFin: p.fechaFinal,
+                    salarioBruto: p.montoBruto,
+                    totalDeduccionesVoluntarias: totalVoluntarias
+                  }
                 }
               }))
+
             } catch (err) {
               console.warn(`No se pudo procesar al empleado ${e.cedula}`, err)
               return []
