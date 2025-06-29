@@ -147,7 +147,29 @@ namespace BackendGeems.Infraestructure
                 }
             }
             return null;
-        } 
+        }
+
+        public List<Empresa> ObtenerTodas()
+        {
+            var empresas = new List<Empresa>();
+            using (var conn = new SqlConnection(_cadenaConexion))
+            {
+                var cmd = new SqlCommand("SELECT CedulaJuridica, Nombre FROM Empresa", conn);
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        empresas.Add(new Empresa
+                        {
+                            CedulaJuridica = reader["CedulaJuridica"].ToString(),
+                            Nombre = reader["Nombre"].ToString()
+                        });
+                    }
+                }
+            }
+            return empresas;
+        }
 
 
 

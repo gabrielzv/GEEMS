@@ -9,6 +9,7 @@ namespace BackendGeems.Application
 
                 public Planilla ObtenerPlanillaPorId(Guid id);
                 public DuenoEmpresa ObtenerDuenoEmpresaPorCedula(string cedula);
+                public List<Empresa> ObtenerTodas();
                
         }
 

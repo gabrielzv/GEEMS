@@ -12,9 +12,11 @@ namespace BackendGeems.API
     public class EmpresasController : ControllerBase
     {
         private readonly IQueryEmpresa _queryEmpresa;
+        private readonly IGeneralRepo _repo;
         public EmpresasController(IQueryEmpresa queryEmpresa)
         {
             _queryEmpresa = queryEmpresa;
+            _repo = new GeneralRepo();
         }
 
         [HttpDelete("borrar")]
@@ -26,6 +28,12 @@ namespace BackendGeems.API
         public bool GetEstadoEliminadoEmpresaPersona(int cedulaPersona)
         {
             return _queryEmpresa.GetEstadoEliminadoEmpresaPersona(cedulaPersona);
+        }
+        [HttpGet("todas")]
+        public ActionResult<List<Empresa>> GetTodasEmpresas()
+        {
+            var empresas = _repo.ObtenerTodas();
+            return Ok(empresas);
         }
     }
 }
