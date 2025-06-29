@@ -19,32 +19,38 @@ namespace BackendGeems.Application
         public void EliminarEmpresa(string cedula)
         {
             Empresa empresa = _empresaRepo.GetEmpresa(cedula);
-            if (empresa == null)
-            {
-                return;
-            }
             List<Empleado> empleados = _empresaRepo.GetEmpleados(cedula);
+            if (HayPagos(empleados))
+            {
+                _empresaRepo.BorradoFisico(cedula);
+            }
+            else
+            {
+                _empresaRepo.BorradoLogico(cedula);
+            }
+            EliminarBeneficios(cedula);
+            EliminarEmpleados(empleados);
+        }
+        private bool HayPagos(List<Empleado> empleados)
+        {
             int totalPagos = 0;
             foreach (var empleado in empleados)
             {
                 totalPagos += _pagoRepo.ContarPagos(empleado.Id);
             }
-            if (totalPagos > 0)
-            {
-                _empresaRepo.BorradoFisico(cedula);
-                Console.WriteLine("Borrado fisico de empresa");
-            }
-            else
-            {
-                _empresaRepo.BorradoLogico(cedula);
-                Console.WriteLine("Borrado logico de empresa");
-            }
+            return totalPagos > 0;
+        }
+        private void EliminarBeneficios(string cedula)
+        {
             List<object> listaBeneficios = _beneficioQuery.GetCompanyBenefits(cedula);
-            foreach(Beneficio beneficio in listaBeneficios)
+            foreach (Beneficio beneficio in listaBeneficios)
             {
                 _beneficioQuery.EliminarBeneficio(beneficio.Id);
             }
-            foreach(Empleado empleado in empleados)
+        }
+        private void EliminarEmpleados(List<Empleado> empleados)
+        {
+            foreach (Empleado empleado in empleados)
             {
                 _borradoDeEmpleados.BorrarEmpleado((empleado.CedulaPersona).ToString());
             }
