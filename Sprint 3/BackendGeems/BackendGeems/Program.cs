@@ -1,5 +1,6 @@
 using BackendGeems.Application;
 using BackendGeems.Infraestructure;
+using BackendGeems.Domain;  
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +38,7 @@ builder.Services.AddScoped<IQueryBeneficio, QueryBeneficio>();
 builder.Services.AddScoped<IBeneficioRepo, BeneficioRepo>();
 builder.Services.AddScoped<CorreoSender>();
 builder.Services.AddScoped<IReporteService, ReporteService>();
-
+builder.Services.AddScoped<ICalculadoraDeducciones, CalculadoraDeducciones>();
 
 
 var app = builder.Build();
