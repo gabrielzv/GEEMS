@@ -85,6 +85,7 @@ namespace BackendGeems.API
                 {
                     return BadRequest(new { message = "No hay empleados con horas registradas para esta planilla." });
                 }
+                _pagoInfrastructure.InactivarBeneficiosPendientesPorEmpresa(nombreEmpresa);
                 return Ok(new { message = "Pagos generados para todos los empleados." });
             }
             catch (Exception ex)

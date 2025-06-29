@@ -608,10 +608,10 @@ namespace BackendGeems.Infraestructure
         {
             List<DeduccionVoluntaria> deduccionesVoluntarias = new List<DeduccionVoluntaria>();
             string query = @"
-                SELECT b.Id, b.Costo, b.NombreDeAPI, b.EsAPI, b.Nombre, b.EsPorcentual
+                SELECT b.Id, b.Costo, b.NombreDeAPI, b.EsAPI, b.Nombre, b.EsPorcentual, b.Estado
                 FROM BeneficiosEmpleado be
                 JOIN Beneficio b ON be.IdBeneficio = b.Id
-                WHERE be.IdEmpleado = @IdEmpleado";
+                WHERE be.IdEmpleado = @IdEmpleado AND (b.Estado = 'Activo' OR b.Estado = 'PendienteBorrado')";
             using (SqlCommand comando = new SqlCommand(query, _conexion))
             {
                 comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
@@ -620,21 +620,28 @@ namespace BackendGeems.Infraestructure
                     _conexion.Open();
                     using (SqlDataReader reader = comando.ExecuteReader())
                     {
+                        
                         while (reader.Read())
                         {
-                            DeduccionVoluntaria deduccion = new DeduccionVoluntaria
+                            string estado = reader["Estado"]?.ToString() ?? "";
+                            Guid idBeneficio = reader["Id"] != DBNull.Value ? Guid.Parse(reader["Id"].ToString()) : Guid.Empty;
+
+                            if (estado == "Activo" || estado == "PendienteBorrado")
                             {
-                                Id = reader["Id"] != DBNull.Value ? Guid.Parse(reader["Id"].ToString()) : Guid.Empty,
-                                Monto = reader["Costo"] != DBNull.Value ? Convert.ToDouble(reader["Costo"]) : 0,
-                                NombreDeAPI = reader["NombreDeAPI"]?.ToString() ?? string.Empty,
-                                esAPI = reader["EsAPI"] != DBNull.Value && Convert.ToBoolean(reader["EsAPI"]),
-                                Nombre = reader["Nombre"]?.ToString() ?? string.Empty,
-                                esPorcentual = reader["EsPorcentual"] != DBNull.Value && Convert.ToBoolean(reader["EsPorcentual"])
-                            };
-                           
+                                DeduccionVoluntaria deduccion = new DeduccionVoluntaria
+                                {
+                                    Id = idBeneficio,
+                                    Monto = reader["Costo"] != DBNull.Value ? Convert.ToDouble(reader["Costo"]) : 0,
+                                    NombreDeAPI = reader["NombreDeAPI"]?.ToString() ?? string.Empty,
+                                    esAPI = reader["EsAPI"] != DBNull.Value && Convert.ToBoolean(reader["EsAPI"]),
+                                    Nombre = reader["Nombre"]?.ToString() ?? string.Empty,
+                                    esPorcentual = reader["EsPorcentual"] != DBNull.Value && Convert.ToBoolean(reader["EsPorcentual"])
+                                };
                                 deduccionesVoluntarias.Add(deduccion);
-                            
+                            }
                         }
+                        reader.Close();
+                      
                     }
                 }
                 catch (SqlException ex)
@@ -678,6 +685,62 @@ namespace BackendGeems.Infraestructure
 
             return cantidadPagos;
         }
+        public void InactivarBeneficiosPendientesPorEmpresa(string nombreEmpresa)
+        {
+            
+            string cedulaJuridica = null;
+            string queryCedula = "SELECT CedulaJuridica FROM Empresa WHERE Nombre = @NombreEmpresa";
+            using (SqlCommand cmdCedula = new SqlCommand(queryCedula, _conexion))
+            {
+                cmdCedula.Parameters.AddWithValue("@NombreEmpresa", nombreEmpresa);
+                try
+                {
+                    _conexion.Open();
+                    var result = cmdCedula.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        cedulaJuridica = result.ToString();
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener la cédula jurídica de la empresa: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+
+            if (string.IsNullOrEmpty(cedulaJuridica))
+            {
+                throw new Exception("No se encontró la cédula jurídica para la empresa especificada.");
+            }
+
+            
+            string query = @"
+                UPDATE Beneficio
+                SET Estado = 'Inactivo', EstaBorrado = 1
+                WHERE Estado = 'PendienteBorrado' AND CedulaJuridica = @CedulaJuridica";
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@CedulaJuridica", cedulaJuridica);
+                try
+                {
+                    _conexion.Open();
+                    comando.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al inactivar beneficios pendientes: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+        }
+
 
     }
 }

@@ -48,9 +48,9 @@ namespace BackendGeems.Infraestructure
             // Se hace la inserción del nuevo beneficio
             Guid beneficioId = Guid.NewGuid();
             string insertQuery = @"INSERT INTO Beneficio 
-                (Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual) 
+                (Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual, Estado, EstaBorrado) 
                 VALUES 
-                (@Id, @Costo, @TiempoMinimo, @Frecuencia, @Descripcion, @Nombre, @CedulaJuridica, @NombreDeAPI, @EsApi, @EsPorcentual)";
+                (@Id, @Costo, @TiempoMinimo, @Frecuencia, @Descripcion, @Nombre, @CedulaJuridica, @NombreDeAPI, @EsApi, @EsPorcentual, @Estado, @EstaBorrado)";
             using (SqlCommand insertCommand = new SqlCommand(insertQuery, _conexion))
             {
                 insertCommand.Parameters.AddWithValue("@Id", beneficioId);
@@ -63,6 +63,8 @@ namespace BackendGeems.Infraestructure
                 insertCommand.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
                 insertCommand.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
                 insertCommand.Parameters.AddWithValue("@EsPorcentual", beneficio.EsPorcentual);
+                insertCommand.Parameters.AddWithValue("@Estado", beneficio.Estado);
+                insertCommand.Parameters.AddWithValue("@EstaBorrado", beneficio.EstaBorrado);
 
                 _conexion.Open();
                 insertCommand.ExecuteNonQuery();
@@ -115,7 +117,9 @@ namespace BackendGeems.Infraestructure
                     Frecuencia = @Frecuencia,
                     NombreDeAPI = @NombreDeAPI,
                     EsAPI = @EsApi,
-                    EsPorcentual = @EsPorcentual
+                    EsPorcentual = @EsPorcentual,
+                    Estado = @Estado,
+                    EstaBorrado = @EstaBorrado
                 WHERE Id = @Id";
             using (SqlCommand cmd = new SqlCommand(updateQuery, _conexion))
             {
@@ -128,6 +132,8 @@ namespace BackendGeems.Infraestructure
                 cmd.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
                 cmd.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
                 cmd.Parameters.AddWithValue("@EsPorcentual", beneficio.EsPorcentual);
+                cmd.Parameters.AddWithValue("@Estado", beneficio.Estado);
+                cmd.Parameters.AddWithValue("@EstaBorrado", beneficio.EstaBorrado);
 
                 _conexion.Open();
                 cmd.ExecuteNonQuery();
@@ -166,7 +172,7 @@ namespace BackendGeems.Infraestructure
         {
             Beneficio? beneficio = null;
 
-            string query = @"SELECT Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual
+            string query = @"SELECT Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual, Estado, EstaBorrado
                              FROM Beneficio WHERE Id = @Id";
             using (SqlCommand cmd = new SqlCommand(query, _conexion))
             {
@@ -188,7 +194,9 @@ namespace BackendGeems.Infraestructure
                         CedulaJuridica = fila["CedulaJuridica"]?.ToString(),
                         NombreDeAPI = fila["NombreDeAPI"]?.ToString(),
                         EsApi = fila["EsAPI"] == DBNull.Value ? false : Convert.ToBoolean(fila["EsAPI"]),
-                        EsPorcentual = fila["EsPorcentual"] == DBNull.Value ? false : Convert.ToBoolean(fila["EsPorcentual"])
+                        EsPorcentual = fila["EsPorcentual"] == DBNull.Value ? false : Convert.ToBoolean(fila["EsPorcentual"]),
+                        Estado = fila["Estado"]?.ToString(),
+                        EstaBorrado = fila["EstaBorrado"] == DBNull.Value ? false : Convert.ToBoolean(fila["EstaBorrado"])
                     };
                 }
             }
@@ -321,6 +329,106 @@ namespace BackendGeems.Infraestructure
                 command.Parameters.AddWithValue("@IdEmpleado", beneficioEmpleado.IdEmpleado);
                 command.Parameters.AddWithValue("@IdBeneficio", beneficioEmpleado.IdBeneficio);
 
+                _conexion.Open();
+                command.ExecuteNonQuery();
+                _conexion.Close();
+            }
+        }
+
+        public void EliminarBeneficio(string IdBeneficio)
+        {
+            bool tieneEmpleados = ExisteMatriculaDeBeneficio(IdBeneficio);
+
+            if (!tieneEmpleados)
+            {
+                // Se hace el caso 1, se elimina el beneficio
+                RealizarEliminacion(IdBeneficio);
+                return;
+            }
+
+            bool planillaPagada = HayPagosRelacionados(IdBeneficio);
+
+            if (!planillaPagada)
+                // Se hace el caso 2, se elimina el beneficio, las asociaciones y se notifica al empleado (FALTA)
+                RealizarEliminacion(IdBeneficio);
+            else
+            {
+                // Se hace el caso 3, se hace el borrado lógico del beneficio
+                BorradoLogico(IdBeneficio);
+            }
+        }
+
+        // Funciones privadas para realizar validaciones de las restricciones de los requerimientos del borrado de beneficios
+        private bool ExisteMatriculaDeBeneficio(string id)
+        {
+            var query = @"
+                    SELECT COUNT(*)
+                    FROM BeneficiosEmpleado
+                    WHERE IdBeneficio = @id";
+            using (SqlCommand command = new SqlCommand(query, _conexion))
+            {
+                command.Parameters.AddWithValue("@id", id);
+                _conexion.Open();
+                int count = (int)command.ExecuteScalar();
+                _conexion.Close();
+                return count > 0;
+            }
+        }
+
+        private bool HayPagosRelacionados(string idBeneficio)
+        {
+            var query = @"
+                    SELECT COUNT(*)
+                    FROM Pago p
+                    JOIN BeneficiosEmpleado be ON p.IdEmpleado = be.IdEmpleado
+                    WHERE be.IdBeneficio = @idBeneficio";
+            using (SqlCommand command = new SqlCommand(query, _conexion))
+            {
+                command.Parameters.AddWithValue("@idBeneficio", idBeneficio);
+                _conexion.Open();
+                int count = (int)command.ExecuteScalar();
+                _conexion.Close();
+                return count > 0;
+            }
+        }
+
+        private void RealizarEliminacion(string id)
+        {
+            string query = @"
+                    DELETE
+                    FROM BeneficiosEmpleado
+                    WHERE IdBeneficio = @id;
+
+                    DELETE
+                    FROM BeneficioContratoElegible
+                    WHERE IdBeneficio = @id;
+
+                    DELETE
+                    FROM Beneficio
+                    WHERE Id = @id;";
+            using (SqlCommand command = new SqlCommand(query, _conexion))
+            {
+                command.Parameters.AddWithValue("@id", id);
+                _conexion.Open();
+                command.ExecuteNonQuery();
+                _conexion.Close();
+            }
+        }
+
+        private void BorradoLogico(string id)
+        {
+            string update = @"
+                    UPDATE Beneficio
+                    SET Estado = 'PendienteBorrado',
+                        EstaBorrado = 1
+                    WHERE Id = @id;
+                    
+                    DELETE
+                    FROM BeneficiosEmpleado
+                    WHERE IdBeneficio = @id;";
+            using (SqlCommand command = new SqlCommand(update, _conexion))
+            {
+                command.Parameters.AddWithValue("@id", id);
                 _conexion.Open();
                 command.ExecuteNonQuery();
                 _conexion.Close();

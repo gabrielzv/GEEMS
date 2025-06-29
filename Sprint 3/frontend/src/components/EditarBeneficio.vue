@@ -320,6 +320,8 @@ export default {
       nombreDeAPI: "BeneficioNormal",
       esApi: false,
       esPorcentual: false,
+      estado: "Activo",
+      estaBorrado: false,
     });
     const beneficioAnterior = ref({
       nombre: null,
@@ -332,6 +334,8 @@ export default {
       nombreDeAPI: null,
       esApi: null,
       esPorcentual: null,
+      estado: "Activo",
+      estaBorrado: false,
     });
 
     // Estados para errores
@@ -350,19 +354,20 @@ export default {
     const getBeneficioAnterior = async () => {
       const url = `${API_BASE_URL}Beneficio/${route.params.id}`;
       try {
-        const response = await axios.get(
-          url
-        );
+        const response = await axios.get(url);
         beneficioAnterior.value = response.data;
         // Se copian todos los datos al formulario para editar
         Object.assign(form.value, response.data);
         // Se asegura que contratosElegibles siempre sea un array
-        form.value.contratosElegibles = Array.isArray(response.data.contratosElegibles)
+        form.value.contratosElegibles = Array.isArray(
+          response.data.contratosElegibles
+        )
           ? response.data.contratosElegibles
           : [];
         // Se asegura que esPorcentual siempre sea un booleano
         form.value.esPorcentual =
-          response.data.esPorcentual === true || response.data.esPorcentual === "true"
+          response.data.esPorcentual === true ||
+          response.data.esPorcentual === "true"
             ? true
             : false;
       } catch (error) {
@@ -491,8 +496,8 @@ export default {
     const validateDeduction = () => {
       seleccionDeduccionError.value =
         form.value.esPorcentual === true || form.value.esPorcentual === false
-        ? ""
-        : "Debe seleccionar un tipo de deducción.";
+          ? ""
+          : "Debe seleccionar un tipo de deducción.";
       return !seleccionDeduccionError.value;
     };
 
@@ -514,7 +519,7 @@ export default {
         isTiempoMinimoValid &&
         isFrecuenciaValid &&
         isContratosValid &&
-        isAPISValid  &&
+        isAPISValid &&
         isDeductionValid
       );
     };
@@ -539,10 +544,7 @@ export default {
 
       const url = `${API_BASE_URL}Beneficio/editarBeneficio`;
       try {
-        const response = await axios.post(
-          url,
-          payload
-        );
+        const response = await axios.post(url, payload);
         mensaje.value = response.data;
         alert(response.data);
         // Redirigir al usuario a la página de inicio después de editar el beneficio

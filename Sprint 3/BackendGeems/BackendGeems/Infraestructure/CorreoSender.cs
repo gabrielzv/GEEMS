@@ -41,5 +41,24 @@ namespace BackendGeems.Infraestructure
 
             await smtp.SendMailAsync(mensaje);
         }
+
+        public async Task EnviarCorreoAsync(string destinatario, string asunto, string mensaje)
+        {
+            var remitente = _config["Correo:Remitente"];
+            var contraseña = _config["Correo:Password"];
+            var mailMessage = new MailMessage(remitente, destinatario)
+            {
+                Subject = asunto,
+                Body = mensaje,
+                IsBodyHtml = true
+            };
+            using var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(remitente, contraseña),
+                EnableSsl = true
+            };
+            await smtpClient.SendMailAsync(mailMessage);
+        }
     }
 }

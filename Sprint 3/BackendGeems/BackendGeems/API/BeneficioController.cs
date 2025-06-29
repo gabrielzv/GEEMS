@@ -127,5 +127,19 @@ namespace BackendGeems.Controllers
                 return StatusCode(500, $"Error al matricular el beneficio: {ex.Message}");
             }
         }
+
+        [HttpDelete("{IdBeneficio}")]
+        public IActionResult EliminarBeneficio(string IdBeneficio)
+        {
+            try
+            {
+                _queryBeneficio.EliminarBeneficio(IdBeneficio);
+                return Ok("Beneficio eliminado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al eliminar el beneficio: {ex.Message}");
+            }
+        }
     }
 }
