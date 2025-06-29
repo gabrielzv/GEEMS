@@ -16,7 +16,8 @@
     "pinia": "^3.0.2",
     "vue": "^3.2.13",
     "vue-router": "^4.5.0",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
