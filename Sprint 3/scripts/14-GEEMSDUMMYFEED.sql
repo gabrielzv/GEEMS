@@ -21,33 +21,33 @@ DECLARE @uidDeduccion2 UNIQUEIDENTIFIER = '00000000-0000-0000-0000-000000000011'
 
 -- Personas
 INSERT INTO Persona VALUES 
-(101010101, 'Av Central', 'Carlos', 'Perez', 'Mora', 'cperez@geems.com', '8888-8888'),
-(202020202, 'Calle 2', 'Ana', 'Lopez', 'Soto', 'alopez@geems.com', '8777-7777'),
-(303030303, 'Calle 3', 'Luis', 'Ramirez', 'Acosta', 'lramirez@geems.com', '8666-6666'),
-(404040404, 'Calle 4', 'María', 'Castro', 'Jiménez', 'mcastro@geems.com', '8555-5555'),
-(505050505, 'Calle 5', 'Pedro', 'Gomez', 'Sánchez', 'pgomez@geems.com', '8444-4444');
+(101010101, 'Av Central', 'Carlos', 'Perez', 'Mora', 'cperez@geems.com', '8888-8888', 0),
+(202020202, 'Calle 2', 'Ana', 'Lopez', 'Soto', 'alopez@geems.com', '8777-7777', 0),
+(303030303, 'Calle 3', 'Luis', 'Ramirez', 'Acosta', 'lramirez@geems.com', '8666-6666', 0),
+(404040404, 'Calle 4', 'María', 'Castro', 'Jiménez', 'mcastro@geems.com', '8555-5555', 0),
+(505050505, 'Calle 5', 'Pedro', 'Gomez', 'Sánchez', 'pgomez@geems.com', '8444-4444', 0);
 
 -- Usuarios
 INSERT INTO Usuario VALUES 
-(@uidAdmin, 'cperez', 'pass777', 'SuperAdmin', 101010101, 'cperez@geems.com'),
-(@uidDueno, 'alopez', 'pass5678', 'DuenoEmpresa', 202020202, 'alopez@geems.com'),
-(@uidColab, 'lramirez', 'pass9999', 'Empleado', 303030303, 'lramirez@geems.com'),
-(@uidSup, 'mcastro', 'clave123', 'Empleado', 404040404, 'mcastro@geems.com'),
-(@uidPayroll, 'pgomez', 'clave321', 'Empleado', 505050505, 'pgomez@geems.com');
+(@uidAdmin, 'cperez', 'pass777', 'SuperAdmin', 101010101, 'cperez@geems.com', 0),
+(@uidDueno, 'alopez', 'pass5678', 'DuenoEmpresa', 202020202, 'alopez@geems.com', 0),
+(@uidColab, 'lramirez', 'pass9999', 'Empleado', 303030303, 'lramirez@geems.com', 0),
+(@uidSup, 'mcastro', 'clave123', 'Empleado', 404040404, 'mcastro@geems.com', 0),
+(@uidPayroll, 'pgomez', 'clave321', 'Empleado', 505050505, 'pgomez@geems.com', 0);
 
 -- SuperAdmin
 INSERT INTO SuperAdmin VALUES (@uidAdmin, 101010101);
 
 -- Empresas
 INSERT INTO Empresa VALUES 
-('3-101-1234567', 'GEEMS Solutions', 'Consultora en gestión empresarial', '2222-2222', 'info@geems.com', 'San José', 'San José', 'Carmen', '300 m norte del parque central', 'Mensual', 3),
-('1-555-9876543', 'Innova Corp', 'Soluciones digitales y tecnológicas', '2100-3333', 'contacto@innova.com', 'Heredia', 'Heredia', 'San Francisco', 'Detrás del parque industrial', 'Quincenal', 4);
+('3-101-1234567', 'GEEMS Solutions', 'Consultora en gestión empresarial', '2222-2222', 'info@geems.com', 'San José', 'San José', 'Carmen', '300 m norte del parque central', 'Mensual', 3, 0),
+('1-555-9876543', 'Innova Corp', 'Soluciones digitales y tecnológicas', '2100-3333', 'contacto@innova.com', 'Heredia', 'Heredia', 'San Francisco', 'Detrás del parque industrial', 'Quincenal', 4, 0);
 
 -- Asociación SuperAdmin → Empresa
 INSERT INTO SuperAdminAdministraEmpresa VALUES (@uidAdmin, '3-101-1234567');
 
 -- Dueño de Empresa
-INSERT INTO DuenoEmpresa VALUES (@uidDueno, '3-101-1234567', 202020202);
+INSERT INTO DuenoEmpresa VALUES (@uidDueno, '3-101-1234567', 202020202, 0);
 
 -- Datos privados empresa
 INSERT INTO DatosPrivadosEmpresa VALUES 
