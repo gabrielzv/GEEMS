@@ -1,3 +1,5 @@
+USE GEEMSDB
+
 CREATE PROCEDURE sp_ActualizarEstadoRegistro
 (
     @IdRegistro UNIQUEIDENTIFIER,
