@@ -12,9 +12,9 @@ namespace BackendGeems.Infraestructure
     public class PagoRepo : IPagoRepo
     {
         private SqlConnection _conexion;
-     
+
         private string _cadenaConexion;
-        
+
         public string CadenaConexion => _cadenaConexion;
 
         public PagoRepo()
@@ -340,8 +340,8 @@ namespace BackendGeems.Infraestructure
                 _conexion.Close();
             }
         }
-        
-        public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, double monto,string NombreBeneficio)
+
+        public void InsertDeduccion(Guid idPago, string tipo, Guid? idBeneficio, double monto, string NombreBeneficio)
         {
             try
             {
@@ -620,7 +620,7 @@ namespace BackendGeems.Infraestructure
                     _conexion.Open();
                     using (SqlDataReader reader = comando.ExecuteReader())
                     {
-                        
+
                         while (reader.Read())
                         {
                             string estado = reader["Estado"]?.ToString() ?? "";
@@ -641,7 +641,7 @@ namespace BackendGeems.Infraestructure
                             }
                         }
                         reader.Close();
-                      
+
                     }
                 }
                 catch (SqlException ex)
@@ -687,7 +687,7 @@ namespace BackendGeems.Infraestructure
         }
         public void InactivarBeneficiosPendientesPorEmpresa(string nombreEmpresa)
         {
-            
+
             string cedulaJuridica = null;
             string queryCedula = "SELECT CedulaJuridica FROM Empresa WHERE Nombre = @NombreEmpresa";
             using (SqlCommand cmdCedula = new SqlCommand(queryCedula, _conexion))
@@ -717,7 +717,7 @@ namespace BackendGeems.Infraestructure
                 throw new Exception("No se encontró la cédula jurídica para la empresa especificada.");
             }
 
-            
+
             string query = @"
                 UPDATE Beneficio
                 SET Estado = 'Inactivo', EstaBorrado = 1
@@ -741,6 +741,39 @@ namespace BackendGeems.Infraestructure
             }
         }
 
-
+        public List<Pago> ObtenerPagosPorPlanilla(Guid idPlanilla)
+        {
+            string query = @"SELECT p.Id, p.FechaRealizada, p.MontoPago, p.IdEmpleado, p.IdPayroll, p.IdPlanilla, p.MontoBruto,
+                                    p.FechaInicio, p.FechaFinal
+                            FROM Pago p
+                            WHERE p.IdPlanilla = @IdPlanilla";
+            List<Pago> pagos = new List<Pago>();
+            using (SqlConnection connection = new SqlConnection(CadenaConexion))
+            {
+                SqlCommand cmd = new SqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
+                connection.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Pago pago = new Pago
+                        {
+                            Id = reader["Id"] != DBNull.Value ? Guid.Parse(reader["Id"].ToString()) : Guid.Empty,
+                            FechaRealizada = reader["FechaRealizada"] != DBNull.Value ? Convert.ToDateTime(reader["FechaRealizada"]) : DateTime.MinValue,
+                            MontoPago = reader["MontoPago"] != DBNull.Value ? Convert.ToDouble(reader["MontoPago"]) : 0,
+                            IdEmpleado = reader["IdEmpleado"] != DBNull.Value ? Guid.Parse(reader["IdEmpleado"].ToString()) : Guid.Empty,
+                            IdPayroll = reader["IdPayroll"] != DBNull.Value ? Guid.Parse(reader["IdPayroll"].ToString()) : Guid.Empty,
+                            IdPlanilla = reader["IdPlanilla"] != DBNull.Value ? Guid.Parse(reader["IdPlanilla"].ToString()) : Guid.Empty,
+                            MontoBruto = reader["MontoBruto"] != DBNull.Value ? Convert.ToDouble(reader["MontoBruto"]) : 0,
+                            FechaInicio = reader["FechaInicio"] != DBNull.Value ? Convert.ToDateTime(reader["FechaInicio"]) : DateTime.MinValue,
+                            FechaFinal = reader["FechaFinal"] != DBNull.Value ? Convert.ToDateTime(reader["FechaFinal"]) : DateTime.MinValue
+                        };
+                        pagos.Add(pago);
+                    }
+                }
+            }
+            return pagos;
+        }
     }
 }

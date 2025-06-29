@@ -106,7 +106,7 @@ export default {
           alert(
             "No hay empleados a los que se les pueda pagar planilla. " + msg
           );
-          this.$router.push({ name: "selectCreatePayroll" }); // Cambia el name si tu ruta es diferente
+          this.$router.push({ name: "selectCreatePayroll" });
         } else {
           alert("Error al generar los pagos de la planilla: " + msg);
         }

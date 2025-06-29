@@ -33,6 +33,7 @@ import Reporte3Historico from "./components/Reporte3Historico.vue";
 import Reporte4Desglose from "./components/Reporte4Desglose.vue";
 import Reporte5Pagos from "./components/Reporte5Pagos.vue";
 import EmpresaEliminada from "./components/EmpresaEliminada.vue";
+import ChooseEmpresa from "./components/ChooseEmpresa.vue";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user";
 import "./assets/tailwind.css";
@@ -75,6 +76,7 @@ const router = createRouter({
         { path: "/reporte3", name: "Reporte3Historico", component: Reporte3Historico, meta: {requiresAuth: true} },
         { path: "/reporte4", name: "Reporte4Desglose", component: Reporte4Desglose, meta: {requiresAuth: true} },
         { path: "/reporte5", name: "Reporte5Pagos", component: Reporte5Pagos, meta: {requiresAuth: true} },
+        { path: "/chooseEmpresa", name: "ChooseEmpresa", component: ChooseEmpresa, meta: {requiresAuth: true} },
       ]
     }
   ],
