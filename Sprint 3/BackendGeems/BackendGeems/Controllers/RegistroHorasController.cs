@@ -37,7 +37,7 @@ namespace BackendGeems.Controllers
                     INNER JOIN Persona p ON e.CedulaPersona = p.Cedula
                     INNER JOIN Usuario u ON p.Cedula = u.CedulaPersona
                     INNER JOIN Empresa emp ON e.NombreEmpresa = emp.Nombre
-                    WHERE emp.Nombre = @NombreEmpresa
+                    WHERE emp.Nombre = @NombreEmpresa AND r.EstaBorrado = 0
                     ORDER BY r.Fecha DESC";
 
                 using SqlCommand cmd = new SqlCommand(query, conn);

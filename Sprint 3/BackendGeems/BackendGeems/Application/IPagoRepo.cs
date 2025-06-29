@@ -21,6 +21,7 @@ namespace BackendGeems.Application
         public void InsertPago(Guid idPago, Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal, double montoBruto, double montoPago);
         public int ContarPagos(Guid idEmpleado);
         public void InactivarBeneficiosPendientesPorEmpresa(string nombreEmpresa);
+        public List<PagoyDeducciones> ObtenerPagosPorEmpleadoyPeriodo(string cedulaEmpleado, DateTime fechaInicio, DateTime fechaFinal);
     }
 
 }
