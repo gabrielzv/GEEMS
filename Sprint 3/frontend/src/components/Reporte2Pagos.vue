@@ -22,18 +22,6 @@
           @change="fetchPagos"
         />
       </div>
-      <button
-        @click="exportarExcel"
-        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        Exportar Excel
-      </button>
-      <button
-        @click="exportarPDF"
-        class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Exportar PDF
-      </button>
     </div>
 
     <div class="mb-2">
@@ -102,12 +90,23 @@
       >
         Enviar PDF por correo
       </button>
-
+      <button
+        @click="exportarPDF"
+        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+      >
+        Descargar PDF
+      </button>
       <button
         @click="enviarExcelPorCorreo"
         class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
         Enviar Excel por correo
+      </button>
+      <button
+        @click="exportarExcel"
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Descargar Excel
       </button>
     </div>
   </div>

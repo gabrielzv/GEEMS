@@ -82,8 +82,8 @@ INSERT INTO Planilla VALUES (@uidPlanilla, '2025-04-01', '2025-04-30', @uidPayro
 INSERT INTO Planilla VALUES (@uidPlanilla2, '2025-05-01', '2025-05-31', @uidPayroll);
 
 -- Registros de horas (aprobadas)
-INSERT INTO Registro VALUES (@uidRegistro, 40, '2025-04-20', 'Aprobado', @uidColab);
-INSERT INTO Registro VALUES (@uidRegistro2, 20, '2025-04-21', 'Aprobado', @uidSup);
+INSERT INTO Registro VALUES (@uidRegistro, 40, '2025-04-20', 'Aprobado', @uidColab,0);
+INSERT INTO Registro VALUES (@uidRegistro2, 20, '2025-04-21', 'Aprobado', @uidSup,0);
 
 -- Pagos (bruto: 850000, neto calculado tras deducciones)
 INSERT INTO Pago (Id, FechaRealizada, MontoPago, IdEmpleado, IdPayroll, IdPlanilla, MontoBruto, FechaInicio, FechaFinal)
