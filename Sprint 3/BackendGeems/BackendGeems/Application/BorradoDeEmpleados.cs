@@ -15,7 +15,6 @@
         {
             try
             {
-
                 bool tienePagos = _EmpleadoRepo.VerificarRelacionEmpleadoPlanilla(Cedula);
                 string NombreEmpleado = _EmpleadoRepo.ObtenerNombreEmpleadoPorCedula(Cedula);
                 string CorreoEmpleado = _EmpleadoRepo.ObtenerCorreoEmpleadoPorCedula(Cedula);

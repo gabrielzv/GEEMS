@@ -7,8 +7,12 @@ namespace BackendGeems.Application
     {
         private readonly IEmpresaRepo _empresaRepo;
         private readonly IPagoRepo _pagoRepo;
-        public QueryEmpresa(IEmpresaRepo empresaRepo, IPagoRepo pagoRepo)
+        private readonly QueryBeneficio _beneficioQuery;
+        private readonly BorradoDeEmpleados _borradoDeEmpleados;
+        public QueryEmpresa(IEmpresaRepo empresaRepo, IPagoRepo pagoRepo, IBeneficioRepo beneficioRepo, IEmpleadoRepo empleadoRepo, IReporteService reporteService)
         {
+            _beneficioQuery = new QueryBeneficio(beneficioRepo);
+            _borradoDeEmpleados = new BorradoDeEmpleados(empleadoRepo, reporteService);
             _pagoRepo = pagoRepo;
             _empresaRepo = empresaRepo;
         }
@@ -19,26 +23,31 @@ namespace BackendGeems.Application
             {
                 return;
             }
-            Console.WriteLine($"Eliminando empresa: {empresa.Nombre}");
             List<Empleado> empleados = _empresaRepo.GetEmpleados(cedula);
             int totalPagos = 0;
-
             foreach (var empleado in empleados)
             {
                 totalPagos += _pagoRepo.ContarPagos(empleado.Id);
             }
-
-            Console.WriteLine($"Total de pagos para la empresa {empresa.Nombre}: {totalPagos}");
             if (totalPagos > 0)
             {
-                Console.WriteLine("Borrado fisico");
+                _empresaRepo.BorradoFisico(cedula);
+                Console.WriteLine("Borrado fisico de empresa");
             }
             else
             {
                 _empresaRepo.BorradoLogico(cedula);
-                Console.WriteLine("Borrado logico");
+                Console.WriteLine("Borrado logico de empresa");
             }
-
+            List<object> listaBeneficios = _beneficioQuery.GetCompanyBenefits(cedula);
+            foreach(Beneficio beneficio in listaBeneficios)
+            {
+                _beneficioQuery.EliminarBeneficio(beneficio.Id);
+            }
+            foreach(Empleado empleado in empleados)
+            {
+                _borradoDeEmpleados.BorrarEmpleado((empleado.CedulaPersona).ToString());
+            }
         }
         public bool GetEstadoEliminadoEmpresaPersona(int cedulaPersona)
         {

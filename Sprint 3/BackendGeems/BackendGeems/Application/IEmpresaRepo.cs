@@ -7,6 +7,7 @@ namespace BackendGeems.Application
         Empresa GetEmpresa(string cedula);
         List<Empleado> GetEmpleados(string cedula);
         void BorradoLogico(string cedula);
+        void BorradoFisico(string cedula);
         bool GetEstadoEliminadoEmpresaEmpleado(int cedulaPersona);
         bool GetEstadoEliminadoEmpresaDueno(int cedulaPersona);
         string GetTipo(int cedulaPersona);

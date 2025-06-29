@@ -1,6 +1,7 @@
 ﻿using BackendGeems.Application;
 using BackendGeems.Domain;
 using Microsoft.Data.SqlClient;
+using System.Transactions;
 namespace BackendGeems.Infraestructure
 {
     public class EmpresaRepo : IEmpresaRepo
@@ -96,6 +97,50 @@ namespace BackendGeems.Infraestructure
 
             cmd.ExecuteNonQuery();
         }
+        public void BorradoFisico(string cedula)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+
+            using SqlTransaction transaction = conn.BeginTransaction();
+
+            try
+            {
+                string queryDatosPrivados = @"DELETE FROM DatosPrivadosEmpresa 
+                                      WHERE CedulaJuridica = @CedulaJuridica";
+                using SqlCommand cmdDatosPrivados = new SqlCommand(queryDatosPrivados, conn, transaction);
+                cmdDatosPrivados.Parameters.AddWithValue("@CedulaJuridica", cedula);
+                cmdDatosPrivados.ExecuteNonQuery();
+
+                string queryEmpresa = @"DELETE FROM Empresa 
+                                WHERE CedulaJuridica = @CedulaJuridica";
+                using SqlCommand cmdEmpresa = new SqlCommand(queryEmpresa, conn, transaction);
+                cmdEmpresa.Parameters.AddWithValue("@CedulaJuridica", cedula);
+                cmdEmpresa.ExecuteNonQuery();
+
+                string queryUpdateDueno = @"UPDATE DuenoEmpresa
+                                    SET CedulaEmpresa = 'ELIMINADO'
+                                    WHERE CedulaEmpresa = @CedulaJuridica";
+                using SqlCommand cmdUpdateDueno = new SqlCommand(queryUpdateDueno, conn, transaction);
+                cmdUpdateDueno.Parameters.AddWithValue("@CedulaJuridica", cedula);
+                cmdUpdateDueno.ExecuteNonQuery();
+
+                string queryDeleteSuperAdmin = @"DELETE FROM SuperAdminAdministraEmpresa
+                                         WHERE CedulaJuridicaEmpresa = @CedulaJuridica";
+                using SqlCommand cmdDeleteSuperAdmin = new SqlCommand(queryDeleteSuperAdmin, conn, transaction);
+                cmdDeleteSuperAdmin.Parameters.AddWithValue("@CedulaJuridica", cedula);
+                cmdDeleteSuperAdmin.ExecuteNonQuery();
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception("Error al borrar la empresa y sus referencias: " + ex.Message);
+            }
+        }
+
+
         public bool GetEstadoEliminadoEmpresaEmpleado(int cedulaPersona)
         {
             using SqlConnection conn = new SqlConnection(_cadenaConexion);
