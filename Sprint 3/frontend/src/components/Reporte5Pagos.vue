@@ -95,6 +95,14 @@
               <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatearColones(registro.pago.totalDeduccionesVoluntarias) }}</td>
               <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatearColones(registro.pago.costoEmpleador) }}</td>
             </tr>
+            <tr class="bg-gray-100 font-semibold">
+              <td colspan="5" class="px-4 py-4 text-right">Totales:</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{{ formatearColones(pagosFiltrados.reduce((s, r) => s + r.pago.salarioBruto, 0)) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{{ formatearColones(pagosFiltrados.reduce((s, r) => s + r.pago.cargasSociales, 0)) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{{ formatearColones(pagosFiltrados.reduce((s, r) => s + r.pago.totalDeduccionesVoluntarias, 0)) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-700">{{ formatearColones(pagosFiltrados.reduce((s, r) => s + r.pago.costoEmpleador, 0)) }}</td>
+            </tr>
+
           </tbody>
         </table>
       </div>
