@@ -1,116 +1,107 @@
 <template>
-  <div class="container mx-auto p-4">
-    <!-- Encabezado del reporte -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-bold text-center uppercase">REPORTE 5</h1>
-      <div class="flex justify-between items-center mt-4">
-        <div>
-          <h2 class="text-xl font-semibold">{{ nombreEmpresa || "Nombre de la empresa" }}</h2>
-          <p class="text-gray-600">Nombre del empleador</p>
+  <div class="w-full flex justify-center">
+    <div class="w-full max-w-screen-xl px-4">
+      <!-- Encabezado del reporte -->
+      <div class="mb-8 text-center">
+        <h1 class="text-2xl font-bold uppercase">REPORTE 5</h1>
+        <div class="flex flex-col md:flex-row justify-between items-center mt-4">
+          <div class="text-left">
+            <h2 class="text-xl font-semibold">{{ nombreEmpresa || "Nombre de la empresa" }}</h2>
+            <p class="text-gray-600">Nombre del empleador</p>
+          </div>
+          <button 
+            class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded mt-4 md:mt-0"
+            @click="exportarAExcel"
+          >
+            Generar Excel
+          </button>
         </div>
-        <button 
-          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-          @click="exportarAExcel"
-        >
-          Generar Excel
-        </button>
       </div>
-    </div>
 
-    <!-- Filtros -->
-    <div class="bg-gray-100 p-4 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha desde</label>
-        <input 
-          type="date" 
-          class="w-full p-2 border rounded"
-          v-model="fechaDesde"
-          @change="aplicarFiltros"
-        >
+      <!-- Filtros -->
+      <div class="bg-gray-100 p-4 rounded-lg mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha desde</label>
+          <input 
+            type="date" 
+            class="w-full p-2 border rounded"
+            v-model="fechaDesde"
+            @change="aplicarFiltros"
+          >
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha hasta</label>
+          <input 
+            type="date" 
+            class="w-full p-2 border rounded"
+            v-model="fechaHasta"
+            @change="aplicarFiltros"
+          >
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de empleados</label>
+          <select 
+            class="w-full p-2 border rounded"
+            v-model="filtroTipo"
+            @change="aplicarFiltros"
+          >
+            <option value="">Todos</option>
+            <option value="Tiempo completo">Tiempo completo</option>
+            <option value="Medio tiempo">Medio tiempo</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label>
+          <input 
+            type="text" 
+            class="w-full p-2 border rounded" 
+            placeholder="Buscar por cédula"
+            v-model="filtroCedula"
+            @input="aplicarFiltros"
+          >
+        </div>
       </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha hasta</label>
-        <input 
-          type="date" 
-          class="w-full p-2 border rounded"
-          v-model="fechaHasta"
-          @change="aplicarFiltros"
-        >
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de empleados</label>
-        <select 
-          class="w-full p-2 border rounded"
-          v-model="filtroTipo"
-          @change="aplicarFiltros"
-        >
-          <option value="">Todos</option>
-          <option value="Tiempo completo">Tiempo completo</option>
-          <option value="Medio tiempo">Medio tiempo</option>
-        </select>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Cédula</label>
-        <input 
-          type="text" 
-          class="w-full p-2 border rounded" 
-          placeholder="Buscar por cédula"
-          v-model="filtroCedula"
-          @input="aplicarFiltros"
-        >
-      </div>
-    </div>
 
-    <!-- Tabla de empleados -->
-    <div v-if="loading" class="text-center py-8">
-      <p class="text-gray-600">Cargando empleados...</p>
-    </div>
-    <div v-else class="bg-white rounded-lg shadow overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre empleado</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cédula</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de empleado</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Período de pago</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de pago</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salario Bruto</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargas sociales empleador</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deducciones voluntarias</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo empleador</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="(registro, index) in pagosFiltrados" :key="index">
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ registro.empleado.nombre }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ registro.empleado.cedula }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ registro.empleado.tipo }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-pre-wrap">
-              <div class="text-sm text-gray-500">
+      <!-- Tabla de empleados -->
+      <div v-if="loading" class="text-center py-8">
+        <p class="text-gray-600">Cargando empleados...</p>
+      </div>
+      <div v-else class="bg-white rounded-lg shadow w-full">
+        <table class="w-full table-auto divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre empleado</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cédula</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo de empleado</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Período de pago</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha de pago</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Salario Bruto</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cargas sociales empleador</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deducciones voluntarias</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Costo empleador</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="(registro, index) in pagosFiltrados" :key="index">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{{ registro.empleado.nombre }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ registro.empleado.cedula }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ registro.empleado.tipo }}</td>
+              <td class="px-4 py-4 whitespace-pre-wrap text-sm text-gray-500 break-words max-w-[200px]">
                 Del<br>{{ formatearFecha(registro.pago.fechaInicio) }}<br>al<br>{{ formatearFecha(registro.pago.fechaFin) }}
-              </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ formatearFecha(registro.pago.fechaPago) }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm text-gray-500">{{ formatearColones(registro.pago.salarioBruto) }}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500"> </div></td>
-            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">{{ formatearColones(registro.pago.totalDeduccionesVoluntarias) }}</div></td>
-            <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500"> </div></td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatearFecha(registro.pago.fechaPago) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatearColones(registro.pago.salarioBruto) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatearColones(registro.pago.cargasSociales) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatearColones(registro.pago.totalDeduccionesVoluntarias) }}</td>
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatearColones(registro.pago.costoEmpleador) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import { useUserStore } from '@/store/user'
@@ -165,13 +156,21 @@ export default {
               const resPagos = await axios.get(`${baseUrl}/api/Pagos/${empleadoData.id}`)
               const pagosEmpleado = resPagos.data
 
+
               return await Promise.all(pagosEmpleado.map(async (p) => {
                 const resDeducciones = await axios.get(`${baseUrl}/api/Deducciones/${p.id}`)
                 const deducciones = resDeducciones.data
 
+                const resDeduccionesDetalladas = await axios.get(`${baseUrl}/api/Deduccion/DeduccionesDetalladas/${p.montoBruto}`)
+                const deduccionesDetalladas = resDeduccionesDetalladas.data
+
                 const totalVoluntarias = deducciones
                   .filter(d => d.tipoDeduccion === "Voluntaria")
                   .reduce((suma, d) => suma + d.monto, 0)
+
+                const salarioBruto = p.montoBruto
+                const cargasSociales = deduccionesDetalladas.totalDeducciones
+                const costoEmpleador = salarioBruto + cargasSociales + totalVoluntarias
 
                 return {
                   empleado: {
@@ -186,7 +185,9 @@ export default {
                     fechaInicio: p.fechaInicio,
                     fechaFin: p.fechaFinal,
                     salarioBruto: p.montoBruto,
-                    totalDeduccionesVoluntarias: totalVoluntarias
+                    totalDeduccionesVoluntarias: totalVoluntarias, 
+                    cargasSociales: deduccionesDetalladas.totalDeducciones, 
+                    costoEmpleador
                   }
                 }
               }))
@@ -285,9 +286,9 @@ export default {
           `"${formatearFecha(registro.pago.fechaFin)}"`,
           `"${formatearFecha(registro.pago.fechaPago)}"`,
           registro.pago.salarioBruto,
-          "", 
+          registro.pago.cargasSociales, 
           registro.pago.totalDeduccionesVoluntarias,
-          "" 
+          registro.pago.costoEmpleador 
         ]
         csvContent += row.join(",") + "\n"
       })
