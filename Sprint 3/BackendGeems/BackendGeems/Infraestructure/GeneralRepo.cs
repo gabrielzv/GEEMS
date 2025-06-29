@@ -126,7 +126,28 @@ namespace BackendGeems.Infraestructure
             }
         }
 
-        
+        // Obtener duenoEmpresa por cedula
+        public DuenoEmpresa ObtenerDuenoEmpresaPorCedula(string cedula)
+        {
+            using (var conn = new SqlConnection(_cadenaConexion))
+            {
+                var cmd = new SqlCommand("SELECT * FROM DuenoEmpresa WHERE CedulaPersona = @CedulaPersona", conn);
+                cmd.Parameters.AddWithValue("@CedulaPersona", cedula);
+                conn.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new DuenoEmpresa
+                        {
+                            CedulaPersona = reader["CedulaPersona"].ToString(),
+                            CedulaEmpresa = reader["CedulaEmpresa"].ToString()
+                        };
+                    }
+                }
+            }
+            return null;
+        } 
 
 
 

@@ -104,6 +104,7 @@ import { useUserStore } from '@/store/user'
 import axios from 'axios'
 import { API_BASE_URL } from '@/config'
 
+
 // refs
 const userStore = useUserStore()
 const planillas = ref([])
@@ -305,16 +306,23 @@ onMounted(async () => {
     nombreEmpresa.value = userStore.empleado?.nombreEmpresa
     await fetchPlanillas(nombreEmpresa.value)
     await fetchPersona(userStore.empleado?.cedulaPersona)
-  } else if (userStore.rol === 'DuenoEmpresa') {
-    const cedulaEmpresa = userStore.usuario?.cedulaEmpresa
-    if (cedulaEmpresa) {
-      const res = await axios.get(`${API_BASE_URL}Empresa/${cedulaEmpresa}`)
-      nombreEmpresa.value = res.data?.nombre
+  } else if (userStore.usuario.tipo === 'DuenoEmpresa') {
+    // 1. Obtener dueño de empresa
+    const cedula = userStore.usuario?.cedulaPersona
+    const duenoRes = await axios.get(`${API_BASE_URL}DuenoEmpresa/${cedula}`)
+    const cedulaJuridica = duenoRes.data?.cedulaEmpresa
+    if (cedulaJuridica) {
+      // 2. Obtener empresa por cédula jurídica
+      const empresaRes = await axios.get(`${API_BASE_URL}Empresa/por-cedula-juridica/${cedulaJuridica}`)
+      console.log(empresaRes.data)
+      nombreEmpresa.value = empresaRes.data?.empresa.nombre
+      // 3. Usar el nombre para fetchPlanillas
       await fetchPlanillas(nombreEmpresa.value)
       await fetchPersona(userStore.usuario?.cedula)
     }
   }
   // Si es super admin, hay que redirigir a otra vista para elegir empresa
+  
 })
 
 watch(selectedPlanillaId, async () => {
