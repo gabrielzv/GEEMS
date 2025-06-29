@@ -34,80 +34,91 @@
     </div>
 
     <div class="overflow-x-auto">
-      <table class="min-w-full border text-center">
-        <thead>
-          <tr class="bg-blue-200">
-            <th class="px-2 py-1 border">Tipo de contrato</th>
-            <th class="px-2 py-1 border">Posición</th>
-            <th class="px-2 py-1 border">Fecha de pago</th>
-            <th class="px-2 py-1 border">Salario Bruto</th>
-            <th class="px-2 py-1 border">Deducciones obligatorias empleado</th>
-            <th class="px-2 py-1 border">Deducciones voluntarias</th>
-            <th class="px-2 py-1 border">Salario neto</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="pago in pagos" :key="pago.fechaRealizada">
-            <td class="border">{{ pago.tipoContrato }}</td>
-            <td class="border">{{ pago.posicion }}</td>
-            <td class="border">{{ formatFecha(pago.fechaRealizada) }}</td>
-            <td class="border">₡{{ formatNumber(pago.montoBruto) }}</td>
-            <td class="border">
-              ₡{{ formatNumber(totalObligatorias(pago.deducciones)) }}
-            </td>
-            <td class="border">
-              ₡{{ formatNumber(totalVoluntarias(pago.deducciones)) }}
-            </td>
-            <td class="border font-semibold">
-              ₡{{ formatNumber(pago.montoPago) }}
-            </td>
-          </tr>
-        </tbody>
-        <tfoot v-if="pagos.length">
-          <tr class="bg-blue-100 font-bold">
-            <td class="border" colspan="3">Totales</td>
-            <td class="border">
-              ₡{{ formatNumber(totalColumn("montoBruto")) }}
-            </td>
-            <td class="border">
-              ₡{{ formatNumber(totalColumn("obligatorias")) }}
-            </td>
-            <td class="border">
-              ₡{{ formatNumber(totalColumn("voluntarias")) }}
-            </td>
-            <td class="border">
-              ₡{{ formatNumber(totalColumn("montoPago")) }}
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+      <template v-if="pagos.length">
+        <table class="min-w-full border text-center">
+          <thead>
+            <tr class="bg-blue-200">
+              <th class="px-2 py-1 border">Tipo de contrato</th>
+              <th class="px-2 py-1 border">Posición</th>
+              <th class="px-2 py-1 border">Fecha de pago</th>
+              <th class="px-2 py-1 border">Salario Bruto</th>
+              <th class="px-2 py-1 border">
+                Deducciones obligatorias empleado
+              </th>
+              <th class="px-2 py-1 border">Deducciones voluntarias</th>
+              <th class="px-2 py-1 border">Salario neto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="pago in pagos" :key="pago.fechaRealizada">
+              <td class="border">{{ pago.tipoContrato }}</td>
+              <td class="border">{{ pago.posicion }}</td>
+              <td class="border">{{ formatFecha(pago.fechaRealizada) }}</td>
+              <td class="border">₡{{ formatNumber(pago.montoBruto) }}</td>
+              <td class="border">
+                ₡{{ formatNumber(totalObligatorias(pago.deducciones)) }}
+              </td>
+              <td class="border">
+                ₡{{ formatNumber(totalVoluntarias(pago.deducciones)) }}
+              </td>
+              <td class="border font-semibold">
+                ₡{{ formatNumber(pago.montoPago) }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="bg-blue-100 font-bold">
+              <td class="border" colspan="3">Totales</td>
+              <td class="border">
+                ₡{{ formatNumber(totalColumn("montoBruto")) }}
+              </td>
+              <td class="border">
+                ₡{{ formatNumber(totalColumn("obligatorias")) }}
+              </td>
+              <td class="border">
+                ₡{{ formatNumber(totalColumn("voluntarias")) }}
+              </td>
+              <td class="border">
+                ₡{{ formatNumber(totalColumn("montoPago")) }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </template>
+      <template v-else>
+        <div class="text-center text-gray-500 py-8">
+          No hay pagos para mostrar en el periodo seleccionado.
+        </div>
+      </template>
     </div>
 
     <div class="px-4 py-4 mb-4 flex gap-4 items-end">
-      <button
-        @click="enviarPDFPorCorreo"
-        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-      >
-        Enviar PDF por correo
-      </button>
-      <button
-        @click="exportarPDF"
-        class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-      >
-        Descargar PDF
-      </button>
-      <button
-        @click="enviarExcelPorCorreo"
-        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        Enviar Excel por correo
-      </button>
-      <button
-        @click="exportarExcel"
-        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        Descargar Excel
-      </button>
+      <template v-if="pagos.length">
+        <button
+          @click="enviarPDFPorCorreo"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+        >
+          Enviar PDF por correo
+        </button>
+        <button
+          @click="exportarPDF"
+          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+        >
+          Descargar PDF
+        </button>
+        <button
+          @click="enviarExcelPorCorreo"
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Enviar Excel por correo
+        </button>
+        <button
+          @click="exportarExcel"
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Descargar Excel
+        </button>
+      </template>
     </div>
   </div>
 </template>
