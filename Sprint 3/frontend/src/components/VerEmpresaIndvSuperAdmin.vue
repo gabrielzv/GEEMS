@@ -111,14 +111,17 @@
       });
       
       const goToEmpresaEliminada = async () => {
-        const empresaId = route.params.empresaId;
-        const url = `${API_BASE_URL}Empresas/borrar?cedula=${empresaId}`;
-        try {
-          await axios.delete(url);
-          alert("Empresa eliminada");
-          router.push("/ConsulEmpresa");
-        } catch (error) {
-          console.error("Error al eliminar la empresa:", error);
+        const confirmar = confirm("¿Está seguro de que desea eliminar esta empresa? Esta acción no es reversible.")
+        if(confirmar){
+          const empresaId = route.params.empresaId;
+          const url = `${API_BASE_URL}Empresas/borrar?cedula=${empresaId}`;
+          try {
+            await axios.delete(url);
+            alert("Empresa eliminada");
+            router.push("/ConsulEmpresa");
+          } catch (error) {
+            console.error("Error al eliminar la empresa:", error);
+          }
         }
       };
 

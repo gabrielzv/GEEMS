@@ -695,26 +695,19 @@ namespace BackendGeems.Infraestructure
             int cantidadPagos = 0;
             string query = "SELECT COUNT(*) FROM Pago WHERE IdEmpleado = @IdEmpleado";
 
-            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            using (SqlConnection conn = new SqlConnection(_cadenaConexion))
             {
-                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                conn.Open();
 
-                try
+                using (SqlCommand comando = new SqlCommand(query, conn))
                 {
-                    _conexion.Open();
+                    comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
                     var result = comando.ExecuteScalar();
                     if (result != null && result != DBNull.Value)
                     {
                         cantidadPagos = Convert.ToInt32(result);
                     }
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception("Error al contar los pagos del empleado: " + ex.Message);
-                }
-                finally
-                {
-                    _conexion.Close();
                 }
             }
 

@@ -4,5 +4,6 @@
     {
         void EliminarEmpresa(string cedula);
         bool GetEstadoEliminadoEmpresaPersona(int cedulaPersona);
+        bool GetEstadoEliminadoEmpresa(string nombreEmpresa);
     }
 }
