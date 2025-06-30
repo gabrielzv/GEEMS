@@ -11,7 +11,7 @@
             <h2 class="text-xl font-semibold">
               {{ nombreEmpresa || "Nombre de la empresa" }}
             </h2>
-            <p class="text-gray-600">Nombre del empleador</p>
+            
           </div>
           <button
             class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded mt-4 md:mt-0"
@@ -217,13 +217,13 @@
 import { useUserStore } from "@/store/user";
 import { ref, computed, onMounted } from "vue";
 import axios from "axios";
+import { API_BASE_URL } from "@/config";
 
 export default {
   setup() {
     const userStore = useUserStore();
     const empleados = ref([]);
     const loading = ref(true);
-    const baseUrl = "https://localhost:7014";
 
     // Variables para los filtros
     const fechaDesde = ref("");
@@ -265,24 +265,24 @@ export default {
           userStore.empleadosEmpresa.map(async (e) => {
             try {
               const resEmpleado = await axios.get(
-                `${baseUrl}/api/GetEmpleado/${e.cedula}`
+                `${API_BASE_URL}GetEmpleado/${e.cedula}`
               );
               const empleadoData = resEmpleado.data;
 
               const resPagos = await axios.get(
-                `${baseUrl}/api/Pagos/${empleadoData.id}`
+                `${API_BASE_URL}Pagos/${empleadoData.id}`
               );
               const pagosEmpleado = resPagos.data;
 
               return await Promise.all(
                 pagosEmpleado.map(async (p) => {
                   const resDeducciones = await axios.get(
-                    `${baseUrl}/api/Deducciones/${p.id}`
+                    `${API_BASE_URL}Deducciones/${p.id}`
                   );
                   const deducciones = resDeducciones.data;
 
                   const resDeduccionesDetalladas = await axios.get(
-                    `${baseUrl}/api/Deduccion/DeduccionesDetalladas/${p.montoBruto}`
+                    `${API_BASE_URL}Deduccion/DeduccionesDetalladas/${p.montoBruto}`
                   );
                   const deduccionesDetalladas = resDeduccionesDetalladas.data;
 
