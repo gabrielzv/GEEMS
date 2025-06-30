@@ -6,19 +6,26 @@ namespace BackendGeems.Application
     public class GestorPagosService
     {
         private readonly IPagoRepo _pagoRepo;
+        private readonly IEmpleadoRepo _empleadoRepo;
         private readonly ServicioCalculoPago _servicioCalculo;
 
-        public GestorPagosService(IPagoRepo pagoRepo, ServicioCalculoPago servicioCalculo)
+        public GestorPagosService(IPagoRepo pagoRepo, ServicioCalculoPago servicioCalculo, IEmpleadoRepo empleadoRepo)
         {
             _pagoRepo = pagoRepo;
             _servicioCalculo = servicioCalculo;
+            _empleadoRepo = empleadoRepo;
         }
 
         public void GenerarPagoEmpleado(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
         {
             try
             {
-               
+
+                if (_empleadoRepo.UsuarioEstaBorradoId(idEmpleado))
+                {
+                    return;
+                    
+                }
                 _pagoRepo.BorrarPagoExistente(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
 
                 if (idEmpleado == Guid.Empty || idPlanilla == Guid.Empty)
@@ -33,6 +40,7 @@ namespace BackendGeems.Application
                 {
                     throw new ArgumentException("\nEl empleado no existe.");
                 }
+                
 
                 TimeSpan duracion = fechaFinal - fechaInicio;
                 bool esQuincenal = duracion.TotalDays <= 16;

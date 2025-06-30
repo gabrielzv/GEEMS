@@ -14,6 +14,7 @@ namespace BackendGeems.Application
         public string ObtenerCorreoEmpleadoPorCedula(string cedula);
 
         public string ObtenerNombreEmpresaPorCedula(string cedula);
+        public bool UsuarioEstaBorradoId(Guid IdEmpleado);
     }
 
 
