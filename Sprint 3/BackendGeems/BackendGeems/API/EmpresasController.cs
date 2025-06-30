@@ -29,18 +29,16 @@ namespace BackendGeems.API
         {
             return _queryEmpresa.GetEstadoEliminadoEmpresaPersona(cedulaPersona);
         }
-<<<<<<< HEAD
         [HttpGet("Estado")]
         public bool GetEstado(string NombreEmpresa)
         {
             return _queryEmpresa.GetEstadoEliminadoEmpresa(NombreEmpresa);
-=======
+        }
         [HttpGet("todas")]
         public ActionResult<List<Empresa>> GetTodasEmpresas()
         {
             var empresas = _repo.ObtenerTodas();
             return Ok(empresas);
->>>>>>> develop
         }
     }
 }
