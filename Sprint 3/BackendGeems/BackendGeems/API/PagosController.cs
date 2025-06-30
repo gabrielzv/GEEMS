@@ -13,11 +13,12 @@ namespace BackendGeems.API
     {
         private readonly GeneralRepo _repoInfrastructure;
         private readonly PagoRepo _pagoInfrastructure;
+        private readonly BorradoDeEmpleados _borradoDeEmpleados;
         private readonly GestorPagosService _gestorPagosService;
         private readonly IQueryPago _queryPago;
         private readonly IGenerarPago _GenerarPago;
 
-        public PagosController(IQueryPago queryPago, IGenerarPago generarPago, GestorPagosService gestorPagosService)
+        public PagosController(IQueryPago queryPago, IGenerarPago generarPago, GestorPagosService gestorPagosService, BorradoDeEmpleados borradoDeEmpleados )
         {
             _queryPago = queryPago;
 
@@ -25,6 +26,7 @@ namespace BackendGeems.API
             _pagoInfrastructure = new PagoRepo();
             _GenerarPago = generarPago;
             _gestorPagosService = gestorPagosService;
+            _borradoDeEmpleados = borradoDeEmpleados;
         }
         [HttpGet]
         public List<Pago> Get(DateTime fechaInicio, DateTime fechaFin)
@@ -32,6 +34,20 @@ namespace BackendGeems.API
             var pagos = _queryPago.ObtenerPagos(fechaInicio, fechaFin);
             return pagos;
         }
+        [HttpGet("Periodo")]
+        public ActionResult<List<PagoyDeducciones>> GetPagosPorPeriodo(string cedulaEmpleado,DateTime fechaInicio, DateTime fechaFin)
+        {
+            try
+            {
+                var pagos = _queryPago.ObtenerPagosPorEmpleadoyPeriodo(cedulaEmpleado, fechaInicio, fechaFin);
+                return Ok(pagos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener pagos: {ex.Message}");
+            }
+        }
+
         [HttpGet("{idEmpleado}")]
         public ActionResult<List<Pago>> GetPagosPorEmpleado(Guid idEmpleado)
         {

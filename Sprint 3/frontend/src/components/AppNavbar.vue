@@ -50,6 +50,11 @@
         <Dropdown label="Reportes" icon="report">
           <NavLink to="/reporte1" icon="salary">Desglose de Mi Salario</NavLink>
           <NavLink to="/reporte2" icon="summary">Resumen de Pagos</NavLink>
+
+          <!-- Payroll tambien puede ver reporte 4-->
+           <template v-if="empleado?.tipo === 'Payroll'">
+            <NavLink to="/reporte4" icon="salary">Desglose de Planillas</NavLink>
+          </template>
         </Dropdown>
         <Dropdown label="Registros" icon="clock">
           <NavLink to="/registrarHoras" icon="edit">Registrar horas</NavLink>

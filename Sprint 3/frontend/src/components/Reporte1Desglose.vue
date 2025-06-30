@@ -197,7 +197,7 @@ function descargarPDF() {
 
   const doc = new jsPDF()
   doc.setFontSize(18)
-  doc.text('Recibo de Pago', 105, 18, { align: 'center' })
+  doc.text(`Pago de ${nombreMes(selectedPago.value.fechaRealizada)}`, 105, 18, { align: 'center' })
 
   doc.setFontSize(12)
   let y = 35
@@ -286,7 +286,7 @@ async function enviarPorCorreo() {
   // Generar el PDF como blob
   const doc = new jsPDF()
   doc.setFontSize(18)
-  doc.text('Recibo de Pago', 105, 18, { align: 'center' })
+  doc.text(`Pago de ${nombreMes(selectedPago.value.fechaRealizada)}`, 105, 18, { align: 'center' })
 
   doc.setFontSize(12)
   let y = 35

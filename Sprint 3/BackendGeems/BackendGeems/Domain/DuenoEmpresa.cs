@@ -4,7 +4,7 @@
     {
         public Guid Id { get; set; }
         public string CedulaEmpresa { get; set; }
-        public int CedulaPersona { get; set; }
+        public string CedulaPersona { get; set; }
     }
 }
 
