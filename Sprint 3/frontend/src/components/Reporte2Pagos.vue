@@ -147,8 +147,7 @@ const userStore = useUserStore();
 const empleado = userStore.empleado;
 const usuario = userStore.usuario;
 
-console.log("userStore", empleado);
-console.log("usuario", usuario);
+
 const cedulaEmpleado = String(empleado.cedulaPersona);
 nombreEmpresa.value = empleado.nombreEmpresa;
 nombreEmpleado.value = nombre.value.fullName || "Dato no disponible";

@@ -1,74 +1,83 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-12 px-4">
     <div class="max-w-7xl mx-auto">
-      <h1 class="text-3xl font-bold text-center mb-10 text-gray-800">Dashboard de empleador</h1>
 
       <div v-if="loading" class="text-center text-gray-600">Cargando datos...</div>
 
-      <div v-else class="space-y-12">
-        <!-- Estructura horizontal: izquierda (gráfico) / derecha (tabla + detalle) -->
-        <div class="flex flex-col lg:flex-row gap-8">
-          <!-- Izquierda: gráfico principal más alto -->
-          <div class="w-full lg:w-1/2">
-            <div class="bg-white rounded-xl shadow-md p-6 h-full">
-              <h2 class="text-xl font-semibold mb-4 text-gray-800 text-center">Distribución por tipo de contrato</h2>
-              <div class="w-full h-[28rem]">
-                <Pie :data="chartData" :options="chartOptions" />
+      <div v-else>
+        <template v-if="userStore.usuario?.tipo === 'DuenoEmpresa'">
+          <div class="space-y-12">
+            <div class="flex flex-col lg:flex-row gap-8">
+              <div class="w-full lg:w-1/2">
+                <div class="bg-white rounded-xl shadow-md p-6 h-full">
+                  <h2 class="text-xl font-semibold mb-4 text-gray-800 text-center">Distribución por tipo de contrato</h2>
+                  <div class="w-full h-[28rem]">
+                    <Pie :data="chartData" :options="chartOptions" />
+                  </div>
+                  <div class="flex justify-center gap-4 mt-6 text-sm text-gray-600">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-blue-400 rounded-full"></span> Tiempo completo</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-yellow-300 rounded-full"></span> Medio tiempo</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-red-400 rounded-full"></span> Por horas</div>
+                  </div>
+                </div>
               </div>
-              <div class="flex justify-center gap-4 mt-6 text-sm text-gray-600">
-                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-blue-400 rounded-full"></span> Tiempo completo</div>
-                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-yellow-300 rounded-full"></span> Medio tiempo</div>
-                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-red-400 rounded-full"></span> Por horas</div>
+
+              <div class="w-full lg:w-1/2 flex flex-col justify-between gap-8">
+                <!-- Tabla de pagos -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                  <h2 class="text-xl font-semibold mb-4 text-gray-800">Últimos pagos</h2>
+                  <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-700">
+                      <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                        <tr>
+                          <th class="px-6 py-3">Planillas</th>
+                          <th class="px-6 py-3">Fecha</th>
+                          <th class="px-6 py-3">Costo Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="(resumen, index) in resumenesPorPlanilla"
+                          :key="index"
+                          @click="handleSeleccionarPlanilla(resumen)"
+                          class="hover:bg-blue-50 hover:shadow-sm border-l-4 border-transparent hover:border-blue-500 transition-all cursor-pointer"
+                        >
+                          <td class="px-6 py-4 font-semibold text-blue-800">Planilla</td>
+                          <td class="px-6 py-4">
+                            Del {{ formatearFecha(resumen.fechaInicio) }} al {{ formatearFecha(resumen.fechaFinal) }}
+                          </td>
+                          <td class="px-6 py-4">{{ formatearColones(resumen.costoTotalEmpleador || 0) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Gráfico detalle planilla -->
+                <div v-if="planillaSeleccionada" class="bg-white rounded-xl shadow-md p-6">
+                  <h3 class="text-lg font-bold mb-4 text-gray-800 text-center">
+                    Detalle de la planilla: Del {{ formatearFecha(planillaSeleccionada.fechaInicio) }} al {{ formatearFecha(planillaSeleccionada.fechaFinal) }}
+                  </h3>
+                  <div class="w-full h-64">
+                    <Pie :data="chartDetalleResumen" :options="{ responsive: true, plugins: { legend: { position: 'bottom' } } }" />
+                  </div>
+                  <p class="mt-4 text-sm text-gray-700 font-semibold text-center">
+                    Costo Total: {{ formatearColones(planillaSeleccionada.costoTotalEmpleador || 0) }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- Derecha: tabla + gráfico detalle apilados -->
-          <div class="w-full lg:w-1/2 flex flex-col justify-between gap-8">
-            <!-- Tabla de pagos -->
-            <div class="bg-white rounded-xl shadow-md p-6">
-              <h2 class="text-xl font-semibold mb-4 text-gray-800">Últimos pagos</h2>
-              <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm text-gray-700">
-                  <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                    <tr>
-                      <th class="px-6 py-3">Planillas</th>
-                      <th class="px-6 py-3">Fecha</th>
-                      <th class="px-6 py-3">Costo Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="(resumen, index) in resumenesPorPlanilla"
-                      :key="index"
-                      @click="handleSeleccionarPlanilla(resumen)"
-                      class="hover:bg-blue-50 hover:shadow-sm border-l-4 border-transparent hover:border-blue-500 transition-all cursor-pointer"
-                    >
-                      <td class="px-6 py-4 font-semibold text-blue-800">Planilla</td>
-                      <td class="px-6 py-4">
-                        Del {{ formatearFecha(resumen.fechaInicio) }} al {{ formatearFecha(resumen.fechaFinal) }}
-                      </td>
-                      <td class="px-6 py-4">{{ formatearColones(resumen.costoTotalEmpleador || 0) }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Gráfico detalle planilla -->
-            <div v-if="planillaSeleccionada" class="bg-white rounded-xl shadow-md p-6">
-              <h3 class="text-lg font-bold mb-4 text-gray-800 text-center">
-                Detalle de la planilla: Del {{ formatearFecha(planillaSeleccionada.fechaInicio) }} al {{ formatearFecha(planillaSeleccionada.fechaFinal) }}
-              </h3>
-              <div class="w-full h-64">
-                <Pie :data="chartDetalleResumen" :options="{ responsive: true, plugins: { legend: { position: 'bottom' } } }" />
-              </div>
-              <p class="mt-4 text-sm text-gray-700 font-semibold text-center">
-                Costo Total: {{ formatearColones(planillaSeleccionada.costoTotalEmpleador || 0) }}
-              </p>
+        </template>
+          
+        <template v-else-if="userStore.usuario?.tipo === 'Empleado'">
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 text-center">Resumen de desempeño</h2>
+            <div class="w-full h-96">
+              <Bar :data="chartEmpleadoData" :options="chartEmpleadoOptions" />
             </div>
           </div>
-        </div>
+        </template>
       </div>
     </div>
   </div>
@@ -102,6 +111,9 @@ const salariosPorContrato = ref([])
 const deduccionesEmpleador = ref([])
 const deduccionesObligatorias = ref([])
 const beneficios = ref([])
+
+
+//const empleado = userStore.empleado;
 
 // Formato utilidades
 const formatearFecha = (fechaStr) => {
@@ -223,7 +235,6 @@ const cargarResumenesPorPlanilla = async () => {
 // Cargar datos detallados de la planilla
 const cargarDetallePlanilla = async (idPlanilla) => {
   try {
-    // Cargar salarios por contrato
     const resSalarios = await axios.get(`${API_BASE_URL}Reporte/salariosPorContrato/${idPlanilla}`)
     const tipos = ["Tiempo Completo", "Medio Tiempo", "Servicios Profesionales", "Por Horas"]
     salariosPorContrato.value = tipos.map(tipo => {
