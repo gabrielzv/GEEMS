@@ -18,9 +18,11 @@ namespace BackendGeems.Application
         }
         public void EliminarEmpresa(string cedula)
         {
-            Empresa empresa = _empresaRepo.GetEmpresa(cedula);
             List<Empleado> empleados = _empresaRepo.GetEmpleados(cedula);
-            if (HayPagos(empleados))
+            bool hayPagos = HayPagos(empleados);
+            EliminarBeneficios(cedula);
+            EliminarEmpleados(empleados);
+            if (hayPagos)
             {
                 _empresaRepo.BorradoFisico(cedula);
             }
@@ -28,8 +30,6 @@ namespace BackendGeems.Application
             {
                 _empresaRepo.BorradoLogico(cedula);
             }
-            EliminarBeneficios(cedula);
-            EliminarEmpleados(empleados);
         }
         private bool HayPagos(List<Empleado> empleados)
         {
@@ -43,9 +43,18 @@ namespace BackendGeems.Application
         private void EliminarBeneficios(string cedula)
         {
             List<object> listaBeneficios = _beneficioQuery.GetCompanyBenefits(cedula);
-            foreach (Beneficio beneficio in listaBeneficios)
+            foreach (var beneficioObj in listaBeneficios)
             {
-                _beneficioQuery.EliminarBeneficio(beneficio.Id);
+                // Usa reflexión para obtener la propiedad Id del objeto anónimo
+                var idProp = beneficioObj.GetType().GetProperty("Id");
+                if (idProp != null)
+                {
+                    var id = idProp.GetValue(beneficioObj)?.ToString();
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        _beneficioQuery.EliminarBeneficio(id);
+                    }
+                }
             }
         }
         private void EliminarEmpleados(List<Empleado> empleados)
@@ -59,15 +68,22 @@ namespace BackendGeems.Application
         {
             string tipo = _empresaRepo.GetTipo(cedulaPersona);
             bool estado = false;
-            if( tipo == "Empleado")
+            try
             {
-                estado = _empresaRepo.GetEstadoEliminadoEmpresaEmpleado(cedulaPersona);
+                if (tipo == "Empleado")
+                {
+                    estado = _empresaRepo.GetEstadoEliminadoEmpresaEmpleado(cedulaPersona);
+                }
+                else if (tipo == "DuenoEmpresa")
+                {
+                    estado = _empresaRepo.GetEstadoEliminadoEmpresaDueno(cedulaPersona);
+                }
+                return estado;
             }
-            else if( tipo == "DuenoEmpresa" )
+            catch (Exception ex)
             {
-                estado = _empresaRepo.GetEstadoEliminadoEmpresaDueno(cedulaPersona);
+                return true; // Empresa no existe ya
             }
-            return estado;
         }
         public bool GetEstadoEliminadoEmpresa(string nombreEmpresa)
         {

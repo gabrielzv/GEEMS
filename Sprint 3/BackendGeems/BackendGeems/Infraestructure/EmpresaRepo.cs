@@ -71,32 +71,35 @@ namespace BackendGeems.Infraestructure
             using SqlTransaction transaction = conn.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
             try
             {
-                string query = @"SELECT * FROM Empleado WHERE NombreEmpresa = (
-                            SELECT Nombre FROM Empresa WHERE CedulaJuridica = @CedulaJuridica
-                        )";
+                string query = @"
+                    SELECT em.* 
+                    FROM Empleado em
+                    JOIN Empresa e ON em.NombreEmpresa = e.Nombre
+                    WHERE e.CedulaJuridica = @CedulaJuridica";
 
                 using SqlCommand cmd = new SqlCommand(query, conn, transaction);
                 cmd.Parameters.AddWithValue("@CedulaJuridica", cedula);
 
-                using SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    empleados.Add(new Empleado
+                    while (reader.Read())
                     {
-                        Id = Guid.Parse(reader["Id"].ToString()),
-                        CedulaPersona = Convert.ToInt32(reader["CedulaPersona"]),
-                        Contrato = reader["Contrato"].ToString(),
-                        NumHorasTrabajadas = Convert.ToInt32(reader["NumHorasTrabajadas"]),
-                        Genero = reader["Genero"].ToString(),
-                        EstadoLaboral = reader["EstadoLaboral"].ToString(),
-                        SalarioBruto = Convert.ToInt32(reader["SalarioBruto"]),
-                        Tipo = reader["Tipo"].ToString(),
-                        FechaIngreso = reader["FechaIngreso"].ToString(),
-                        NombreEmpresa = reader["NombreEmpresa"].ToString(),
-                        CantidadDependientes = Convert.ToInt32(reader["NumDependientes"]),
-                        fechaNacimiento = Convert.ToDateTime(reader["FechaNacimiento"])
-                    });
+                        empleados.Add(new Empleado
+                        {
+                            Id = Guid.Parse(reader["Id"].ToString()),
+                            CedulaPersona = Convert.ToInt32(reader["CedulaPersona"]),
+                            Contrato = reader["Contrato"].ToString(),
+                            NumHorasTrabajadas = Convert.ToInt32(reader["NumHorasTrabajadas"]),
+                            Genero = reader["Genero"].ToString(),
+                            EstadoLaboral = reader["EstadoLaboral"].ToString(),
+                            SalarioBruto = Convert.ToInt32(reader["SalarioBruto"]),
+                            Tipo = reader["Tipo"].ToString(),
+                            FechaIngreso = reader["FechaIngreso"].ToString(),
+                            NombreEmpresa = reader["NombreEmpresa"].ToString(),
+                            CantidadDependientes = Convert.ToInt32(reader["NumDependientes"]),
+                            fechaNacimiento = Convert.ToDateTime(reader["FechaNacimiento"])
+                        });
+                    }
                 }
 
                 transaction.Commit();
@@ -146,7 +149,6 @@ namespace BackendGeems.Infraestructure
                 try
                 {
                     EliminarDatosPrivadosEmpresa(conn, transaction, cedula);
-                    ActualizarDuenoEmpresa(conn, transaction, cedula);
                     EliminarSuperAdminEmpresa(conn, transaction, cedula);
                     EliminarEmpresa(conn, transaction, cedula);
 
@@ -162,13 +164,6 @@ namespace BackendGeems.Infraestructure
         private void EliminarDatosPrivadosEmpresa(SqlConnection conn, SqlTransaction transaction, string cedula)
         {
             string query = @"DELETE FROM DatosPrivadosEmpresa WHERE CedulaJuridica = @CedulaJuridica";
-            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
-            cmd.Parameters.AddWithValue("@CedulaJuridica", cedula);
-            cmd.ExecuteNonQuery();
-        }
-        private void ActualizarDuenoEmpresa(SqlConnection conn, SqlTransaction transaction, string cedula)
-        {
-            string query = @"UPDATE DuenoEmpresa SET CedulaEmpresa = 'ELIMINADO' WHERE CedulaEmpresa = @CedulaJuridica";
             using SqlCommand cmd = new SqlCommand(query, conn, transaction);
             cmd.Parameters.AddWithValue("@CedulaJuridica", cedula);
             cmd.ExecuteNonQuery();
@@ -196,10 +191,10 @@ namespace BackendGeems.Infraestructure
             try
             {
                 string query = @"
-            SELECT e.EstaBorrado
-            FROM Empleado em
-            JOIN Empresa e ON em.NombreEmpresa = e.Nombre
-            WHERE em.CedulaPersona = @CedulaPersona";
+                    SELECT e.EstaBorrado
+                    FROM Empleado em
+                    JOIN Empresa e ON em.NombreEmpresa = e.Nombre
+                    WHERE em.CedulaPersona = @CedulaPersona";
 
                 using SqlCommand cmd = new SqlCommand(query, conn, transaction);
                 cmd.Parameters.AddWithValue("@CedulaPersona", cedulaPersona);
@@ -230,10 +225,10 @@ namespace BackendGeems.Infraestructure
             try
             {
                 string query = @"
-            SELECT e.EstaBorrado
-            FROM DuenoEmpresa d
-            JOIN Empresa e ON d.CedulaEmpresa = e.CedulaJuridica
-            WHERE d.CedulaPersona = @CedulaPersona";
+                    SELECT e.EstaBorrado
+                    FROM DuenoEmpresa d
+                    JOIN Empresa e ON d.CedulaEmpresa = e.CedulaJuridica
+                    WHERE d.CedulaPersona = @CedulaPersona";
 
                 using SqlCommand cmd = new SqlCommand(query, conn, transaction);
                 cmd.Parameters.AddWithValue("@CedulaPersona", cedulaPersona);
@@ -264,9 +259,9 @@ namespace BackendGeems.Infraestructure
             try
             {
                 string query = @"
-            SELECT Tipo
-            FROM Usuario
-            WHERE CedulaPersona = @CedulaPersona";
+                    SELECT Tipo
+                    FROM Usuario
+                    WHERE CedulaPersona = @CedulaPersona";
 
                 using SqlCommand cmd = new SqlCommand(query, conn, transaction);
                 cmd.Parameters.AddWithValue("@CedulaPersona", cedulaPersona);
@@ -297,9 +292,9 @@ namespace BackendGeems.Infraestructure
             try
             {
                 string query = @"
-            SELECT e.EstaBorrado
-            FROM Empresa e
-            WHERE e.Nombre = @Nombre";
+                    SELECT e.EstaBorrado
+                    FROM Empresa e
+                    WHERE e.Nombre = @Nombre";
 
                 using SqlCommand cmd = new SqlCommand(query, conn, transaction);
                 cmd.Parameters.AddWithValue("@Nombre", nombreEmpresa);
