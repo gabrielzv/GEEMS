@@ -62,14 +62,14 @@ namespace BackendGeems.API
             }
         }
         [HttpPost]
-        public void Post(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFin)
+        public void Post(Guid idEmpleado,Guid IdPayroll, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFin)
         {
-            _GenerarPago.GenerarPagoEmpleado(idEmpleado, idPlanilla, fechaInicio, fechaFin);
+            _GenerarPago.GenerarPagoEmpleado(idEmpleado,IdPayroll, idPlanilla, fechaInicio, fechaFin);
 
         }
 
         [HttpPost("generarPagosEmpresa")]
-        public IActionResult GenerarPagosEmpresa([FromQuery] string nombreEmpresa, [FromQuery] Guid idPlanilla, [FromQuery] DateTime fechaInicio, [FromQuery] DateTime fechaFinal)
+        public IActionResult GenerarPagosEmpresa([FromQuery] string nombreEmpresa, [FromQuery] Guid idPayroll, [FromQuery] Guid idPlanilla, [FromQuery] DateTime fechaInicio, [FromQuery] DateTime fechaFinal)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace BackendGeems.API
                             // Saltar empleados sin horas o salario
                             continue;
                         }
-                        _gestorPagosService.GenerarPagoEmpleado(empleado.Id, idPlanilla, fechaInicio, fechaFinal);
+                        _gestorPagosService.GenerarPagoEmpleado(empleado.Id,idPayroll, idPlanilla, fechaInicio, fechaFinal);
                         pagosGenerados++;
                     }
                     catch (Exception ex)

@@ -16,7 +16,7 @@ namespace BackendGeems.Application
             _empleadoRepo = empleadoRepo;
         }
 
-        public void GenerarPagoEmpleado(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        public void GenerarPagoEmpleado(Guid idEmpleado, Guid IdPayroll,Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
         {
             try
             {
@@ -48,13 +48,13 @@ namespace BackendGeems.Application
                 {
                     Console.WriteLine("Mensual");
 
-                    GenerarPagoMensual(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
+                    GenerarPagoMensual(idEmpleado,IdPayroll, idPlanilla, fechaInicio, fechaFinal);
 
                 }
                 else
                 {
                     Console.WriteLine("Quincenal");
-                    GenerarPagoQuincenal(idEmpleado, idPlanilla, fechaInicio, fechaFinal);
+                    GenerarPagoQuincenal(idEmpleado,IdPayroll, idPlanilla, fechaInicio, fechaFinal);
 
                 }
             }
@@ -64,7 +64,7 @@ namespace BackendGeems.Application
             }
         }   
 
-        public void GenerarPagoMensual(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        public void GenerarPagoMensual(Guid idEmpleado, Guid IdPayroll, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace BackendGeems.Application
 
                 Guid idPago = Guid.NewGuid();
 
-                _pagoRepo.InsertPago(idPago, idEmpleado, idPlanilla, fechaInicio, fechaFinal, resultado.SalarioBruto, resultado.SalarioBruto - resultado.TotalDeducciones);
+                _pagoRepo.InsertPago(idPago, idEmpleado,IdPayroll, idPlanilla, fechaInicio, fechaFinal, resultado.SalarioBruto, resultado.SalarioBruto - resultado.TotalDeducciones);
 
                 _pagoRepo.InsertDeduccion(idPago, "Obligatoria", null, resultado.ImpuestoRenta, "Impuesto De Renta");
                 _pagoRepo.InsertDeduccion(idPago, "Obligatoria", null, resultado.SEM, "SEM");
@@ -90,7 +90,7 @@ namespace BackendGeems.Application
             }
         }
 
-        public void GenerarPagoQuincenal(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
+        public void GenerarPagoQuincenal(Guid idEmpleado,Guid IdPayroll, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace BackendGeems.Application
 
                 Guid idPago = Guid.NewGuid();
 
-                _pagoRepo.InsertPago(idPago, idEmpleado, idPlanilla, fechaInicio, fechaFinal, resultado.SalarioBruto, resultado.SalarioBruto - resultado.TotalDeducciones);
+                _pagoRepo.InsertPago(idPago, idEmpleado,IdPayroll, idPlanilla, fechaInicio, fechaFinal, resultado.SalarioBruto, resultado.SalarioBruto - resultado.TotalDeducciones);
 
                 _pagoRepo.InsertDeduccion(idPago, "Obligatoria", null, resultado.ImpuestoRenta, "Impuesto de Renta Quincenal");
                 _pagoRepo.InsertDeduccion(idPago, "Obligatoria", null, resultado.SEM, "SEM");

@@ -18,7 +18,7 @@ namespace BackendGeems.Application
                 public double ObtenerSalarioEmpleado(Guid idEmpleado);
                 public double ObtenerMontoAPI(Guid idEmpleado, string nombreAPI, double salarioBruto);
                 public List<DeduccionVoluntaria> ObtenerDeduccionesVoluntarias(Guid idEmpleado);
-                public void InsertPago(Guid idPago, Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal, double montoBruto, double montoPago);
+                public void InsertPago(Guid idPago, Guid idEmpleado,Guid IdPayroll, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal, double montoBruto, double montoPago);
                 public int ContarPagos(Guid idEmpleado);
                 public void InactivarBeneficiosPendientesPorEmpresa(string nombreEmpresa);
                 public List<PagoyDeducciones> ObtenerPagosPorEmpleadoyPeriodo(string cedulaEmpleado, DateTime fechaInicio, DateTime fechaFinal);
