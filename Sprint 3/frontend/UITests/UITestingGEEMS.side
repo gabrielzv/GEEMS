@@ -298,6 +298,148 @@
       ],
       "value": ""
     }]
+  }, {
+    "id": "ab75b86a-fc67-43be-9d4d-e0c4acbd3b32",
+    "name": "AprobarHoras",
+    "commands": [{
+      "id": "7815397a-1ce9-47fe-bf7d-04f498ed526f",
+      "comment": "",
+      "command": "open",
+      "target": "/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ca7a54a2-4353-484b-a6ef-ea85c5080193",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1039x1032",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "8450503e-29f6-4356-9f3d-e37351d35df6",
+      "comment": "",
+      "command": "click",
+      "target": "css=.focus\\3Aring-2",
+      "targets": [
+        ["css=.focus\\3Aring-2", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "582899f9-0afd-4d78-bb56-6b07b24488de",
+      "comment": "",
+      "command": "type",
+      "target": "css=.focus\\3Aring-2",
+      "targets": [
+        ["css=.focus\\3Aring-2", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "pgomez"
+    }, {
+      "id": "ecb9825d-6e83-46b7-bcfd-62588720e6c4",
+      "comment": "",
+      "command": "click",
+      "target": "css=.px-3",
+      "targets": [
+        ["css=.px-3", "css:finder"],
+        ["xpath=//input[@type='password']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "642ded34-2d4d-4d0b-83d1-5d9e1c32435d",
+      "comment": "",
+      "command": "type",
+      "target": "css=.px-3",
+      "targets": [
+        ["css=.px-3", "css:finder"],
+        ["xpath=//input[@type='password']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "clave321"
+    }, {
+      "id": "c190cfd3-82b6-4969-9749-cf03d8ba9f89",
+      "comment": "",
+      "command": "click",
+      "target": "css=.w-full:nth-child(5)",
+      "targets": [
+        ["css=.w-full:nth-child(5)", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Entrar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "7e47ee9d-2b3d-4d22-adfa-b958eea18e28",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "linkText=Aprobar horas",
+      "targets": [
+        ["linkText=Aprobar horas", "linkText"],
+        ["css=.flex:nth-child(5)", "css:finder"],
+        ["xpath=//div[@id='app']/div/header/nav/a[2]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/aprobarHoras')]", "xpath:href"],
+        ["xpath=//nav/a[2]", "xpath:position"],
+        ["xpath=//a[contains(.,'Aprobar horas')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "a954b5f5-9b52-4fb8-b9e7-d5b46a557aef",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Aprobar horas",
+      "targets": [
+        ["linkText=Aprobar horas", "linkText"],
+        ["css=.flex:nth-child(5)", "css:finder"],
+        ["xpath=//div[@id='app']/div/header/nav/a[2]", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/aprobarHoras')]", "xpath:href"],
+        ["xpath=//nav/a[2]", "xpath:position"],
+        ["xpath=//a[contains(.,'Aprobar horas')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "a111164e-62f4-435e-8753-36f0e1f2014c",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "css=.border-b:nth-child(1) > .py-3:nth-child(1)",
+      "targets": [
+        ["css=.border-b:nth-child(1) > .py-3:nth-child(1)", "css:finder"],
+        ["xpath=//div[@id='app']/div/main/div/div/div[3]/table/tbody/tr/td", "xpath:idRelative"],
+        ["xpath=//td", "xpath:position"],
+        ["xpath=//td[contains(.,'Luis Ramirez')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "9d30be8e-57f3-48b9-a04b-e6b9559164c3",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "css=.border-b:nth-child(1) > .py-3:nth-child(2)",
+      "targets": [
+        ["css=.border-b:nth-child(1) > .py-3:nth-child(2)", "css:finder"],
+        ["xpath=//div[@id='app']/div/main/div/div/div[3]/table/tbody/tr/td[2]", "xpath:idRelative"],
+        ["xpath=//td[2]", "xpath:position"],
+        ["xpath=//td[contains(.,'lramirez')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "5a38adf4-ddb8-423e-8f0f-63a9782f6417",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "css=.border-b:nth-child(1) .border",
+      "targets": [
+        ["css=.border-b:nth-child(1) .border", "css:finder"],
+        ["xpath=//div[@id='app']/div/main/div/div/div[3]/table/tbody/tr/td[5]/select", "xpath:idRelative"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }]
   }],
   "suites": [{
     "id": "967616f3-fce2-45f6-8cd1-cc728d30019e",
