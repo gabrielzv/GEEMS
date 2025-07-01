@@ -185,7 +185,7 @@ namespace BackendGeems.Infraestructure
         }
 
 
-        public void BorrarTimesheetEmpleado(string cedula)
+        public void BorrarTimesheetEmpleado(string cedula, bool Permanente)
         {
             try
             {
@@ -203,16 +203,33 @@ namespace BackendGeems.Infraestructure
                     empleadoId = Guid.Parse(result.ToString());
                 }
 
-
-                string queryBorrarRegistro = "UPDATE Registro SET EstaBorrado = 1 WHERE IdEmpleado = @IdEmpleado";
-                using (SqlCommand cmdBorrar = new SqlCommand(queryBorrarRegistro, _conexion))
+                if (Permanente)
                 {
-                    cmdBorrar.Parameters.AddWithValue("@IdEmpleado", empleadoId);
-                   
-                    _conexion.Open();
-                    cmdBorrar.ExecuteNonQuery();
-                    _conexion.Close();
+                    string queryBorrarRegistro = "DELETE FROM Registro WHERE IdEmpleado = @IdEmpleado";
+                    using (SqlCommand cmdBorrar = new SqlCommand(queryBorrarRegistro, _conexion))
+                    {
+                        cmdBorrar.Parameters.AddWithValue("@IdEmpleado", empleadoId);
+
+                        _conexion.Open();
+                        cmdBorrar.ExecuteNonQuery();
+                        _conexion.Close();
+                    }
                 }
+                else
+                {
+                    string queryBorrarRegistro = "UPDATE Registro SET EstaBorrado = 1 WHERE IdEmpleado = @IdEmpleado";
+                    using (SqlCommand cmdBorrar = new SqlCommand(queryBorrarRegistro, _conexion))
+                    {
+                        cmdBorrar.Parameters.AddWithValue("@IdEmpleado", empleadoId);
+
+                        _conexion.Open();
+                        cmdBorrar.ExecuteNonQuery();
+                        _conexion.Close();
+                    }
+
+                }
+
+
             }
             catch (Exception ex)
             {
@@ -233,11 +250,11 @@ namespace BackendGeems.Infraestructure
                     cmdEmpleado.Parameters.AddWithValue("@Cedula", cedula);
                     _conexion.Open();
                     var result = cmdEmpleado.ExecuteScalar();
-                    
+
 
                     if (result != null && result != DBNull.Value)
                     {
-                        
+
                         using (SqlDataReader reader = cmdEmpleado.ExecuteReader())
                         {
                             if (reader.Read())
