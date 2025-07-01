@@ -53,18 +53,62 @@
                   </div>
                 </div>
 
-                <!-- Gráfico detalle planilla -->
                 <div v-if="planillaSeleccionada" class="bg-white rounded-xl shadow-md p-6">
-                  <h3 class="text-lg font-bold mb-4 text-gray-800 text-center">
-                    Detalle de la planilla: Del {{ formatearFecha(planillaSeleccionada.fechaInicio) }} al {{ formatearFecha(planillaSeleccionada.fechaFinal) }}
-                  </h3>
-                  <div class="w-full h-64">
-                    <Pie :data="chartDetalleResumen" :options="{ responsive: true, plugins: { legend: { position: 'bottom' } } }" />
-                  </div>
-                  <p class="mt-4 text-sm text-gray-700 font-semibold text-center">
-                    Costo Total: {{ formatearColones(planillaSeleccionada.costoTotalEmpleador || 0) }}
-                  </p>
+
+
+                  <!-- Gráfico pastel de pagos -->
+                    <h3 class="text-lg font-bold mb-4 text-gray-800 text-center">
+                      Detalle de la planilla: Del {{ formatearFecha(planillaSeleccionada.fechaInicio) }} al {{ formatearFecha(planillaSeleccionada.fechaFinal) }}
+                    </h3>
+
+                    <!-- Más espacio vertical y horizontal -->
+                    <div class="w-full min-h-[300px] flex justify-center items-center">
+                      <div class="w-full max-w-[600px]">
+                        <Pie
+                          :data="chartDetalleResumen"
+                          :options="{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                              legend: {
+                                position: 'right',
+                                labels: {
+                                  boxWidth: 30,
+                                  padding: 20,
+                                  generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                      return data.labels.map(function(label, i) {
+                                        const dataset = data.datasets[0];
+                                        const value = dataset.data[i];
+                                        return {
+                                          text: `${label}: ₡${value.toLocaleString('es-CR')}`,
+                                          fillStyle: dataset.backgroundColor[i],
+                                          hidden: isNaN(value) || value === 0,
+                                          index: i
+                                        };
+                                      });
+                                    }
+                                    return [];
+                                  }
+                                }
+                              },
+                              datalabels: {
+                                display: false
+                              }
+                            }
+                          }"
+                          height="300" 
+                        />
+                      </div>
+                    </div>
+
+                    <p class="mt-4 text-sm text-gray-700 font-semibold text-center">
+                      Costo Total: {{ formatearColones(planillaSeleccionada.costoTotalEmpleador || 0) }}
+                    </p>
+
                 </div>
+
               </div>
             </div>
           </div>
@@ -129,14 +173,51 @@
 
                   <!-- Gráfico de pastel de las deducciones -->
                   <div class="md:w-1/2 flex items-center justify-center">
-                    <div class="w-full max-w-[200px] h-[200px]">
+                    <div class="w-full max-w-[380px] min-h-[280px]">
                       <Pie
                         v-if="chartDeduccionPorTipo"
                         :data="chartDeduccionPorTipo"
-                        :options="{ responsive: true, plugins: { legend: { position: 'bottom' } } }"
+                        :options="{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: 'right',
+                              labels: {
+                                boxWidth: 20,
+                                padding: 16,
+                                font: {
+                                  size: 12
+                                },
+                                generateLabels(chart) {
+                                  const data = chart.data;
+                                  if (!data || !data.labels || !data.datasets.length) return [];
+
+                                  return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const backgroundColor = data.datasets[0].backgroundColor[i];
+
+                                    return {
+                                      text: `${label}: ₡${value.toLocaleString('es-CR')}`,
+                                      fillStyle: backgroundColor,
+                                      strokeStyle: backgroundColor,
+                                      lineWidth: 1,
+                                      index: i
+                                    };
+                                  });
+                                }
+                              }
+                            },
+                            datalabels: {
+                              display: false
+                            }
+                          }
+                        }"
                       />
                     </div>
                   </div>
+
+
                 </div>
 
                 
