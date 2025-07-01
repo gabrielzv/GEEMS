@@ -1,0 +1,5 @@
+USE GEEMSDB;
+GO
+
+CREATE NONCLUSTERED INDEX IX_Deducciones_IdPago
+ON Deducciones (IdPago);

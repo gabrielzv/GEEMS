@@ -1,3 +1,6 @@
+USE GEEMSDB;
+GO
+
 Alter Table Pago
 Add  TipoContrato Varchar(50);
 
