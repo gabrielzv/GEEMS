@@ -316,7 +316,161 @@ namespace BackendGeems.Infraestructure
                 throw new Exception("Error al obtener el estado de eliminación de la empresa: " + ex.Message);
             }
         }
+        public void BorrarEmpleador(int cedula)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+            using SqlTransaction transaction = conn.BeginTransaction();
+            try
+            {
+                BorrarLogicoPersonaEmpleador(conn, transaction, cedula);
+                BorrarLogicoUsuarioEmpleador(conn, transaction, cedula);
+                BorrarLogicoDuenoEmpresa(conn, transaction, cedula);
 
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception("Error al realizar el borrado lógico del empleador: " + ex.Message);
+            }
+        }
+        private void BorrarLogicoPersonaEmpleador(SqlConnection conn, SqlTransaction transaction, int cedula)
+        {
+            string query = @"UPDATE Persona SET EstaBorrado = 1 WHERE Cedula = @Cedula";
+            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+            cmd.Parameters.AddWithValue("@Cedula", cedula);
+            cmd.ExecuteNonQuery();
+        }
+        private void BorrarLogicoUsuarioEmpleador(SqlConnection conn, SqlTransaction transaction, int cedula)
+        {
+            string query = @"UPDATE Usuario SET EstaBorrado = 1 WHERE CedulaPersona = @Cedula";
+            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+            cmd.Parameters.AddWithValue("@Cedula", cedula);
+            cmd.ExecuteNonQuery();
+        }
+        private void BorrarLogicoDuenoEmpresa(SqlConnection conn, SqlTransaction transaction, int cedula)
+        {
+            string query = @"UPDATE DuenoEmpresa SET EstaBorrado = 1 WHERE CedulaPersona = @Cedula";
+            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+            cmd.Parameters.AddWithValue("@Cedula", cedula);
+            cmd.ExecuteNonQuery();
+        }
+        public string ObtenerEmpresaDueno(int cedula)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+
+            using SqlTransaction transaction = conn.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
+            try
+            {
+                string query = @"
+                    SELECT CedulaEmpresa
+                    FROM DuenoEmpresa
+                    WHERE CedulaPersona = @CedulaPersona";
+
+                using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+                cmd.Parameters.AddWithValue("@CedulaPersona", cedula);
+
+                object result = cmd.ExecuteScalar();
+
+                transaction.Commit();
+
+                if (result != null && result != DBNull.Value)
+                {
+                    return result.ToString();
+                }
+
+                throw new Exception($"No se encontró empresa asociada al dueño con cédula {cedula}");
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception("Error al obtener la cédula jurídica de la empresa del dueño: " + ex.Message);
+            }
+        }
+        private void BorrarFisicoPersonaEmpleador(SqlConnection conn, SqlTransaction transaction, int cedula)
+        {
+            string query = @"DELETE FROM Persona WHERE Cedula = @Cedula";
+            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+            cmd.Parameters.AddWithValue("@Cedula", cedula);
+            cmd.ExecuteNonQuery();
+        }
+        private void BorrarFisicoUsuarioEmpleador(SqlConnection conn, SqlTransaction transaction, int cedula)
+        {
+            string query = @"DELETE FROM Usuario WHERE CedulaPersona = @Cedula";
+            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+            cmd.Parameters.AddWithValue("@Cedula", cedula);
+            cmd.ExecuteNonQuery();
+        }
+        private void BorrarFisicoDuenoEmpresa(SqlConnection conn, SqlTransaction transaction, int cedula)
+        {
+            string query = @"DELETE FROM DuenoEmpresa WHERE CedulaPersona = @Cedula";
+            using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+            cmd.Parameters.AddWithValue("@Cedula", cedula);
+            cmd.ExecuteNonQuery();
+        }
+        public void BorrarEmpleadorLogico(int cedula)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+            using SqlTransaction transaction = conn.BeginTransaction();
+            try
+            {
+                BorrarLogicoPersonaEmpleador(conn, transaction, cedula);
+                BorrarLogicoUsuarioEmpleador(conn, transaction, cedula);
+                BorrarLogicoDuenoEmpresa(conn, transaction, cedula);
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception("Error al realizar el borrado lógico del empleador: " + ex.Message);
+            }
+        }
+        public void BorrarEmpleadorFisico(int cedula)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+            using SqlTransaction transaction = conn.BeginTransaction();
+            try
+            {
+                BorrarFisicoPersonaEmpleador(conn, transaction, cedula);
+                BorrarFisicoUsuarioEmpleador(conn, transaction, cedula);
+                BorrarFisicoDuenoEmpresa(conn, transaction, cedula);
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception("Error al realizar el borrado físico del empleador: " + ex.Message);
+            }
+        }
+        public int ContarPagosEmpresa(string cedulaJuridica)
+        {
+            using SqlConnection conn = new SqlConnection(_cadenaConexion);
+            conn.Open();
+            using SqlTransaction transaction = conn.BeginTransaction();
+            try
+            {
+                string query = @"
+            SELECT COUNT(*)
+            FROM Pago p
+            JOIN Empleado e ON p.IdEmpleado = e.Id
+            JOIN Empresa em ON e.NombreEmpresa = em.Nombre
+            WHERE em.CedulaJuridica = @CedulaJuridica";
+                using SqlCommand cmd = new SqlCommand(query, conn, transaction);
+                cmd.Parameters.AddWithValue("@CedulaJuridica", cedulaJuridica);
+                int count = Convert.ToInt32(cmd.ExecuteScalar());
+                transaction.Commit();
+                return count;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new Exception("Error al contar los pagos de la empresa: " + ex.Message);
+            }
+        }
 
     }
 }

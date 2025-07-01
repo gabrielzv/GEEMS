@@ -40,13 +40,6 @@
           Volver
         </button>
         <router-link
-          to="/actualizar-perfil"
-          class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Editar perfil
-        </router-link>
-        <!-- <button> -->
-        <router-link
           v-if="
             userView.role !== 'DuenoEmpresa' && userView.role !== 'SuperAdmin'
           "
@@ -55,7 +48,13 @@
         >
           Mis beneficios
         </router-link>
-        <!-- </button> -->
+        <button
+          v-if="userView.role === 'DuenoEmpresa'"
+          @click="eliminarCuenta"
+          class="px-6 py-3 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          Eliminar Cuenta
+        </button>
       </div>
     </div>
   </div>
@@ -67,13 +66,31 @@ import { ref, onMounted } from "vue";
 import axios from "axios";
 import UserInfo from "./UserInfo.vue";
 import { useUserStore } from "../store/user";
+import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
 const usuario = userStore.usuario;
+const router = useRouter();
 
 const loading = ref(true);
 const error = ref(false);
 const userView = ref({});
+
+const eliminarCuenta = async () => {
+  if (!confirm("¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.")) {
+    return;
+  }
+  try {
+    await axios.delete(`${API_BASE_URL}Empresas/Empleador`, {
+      params: { cedula: usuario.cedulaPersona }
+    });
+    userStore.logout();
+    router.push("/login");
+  } catch (err) {
+    alert("Error al eliminar la cuenta.");
+    console.error(err);
+  }
+};
 
 const fetchUserView = async () => {
   loading.value = true;

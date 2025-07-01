@@ -40,5 +40,9 @@ namespace BackendGeems.API
             var empresas = _repo.ObtenerTodas();
             return Ok(empresas);
         }
+        [HttpDelete("Empleador")]
+        public void BorrarEmpleador(int cedula){
+            _queryEmpresa.EliminarEmpleador(cedula);
+        }
     }
 }
