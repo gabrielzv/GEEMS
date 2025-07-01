@@ -167,6 +167,24 @@ namespace BackendGeems.Infraestructure
             }
         }
 
+        public bool UsuarioEstaBorradoId(Guid IdEmpleado)
+        {
+            string query = "SELECT EstaBorrado FROM Empleado WHERE Id = @IdEmpleado";
+            using (SqlCommand cmd = new SqlCommand(query, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@IdEmpleado", IdEmpleado);
+                _conexion.Open();
+                var result = cmd.ExecuteScalar();
+                _conexion.Close();
+                if (result != null && result != DBNull.Value)
+                {
+                    return Convert.ToInt32(result) == 1;
+                }
+                return false;
+            }
+        }
+
+
         public void BorrarTimesheetEmpleado(string cedula)
         {
             try
@@ -186,11 +204,11 @@ namespace BackendGeems.Infraestructure
                 }
 
 
-                string queryBorrarRegistro = "DELETE FROM Registro WHERE IdEmpleado = @IdEmpleado AND Estado = @Estado";
+                string queryBorrarRegistro = "UPDATE Registro SET EstaBorrado = 1 WHERE IdEmpleado = @IdEmpleado";
                 using (SqlCommand cmdBorrar = new SqlCommand(queryBorrarRegistro, _conexion))
                 {
                     cmdBorrar.Parameters.AddWithValue("@IdEmpleado", empleadoId);
-                    cmdBorrar.Parameters.AddWithValue("@Estado", "NoRevisado");
+                   
                     _conexion.Open();
                     cmdBorrar.ExecuteNonQuery();
                     _conexion.Close();

@@ -151,18 +151,11 @@ export default {
           CedulaPersona: this.cedulaPersona || 0,
           CorreoPersona: this.CorreoPersona || "",
         });
-        console.log(this.tipo);
-        console.log("PRUEBA");
         const usuario = res.data.usuario;
         
         const estadoEmpresaUrl = `${API_BASE_URL}Empresas/EstadoEliminadoEmpresaPersona?cedulaPersona=${usuario.cedulaPersona}`;
         const estadoRes = await axios.get(estadoEmpresaUrl);
         const empresaEstaEliminada = estadoRes.data;
-        if (empresaEstaEliminada) {
-          this.$router.push("/empresaEliminada");
-          return;
-        }
-        
 
         const userStore = useUserStore();
         await userStore.setUsuario({
@@ -173,6 +166,11 @@ export default {
           contrasena: usuario.contrasena,
         });
 
+        if (empresaEstaEliminada) {
+          this.$router.push("/empresaEliminada");
+          return;
+        }
+        
         this.mensaje = "Inicio de sesión exitoso.";
         this.$router.push("/home");
       } catch (err) {

@@ -6,12 +6,6 @@
         <h1 class="text-3xl font-bold text-gray-800">
           {{ empresa?.nombre || "Nombre de empresa" }}
         </h1>
-        <div class="text-center bg-white px-4 py-2 rounded-full shadow">
-          <p class="text-lg font-semibold text-gray-800">
-            {{ pagosPendientes }}
-          </p>
-          <p class="text-sm text-gray-600">Pagos Pendientes</p>
-        </div>
       </div>
 
       <!-- Información de la empresa -->
@@ -182,13 +176,16 @@ export default {
     };
 
     const goToEmpresaEliminada = async () => {
-      const cedula = empresa.value?.cedulaJuridica;
-      const url = `${API_BASE_URL}Empresas/borrar?cedula=${cedula}`;
-      try {
-        await axios.delete(url);
-        router.push("/empresaEliminada");
-      } catch (error) {
-        console.error("Error al eliminar la empresa:", error);
+      const confirmar = confirm("¿Está seguro de que desea eliminar su empresa? Esta acción no es reversible.")
+      if(confirmar){
+        const cedula = empresa.value?.cedulaJuridica;
+        const url = `${API_BASE_URL}Empresas/borrar?cedula=${cedula}`;
+        try {
+          await axios.delete(url);
+          router.push("/empresaEliminada");
+        } catch (error) {
+          console.error("Error al eliminar la empresa:", error);
+        }
       }
     };
 

@@ -243,6 +243,36 @@ namespace BackendGeems.Infraestructure
             }
             return tipoContrato;
         }
+        public string ObtenerTipoEmpleado(Guid idEmpleado)
+        {
+            string tipoContrato = null;
+            string query = "SELECT Tipo FROM Empleado WHERE Id = @IdEmpleado";
+
+            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            {
+                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
+                try
+                {
+                    _conexion.Open();
+                    var result = comando.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        tipoContrato = result.ToString();
+
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    throw new Exception("Error al obtener el tipo de Empleado: " + ex.Message);
+                }
+                finally
+                {
+                    _conexion.Close();
+                }
+            }
+            return tipoContrato;
+        }
 
         public double ObtenerSalarioEmpleado(Guid idEmpleado)
         {
@@ -323,8 +353,11 @@ namespace BackendGeems.Infraestructure
 
         public void InsertPago(Guid idPago, Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal, double montoBruto, double montoPago)
         {
-            string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada)
-                   VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada)";
+
+            string contrato = ObtenerTipoContratoEmpleado(idEmpleado);
+            string tipoEmpleado = ObtenerTipoEmpleado(idEmpleado);
+            string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada,TipoContrato,Posicion)
+                   VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada,@TipoContrato,@Posicion)";
             using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
             {
                 cmd.Parameters.AddWithValue("@Id", idPago);
@@ -335,6 +368,8 @@ namespace BackendGeems.Infraestructure
                 cmd.Parameters.AddWithValue("@MontoBruto", montoBruto);
                 cmd.Parameters.AddWithValue("@MontoPago", montoPago);
                 cmd.Parameters.AddWithValue("@FechaRealizada", DateTime.Now);
+                cmd.Parameters.AddWithValue("@TipoContrato", contrato ?? (object)DBNull.Value);
+                cmd.Parameters.AddWithValue("@Posicion", tipoEmpleado ?? (object)DBNull.Value);
                 _conexion.Open();
                 cmd.ExecuteNonQuery();
                 _conexion.Close();
@@ -660,26 +695,19 @@ namespace BackendGeems.Infraestructure
             int cantidadPagos = 0;
             string query = "SELECT COUNT(*) FROM Pago WHERE IdEmpleado = @IdEmpleado";
 
-            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            using (SqlConnection conn = new SqlConnection(_cadenaConexion))
             {
-                comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                conn.Open();
 
-                try
+                using (SqlCommand comando = new SqlCommand(query, conn))
                 {
-                    _conexion.Open();
+                    comando.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+
                     var result = comando.ExecuteScalar();
                     if (result != null && result != DBNull.Value)
                     {
                         cantidadPagos = Convert.ToInt32(result);
                     }
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception("Error al contar los pagos del empleado: " + ex.Message);
-                }
-                finally
-                {
-                    _conexion.Close();
                 }
             }
 
@@ -741,6 +769,73 @@ namespace BackendGeems.Infraestructure
             }
         }
 
+        public List<PagoyDeducciones> ObtenerPagosPorEmpleadoyPeriodo(string cedulaEmpleado, DateTime fechaInicio, DateTime fechaFinal)
+        {
+            var resultados = new List<PagoyDeducciones>();
+
+
+            Guid idEmpleado = Guid.Empty;
+            string queryEmpleado = "SELECT Id FROM Empleado WHERE CedulaPersona = (SELECT Cedula FROM Persona WHERE Cedula = @Cedula)";
+            using (SqlCommand cmd = new SqlCommand(queryEmpleado, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@Cedula", cedulaEmpleado);
+                _conexion.Open();
+                var result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    idEmpleado = Guid.Parse(result.ToString());
+                }
+                _conexion.Close();
+            }
+            if (idEmpleado == Guid.Empty)
+                return resultados;
+
+
+            string queryPagos = @"SELECT * FROM Pago 
+                                  WHERE IdEmpleado = @IdEmpleado 
+                                  AND FechaRealizada BETWEEN @FechaInicio AND @FechaFinal";
+            using (SqlCommand cmd = new SqlCommand(queryPagos, _conexion))
+            {
+                cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
+                _conexion.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var pagoId = reader["Id"] != DBNull.Value ? Guid.Parse(reader["Id"].ToString()) : Guid.Empty;
+                        var pagoyDeducciones = new PagoyDeducciones
+                        {
+                            TipoContrato = reader["TipoContrato"] != DBNull.Value ? reader["TipoContrato"].ToString() : string.Empty,
+                            Posicion = reader["Posicion"] != DBNull.Value ? reader["Posicion"].ToString() : string.Empty,
+                            FechaRealizada = reader["FechaRealizada"] != DBNull.Value ? Convert.ToDateTime(reader["FechaRealizada"]) : DateTime.MinValue,
+                            MontoBruto = reader["MontoBruto"] != DBNull.Value ? Convert.ToDouble(reader["MontoBruto"]) : 0,
+                            MontoPago = reader["MontoPago"] != DBNull.Value ? Convert.ToDouble(reader["MontoPago"]) : 0,
+                            FechaInicio = reader["FechaInicio"] != DBNull.Value ? Convert.ToDateTime(reader["FechaInicio"]) : DateTime.MinValue,
+                            FechaFinal = reader["FechaFinal"] != DBNull.Value ? Convert.ToDateTime(reader["FechaFinal"]) : DateTime.MinValue,
+                            Deducciones = new List<PagoDeduccion>()
+                        };
+
+
+                        var deducciones = ObtenerDeduccionesPorPago(pagoId);
+                        foreach (var ded in deducciones)
+                        {
+                            pagoyDeducciones.Deducciones.Add(new PagoDeduccion
+                            {
+                                Tipo = ded.TipoDeduccion,
+                                Monto = ded.Monto,
+                            });
+                        }
+
+                        resultados.Add(pagoyDeducciones);
+                    }
+                }
+                _conexion.Close();
+            }
+
+            return resultados;
+        }
         public List<Pago> ObtenerPagosPorPlanilla(Guid idPlanilla)
         {
             string query = @"SELECT p.Id, p.FechaRealizada, p.MontoPago, p.IdEmpleado, p.IdPayroll, p.IdPlanilla, p.MontoBruto,

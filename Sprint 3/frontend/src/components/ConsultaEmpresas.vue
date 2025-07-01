@@ -115,14 +115,29 @@ export default {
       const url = `${API_BASE_URL}Empresa`;
       try {
         const res = await axios.get(url);
-        companies.value = res.data.map((empresa) => ({
-          id: empresa.cedulaJuridica,
-          name: empresa.nombre,
-          legalId: empresa.cedulaJuridica,
-          phone: empresa.telefono,
-          owner: empresa.dueno || "Sin asignar",
-          email: empresa.correo,
-        }));
+        const empresas = res.data;
+        const empresasFiltradas = [];
+        for (const empresa of empresas) {
+          try {
+            const estadoRes = await axios.get(
+              `${API_BASE_URL}Empresas/Estado`,
+              { params: { NombreEmpresa: empresa.nombre } }
+            );
+            if (estadoRes.data === false) {
+              empresasFiltradas.push({
+                id: empresa.cedulaJuridica,
+                name: empresa.nombre,
+                legalId: empresa.cedulaJuridica,
+                phone: empresa.telefono,
+                owner: empresa.dueno || "Sin asignar",
+                email: empresa.correo,
+              });
+            }
+          } catch (estadoError) {
+            console.error(`Error al consultar estado de ${empresa.nombre}:`, estadoError);
+          }
+        }
+        companies.value = empresasFiltradas;
       } catch (err) {
         console.error("Error al obtener las empresas:", err);
         error.value = true;

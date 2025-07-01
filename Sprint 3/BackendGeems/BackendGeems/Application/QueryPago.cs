@@ -14,6 +14,11 @@ namespace BackendGeems.Application
            var pagos = _repoInfrastructure.ObtenerPagos(fechaInicio, fechaFinal);
             return pagos;
         }
+        public List<PagoyDeducciones> ObtenerPagosPorEmpleadoyPeriodo(string cedulaEmpleado, DateTime fechaInicio, DateTime fechaFinal)
+        {
+            var pagos = _repoInfrastructure.ObtenerPagosPorEmpleadoyPeriodo(cedulaEmpleado, fechaInicio, fechaFinal);
+            return pagos;
+        }
     }
     
 }
