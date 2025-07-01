@@ -9,12 +9,20 @@ namespace BackendGeems.Application
         private readonly IPagoRepo _pagoRepo;
         private readonly QueryBeneficio _beneficioQuery;
         private readonly BorradoDeEmpleados _borradoDeEmpleados;
-        public QueryEmpresa(IEmpresaRepo empresaRepo, IPagoRepo pagoRepo, IBeneficioRepo beneficioRepo, IEmpleadoRepo empleadoRepo, IReporteService reporteService)
+        private readonly IEmpleadoRepo _empleadoRepo;
+
+        public QueryEmpresa(
+            IEmpresaRepo empresaRepo,
+            IPagoRepo pagoRepo,
+            IBeneficioRepo beneficioRepo,
+            IEmpleadoRepo empleadoRepo,
+            IReporteService reporteService)
         {
             _beneficioQuery = new QueryBeneficio(beneficioRepo);
             _borradoDeEmpleados = new BorradoDeEmpleados(empleadoRepo, reporteService);
             _pagoRepo = pagoRepo;
             _empresaRepo = empresaRepo;
+            _empleadoRepo = empleadoRepo;
         }
         public void EliminarEmpresa(string cedula)
         {
@@ -45,7 +53,6 @@ namespace BackendGeems.Application
             List<object> listaBeneficios = _beneficioQuery.GetCompanyBenefits(cedula);
             foreach (var beneficioObj in listaBeneficios)
             {
-                // Usa reflexión para obtener la propiedad Id del objeto anónimo
                 var idProp = beneficioObj.GetType().GetProperty("Id");
                 if (idProp != null)
                 {
@@ -82,12 +89,34 @@ namespace BackendGeems.Application
             }
             catch (Exception ex)
             {
-                return true; // Empresa no existe ya
+                return true;
             }
         }
         public bool GetEstadoEliminadoEmpresa(string nombreEmpresa)
         {
             return _empresaRepo.GetEstadoEliminadoEmpresa(nombreEmpresa);
         }
+        public void EliminarEmpleador(int cedula)
+        {
+            try
+            {
+                string cedulaEmpresa = _empresaRepo.ObtenerEmpresaDueno(cedula);
+                int cantidadPagos = _empresaRepo.ContarPagosEmpresa(cedulaEmpresa);
+                if (cantidadPagos > 0)
+                {
+                    _empresaRepo.BorrarEmpleadorLogico(cedula);
+                }
+                else
+                {
+                    _empresaRepo.BorrarEmpleadorFisico(cedula);
+                }
+                EliminarEmpresa(cedulaEmpresa);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("Error al eliminar el empleador: " + ex.Message);
+            }
+        }
+
     }
 }
