@@ -124,32 +124,37 @@ namespace BackendGeems.Infraestructure
         }
         public void InsertRegister(Registro inserting)
         {
-            string query = @"INSERT INTO Registro (Id, NumHoras, Fecha, Estado, IdEmpleado)
-                     VALUES (@Id, @NumHoras, @Fecha, @Estado, @IdEmpleado)";
-
-            using (SqlCommand comando = new SqlCommand(query, _conexion))
+            using (SqlConnection conn = new SqlConnection(_cadenaConexion))
             {
-                comando.Parameters.AddWithValue("@Id", inserting.Id);
-                comando.Parameters.AddWithValue("@NumHoras", inserting.NumHoras);
-                comando.Parameters.AddWithValue("@Fecha", inserting.Fecha);
-                comando.Parameters.AddWithValue("@Estado", inserting.Estado ?? (object)DBNull.Value);
-                comando.Parameters.AddWithValue("@IdEmpleado", inserting.IdEmpleado);
+                conn.Open();
+                using (SqlTransaction tx = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        string query = @"INSERT INTO Registro (Id, NumHoras, Fecha, Estado, IdEmpleado)
+                                        VALUES (@Id, @NumHoras, @Fecha, @Estado, @IdEmpleado)";
+                        using (SqlCommand comando = new SqlCommand(query, conn, tx))
+                        {
+                            comando.Parameters.AddWithValue("@Id", inserting.Id);
+                            comando.Parameters.AddWithValue("@NumHoras", inserting.NumHoras);
+                            comando.Parameters.AddWithValue("@Fecha", inserting.Fecha);
+                            comando.Parameters.AddWithValue("@Estado", inserting.Estado ?? (object)DBNull.Value);
+                            comando.Parameters.AddWithValue("@IdEmpleado", inserting.IdEmpleado);
 
-                try
-                {
-                    _conexion.Open();
-                    comando.ExecuteNonQuery();
-                }
-                catch (SqlException ex)
-                {
-                    throw new Exception("Error al insertar el registro: " + ex.Message);
-                }
-                finally
-                {
-                    _conexion.Close();
+                            comando.ExecuteNonQuery();
+                        }
+
+                        tx.Commit();
+                    }
+                    catch (SqlException ex)
+                    {
+                        tx.Rollback();
+                        throw new Exception("Error al insertar el registro: " + ex.Message);
+                    }
                 }
             }
         }
+
         public int GetMonthHours(Guid idEmpleado, DateTime fecha)
         {
             Console.WriteLine("Se entra al GetMonthHours");

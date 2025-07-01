@@ -95,18 +95,6 @@
     <div class="px-4 py-4 mb-4 flex gap-4 items-end">
       <template v-if="pagos.length">
         <button
-          @click="enviarPDFPorCorreo"
-          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          Enviar PDF por correo
-        </button>
-        <button
-          @click="exportarPDF"
-          class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          Descargar PDF
-        </button>
-        <button
           @click="enviarExcelPorCorreo"
           class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
@@ -127,8 +115,6 @@
 import { ref, onMounted, watch } from "vue";
 import axios from "axios";
 import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { useUserStore } from "../store/user";
 import { API_BASE_URL } from "@/config";
 
@@ -146,7 +132,6 @@ const nombre = ref({});
 const userStore = useUserStore();
 const empleado = userStore.empleado;
 const usuario = userStore.usuario;
-
 
 const cedulaEmpleado = String(empleado.cedulaPersona);
 nombreEmpresa.value = empleado.nombreEmpresa;
@@ -253,105 +238,6 @@ function exportarExcel() {
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Reporte2");
   XLSX.writeFile(wb, "Reporte2Pagos.xlsx");
-}
-
-function exportarPDF() {
-  const doc = new jsPDF();
-  doc.setFontSize(14);
-  doc.text("REPORTE 2 – EMPLEADO (HISTÓRICO PAGO PLANILLA)", 10, 10);
-  doc.setFontSize(10);
-  doc.text(`Empresa: ${nombreEmpresa.value}`, 10, 18);
-  doc.text(`Empleado: ${nombreEmpleado.value}`, 10, 24);
-  autoTable(doc, {
-    startY: 30,
-    head: [
-      [
-        "Tipo de contrato",
-        "Posición",
-        "Fecha de pago",
-        "Salario Bruto",
-        "Deducciones obligatorias empleado",
-        "Deducciones voluntarias",
-        "Salario neto",
-      ],
-    ],
-    body: pagos.value.map((pago) => [
-      pago.tipoContrato,
-      pago.posicion,
-      formatFecha(pago.fechaRealizada),
-      "CRC" + formatNumber(pago.montoBruto),
-      "CRC" + formatNumber(totalObligatorias(pago.deducciones)),
-      "CRC" + formatNumber(totalVoluntarias(pago.deducciones)),
-      "CRC" + formatNumber(pago.montoPago),
-    ]),
-    foot: [
-      [
-        { content: "Totales", colSpan: 3 },
-        "CRC" + formatNumber(totalColumn("montoBruto")),
-        "CRC" + formatNumber(totalColumn("obligatorias")),
-        "CRC" + formatNumber(totalColumn("voluntarias")),
-        "CRC" + formatNumber(totalColumn("montoPago")),
-      ],
-    ],
-  });
-  doc.save("Reporte2Pagos.pdf");
-}
-
-async function enviarPDFPorCorreo() {
-  try {
-    // Generar PDF como Blob
-    const doc = new jsPDF();
-    doc.setFontSize(14);
-    doc.text("REPORTE 2 – EMPLEADO (HISTÓRICO PAGO PLANILLA)", 10, 10);
-    doc.setFontSize(10);
-    doc.text(`Empresa: ${nombreEmpresa.value}`, 10, 18);
-    doc.text(`Empleado: ${nombreEmpleado.value}`, 10, 24);
-    autoTable(doc, {
-      startY: 30,
-      head: [
-        [
-          "Tipo de contrato",
-          "Posición",
-          "Fecha de pago",
-          "Salario Bruto",
-          "Deducciones obligatorias empleado",
-          "Deducciones voluntarias",
-          "Salario neto",
-        ],
-      ],
-      body: pagos.value.map((pago) => [
-        pago.tipoContrato,
-        pago.posicion,
-        formatFecha(pago.fechaRealizada),
-        "CRC" + formatNumber(pago.montoBruto),
-        "CRC" + formatNumber(totalObligatorias(pago.deducciones)),
-        "CRC" + formatNumber(totalVoluntarias(pago.deducciones)),
-        "CRC" + formatNumber(pago.montoPago),
-      ]),
-      foot: [
-        [
-          { content: "Totales", colSpan: 3 },
-          "CRC" + formatNumber(totalColumn("montoBruto")),
-          "CRC" + formatNumber(totalColumn("obligatorias")),
-          "CRC" + formatNumber(totalColumn("voluntarias")),
-          "CRC" + formatNumber(totalColumn("montoPago")),
-        ],
-      ],
-    });
-    const pdfBlob = doc.output("blob");
-
-    const formData = new FormData();
-    formData.append("Archivo", pdfBlob, "Reporte2Pagos.pdf");
-    formData.append("Correo", correoDestino.value || usuario.email || "");
-    formData.append("NombreUsuario", nombreEmpleado.value || "Usuario");
-
-    await axios.post(`${API_BASE_URL}Reporte/Reporte`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    alert("PDF enviado correctamente.");
-  } catch (err) {
-    alert("Error al enviar el PDF.");
-  }
 }
 
 async function enviarExcelPorCorreo() {
