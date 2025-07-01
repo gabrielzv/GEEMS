@@ -23,6 +23,7 @@ namespace BackendGeems.Application
                 public void InactivarBeneficiosPendientesPorEmpresa(string nombreEmpresa);
                 public List<PagoyDeducciones> ObtenerPagosPorEmpleadoyPeriodo(string cedulaEmpleado, DateTime fechaInicio, DateTime fechaFinal);
                 public List<Pago> ObtenerPagosPorPlanilla(Guid idPlanilla);
-        }
+            public double ObtenerDeduccionesVoluntariasPorPago(Guid idPago);
+    }
 
 }

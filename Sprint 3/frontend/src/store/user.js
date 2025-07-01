@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 export const useUserStore = defineStore("user", {
   state: () => ({
@@ -16,7 +17,7 @@ export const useUserStore = defineStore("user", {
     async fetchEmpleado(cedulaPersona) {
       try {
         const empleadoRes = await axios.get(
-          `https://localhost:7014/api/GetEmpleado/${cedulaPersona}`
+          `${API_BASE_URL}GetEmpleado/${cedulaPersona}`
         );
         this.empleado = empleadoRes.data;
         sessionStorage.setItem("empleado", JSON.stringify(this.empleado));
@@ -28,7 +29,7 @@ export const useUserStore = defineStore("user", {
     async fetchEmpresa(cedulaPersona) {
       try {
         const empresaRes = await axios.get(
-          `https://localhost:7014/api/Empresa/${cedulaPersona}`
+          `${API_BASE_URL}Empresa/${cedulaPersona}`
         );
 
         const { empresa, empleados } = empresaRes.data;
