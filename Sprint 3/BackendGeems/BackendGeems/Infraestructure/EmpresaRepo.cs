@@ -316,25 +316,6 @@ namespace BackendGeems.Infraestructure
                 throw new Exception("Error al obtener el estado de eliminación de la empresa: " + ex.Message);
             }
         }
-        public void BorrarEmpleador(int cedula)
-        {
-            using SqlConnection conn = new SqlConnection(_cadenaConexion);
-            conn.Open();
-            using SqlTransaction transaction = conn.BeginTransaction();
-            try
-            {
-                BorrarLogicoPersonaEmpleador(conn, transaction, cedula);
-                BorrarLogicoUsuarioEmpleador(conn, transaction, cedula);
-                BorrarLogicoDuenoEmpresa(conn, transaction, cedula);
-
-                transaction.Commit();
-            }
-            catch (Exception ex)
-            {
-                transaction.Rollback();
-                throw new Exception("Error al realizar el borrado lógico del empleador: " + ex.Message);
-            }
-        }
         private void BorrarLogicoPersonaEmpleador(SqlConnection conn, SqlTransaction transaction, int cedula)
         {
             string query = @"UPDATE Persona SET EstaBorrado = 1 WHERE Cedula = @Cedula";
