@@ -1,4 +1,5 @@
-USE GEEMSDB
+USE GEEMSDB;
+GO
 
 CREATE PROCEDURE sp_ActualizarEstadoRegistro
 (
