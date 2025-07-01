@@ -10,12 +10,14 @@ namespace BackendGeems.Infraestructure
         private SqlConnection _conexion;
         private string _cadenaConexion;
         public string CadenaConexion => _cadenaConexion;
+        private readonly CorreoSender _correoSender;
 
         public BeneficioRepo()
         {
             var builder = WebApplication.CreateBuilder();
             _cadenaConexion = builder.Configuration.GetConnectionString("DefaultConnection");
             _conexion = new SqlConnection(_cadenaConexion);
+            _correoSender = new CorreoSender(builder.Configuration);
         }
 
         private DataTable CrearTablaConsulta(SqlCommand comando)
@@ -211,7 +213,8 @@ namespace BackendGeems.Infraestructure
                 SELECT b.Id, b.Nombre, b.Descripcion, b.Costo, b.TiempoMinimoEnEmpresa
                 FROM Beneficio b
                 INNER JOIN DuenoEmpresa de ON b.CedulaJuridica = de.CedulaEmpresa
-                WHERE de.CedulaEmpresa = @CedulaJuridica;";
+                WHERE de.CedulaEmpresa = @CedulaJuridica
+                AND b.Estado = 'Activo';";
 
             using (var command = new SqlCommand(query, _conexion))
             {
@@ -349,11 +352,15 @@ namespace BackendGeems.Infraestructure
             bool planillaPagada = HayPagosRelacionados(IdBeneficio);
 
             if (!planillaPagada)
-                // Se hace el caso 2, se elimina el beneficio, las asociaciones y se notifica al empleado (FALTA)
+            {
+                // Se hace el caso 2, se elimina el beneficio, las asociaciones y se notifica al empleado
+                NotificarEmpleados(IdBeneficio);
                 RealizarEliminacion(IdBeneficio);
+            }
             else
             {
-                // Se hace el caso 3, se hace el borrado lógico del beneficio
+                // Se hace el caso 3, se hace el borrado lógico del beneficio y se notifica al empleado
+                NotificarEmpleados(IdBeneficio);
                 BorradoLogico(IdBeneficio);
             }
         }
@@ -433,6 +440,51 @@ namespace BackendGeems.Infraestructure
                 command.ExecuteNonQuery();
                 _conexion.Close();
             }
+        }
+
+        private void NotificarEmpleados(string IdBeneficio)
+        {
+            // Se obtiene primero el nombre del beneficio.
+            string nombreBeneficio = "";
+            string queryNombre = "SELECT Nombre FROM Beneficio WHERE Id = @IdBeneficio";
+            using (SqlCommand cmdNombre = new SqlCommand(queryNombre, _conexion))
+            {
+                cmdNombre.Parameters.AddWithValue("@IdBeneficio", IdBeneficio);
+                _conexion.Open();
+                var result = cmdNombre.ExecuteScalar();
+                if (result != null)
+                    nombreBeneficio = result.ToString();
+                _conexion.Close();
+            }
+
+            string asunto = "Notificación de beneficio eliminado";
+            string mensaje = $"El beneficio \"{nombreBeneficio}\" ha sido eliminado.";
+
+            // Se obtienen los correos de los empleados que matricularon ese beneficio.
+            string query = @"
+                SELECT u.CorreoPersona
+                FROM BeneficiosEmpleado be
+                JOIN Empleado e ON be.IdEmpleado = e.Id
+                JOIN Usuario u ON e.CedulaPersona = u.CedulaPersona
+                WHERE be.IdBeneficio = @IdBeneficio;";
+
+            using (SqlCommand command = new SqlCommand(query, _conexion))
+            {
+                command.Parameters.AddWithValue("@IdBeneficio", IdBeneficio);
+                _conexion.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    string email = reader["CorreoPersona"].ToString();
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        _correoSender.EnviarCorreoAsync(email, asunto, mensaje);
+                    }
+                }
+                _conexion.Close();
+            }
+            
         }
     }
 }
