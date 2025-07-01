@@ -47,6 +47,7 @@ export default {
       fechaFin: "",
       nombreEmpresa: "",
       cedulaPersona: "",
+      idPayroll: "",
     };
   },
   async mounted() {
@@ -85,20 +86,26 @@ export default {
   },
   methods: {
     async generarPagosYResumen() {
+      const userStore = useUserStore();
+
+      if (!userStore.usuario) {
+        userStore.cargarDesdeSessionStorage();
+      }
+
+      const empleado = userStore.empleado;
+      this.idPayroll = empleado.id;
+
       const url = `${API_BASE_URL}Pagos/generarPagosEmpresa`;
       try {
-        await axios.post(
-          url,
-          null,
-          {
-            params: {
-              nombreEmpresa: this.nombreEmpresa,
-              idPlanilla: this.idPlanilla,
-              fechaInicio: this.fechaInicio,
-              fechaFinal: this.fechaFin,
-            },
-          }
-        );
+        await axios.post(url, null, {
+          params: {
+            nombreEmpresa: this.nombreEmpresa,
+            idPayroll: this.idPayroll,
+            idPlanilla: this.idPlanilla,
+            fechaInicio: this.fechaInicio,
+            fechaFinal: this.fechaFin,
+          },
+        });
         await this.obtenerResumen();
       } catch (e) {
         const msg = e.response?.data?.message || e.message;
@@ -116,16 +123,13 @@ export default {
     async obtenerResumen() {
       const url = `${API_BASE_URL}Pagos/resumenPlanilla`;
       try {
-        const res = await axios.get(
-          url,
-          {
-            params: {
-              nombreEmpresa: this.nombreEmpresa,
-              fechaInicio: this.fechaInicio,
-              fechaFin: this.fechaFin,
-            },
-          }
-        );
+        const res = await axios.get(url, {
+          params: {
+            nombreEmpresa: this.nombreEmpresa,
+            fechaInicio: this.fechaInicio,
+            fechaFin: this.fechaFin,
+          },
+        });
         this.resumen = res.data;
       } catch (e) {
         alert("Error al obtener el resumen de planilla");

@@ -306,43 +306,53 @@ namespace BackendGeems.Infraestructure
 
         public void BorrarPagoExistente(Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal)
         {
-            if (ExistePago(idEmpleado, idPlanilla, fechaInicio, fechaFinal))
+            string queryPagos = @"SELECT Id FROM Pago 
+                          WHERE IdEmpleado = @IdEmpleado 
+                            AND IdPlanilla = @IdPlanilla 
+                            AND FechaInicio = @FechaInicio 
+                            AND FechaFinal = @FechaFinal";
+
+            List<Guid> idsPago = new List<Guid>();
+
+            using (SqlCommand cmd = new SqlCommand(queryPagos, _conexion))
             {
-                Console.WriteLine("Ya existe un pago para este empleado en el periodo especificado. Eliminando pago existente.");
-                string queryPago = @"SELECT Id FROM Pago WHERE IdEmpleado = @IdEmpleado AND IdPlanilla = @IdPlanilla AND FechaInicio = @FechaInicio AND FechaFinal = @FechaFinal";
-                Guid idPagoExistente = Guid.Empty;
-                using (SqlCommand cmd = new SqlCommand(queryPago, _conexion))
+                cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
+                cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
+                cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
+
+                _conexion.Open();
+                using (var reader = cmd.ExecuteReader())
                 {
-                    cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
-                    cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
-                    cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
-                    cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
-                    _conexion.Open();
-                    var result = cmd.ExecuteScalar();
-                    if (result != null && result != DBNull.Value)
+                    while (reader.Read())
                     {
-                        idPagoExistente = Guid.Parse(result.ToString());
+                        idsPago.Add(reader.GetGuid(0));
                     }
-                    _conexion.Close();
                 }
+                _conexion.Close();
+            }
 
-                if (idPagoExistente != Guid.Empty)
+            if (idsPago.Count > 0)
+            {
+                Console.WriteLine($"Se encontraron {idsPago.Count} pagos. Eliminando...");
+
+                foreach (var idPago in idsPago)
                 {
-
+                 
                     string deleteDeducciones = "DELETE FROM Deducciones WHERE IdPago = @IdPago";
                     using (SqlCommand cmd = new SqlCommand(deleteDeducciones, _conexion))
                     {
-                        cmd.Parameters.AddWithValue("@IdPago", idPagoExistente);
+                        cmd.Parameters.AddWithValue("@IdPago", idPago);
                         _conexion.Open();
                         cmd.ExecuteNonQuery();
                         _conexion.Close();
                     }
 
-
+                  
                     string deletePago = "DELETE FROM Pago WHERE Id = @IdPago";
                     using (SqlCommand cmd = new SqlCommand(deletePago, _conexion))
                     {
-                        cmd.Parameters.AddWithValue("@IdPago", idPagoExistente);
+                        cmd.Parameters.AddWithValue("@IdPago", idPago);
                         _conexion.Open();
                         cmd.ExecuteNonQuery();
                         _conexion.Close();
@@ -351,17 +361,19 @@ namespace BackendGeems.Infraestructure
             }
         }
 
-        public void InsertPago(Guid idPago, Guid idEmpleado, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal, double montoBruto, double montoPago)
+
+        public void InsertPago(Guid idPago, Guid idEmpleado,Guid IdPayroll, Guid idPlanilla, DateTime fechaInicio, DateTime fechaFinal, double montoBruto, double montoPago)
         {
 
             string contrato = ObtenerTipoContratoEmpleado(idEmpleado);
             string tipoEmpleado = ObtenerTipoEmpleado(idEmpleado);
             string insertPagoQuery = @"INSERT INTO Pago (Id, IdEmpleado, IdPayroll, IdPlanilla, FechaInicio, FechaFinal, MontoBruto, MontoPago, FechaRealizada,TipoContrato,Posicion)
-                   VALUES (@Id, @IdEmpleado, @IdEmpleado, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada,@TipoContrato,@Posicion)";
+                   VALUES (@Id, @IdEmpleado, @IdPayroll, @IdPlanilla, @FechaInicio, @FechaFinal, @MontoBruto, @MontoPago, @FechaRealizada,@TipoContrato,@Posicion)";
             using (SqlCommand cmd = new SqlCommand(insertPagoQuery, _conexion))
             {
                 cmd.Parameters.AddWithValue("@Id", idPago);
                 cmd.Parameters.AddWithValue("@IdEmpleado", idEmpleado);
+                cmd.Parameters.AddWithValue("@IdPayroll", IdPayroll);
                 cmd.Parameters.AddWithValue("@IdPlanilla", idPlanilla);
                 cmd.Parameters.AddWithValue("@FechaInicio", fechaInicio);
                 cmd.Parameters.AddWithValue("@FechaFinal", fechaFinal);
