@@ -33,8 +33,10 @@ public class CalculosTest
         {
             // Arrange
             var repo = new PagoRepo();
-            var servicioDeCalculo = new ServicioCalculoPago(repo);
-            var gestorPagos = new GestorPagosService(repo,servicioDeCalculo);
+        var EmpleadoRepo = new EmpleadoRepo();
+        var servicioDeCalculo = new ServicioCalculoPago(repo);
+            
+            var gestorPagos = new GestorPagosService(repo,servicioDeCalculo,EmpleadoRepo);
             Guid idEmpleado = Guid.NewGuid();
             Guid idPlanilla = Guid.NewGuid();
             DateTime fechaInicio = new DateTime(2024, 7, 1);
@@ -50,8 +52,9 @@ public class CalculosTest
     {
         // Arrange
         var repo = new PagoRepo();
+        var EmpleadoRepo = new EmpleadoRepo();
         var servicioDeCalculo = new ServicioCalculoPago(repo);
-        var gestorPagos = new GestorPagosService(repo, servicioDeCalculo);
+        var gestorPagos = new GestorPagosService(repo, servicioDeCalculo, EmpleadoRepo);
         Guid idEmpleado = Guid.NewGuid();
         Guid idPlanilla = Guid.NewGuid();
         DateTime fechaInicio = new DateTime(2024, 5, 1);

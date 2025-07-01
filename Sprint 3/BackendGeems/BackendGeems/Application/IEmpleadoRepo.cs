@@ -9,7 +9,7 @@ namespace BackendGeems.Application
         public void BorrarLogicoEmpleado(string cedula);
         public void BorrarPermanenteEmpleado(string cedula);
         public bool UsuarioEstaBorrado(string cedula);
-        public void BorrarTimesheetEmpleado(string cedula);
+        public void BorrarTimesheetEmpleado(string cedula, bool Permanente);
         public string ObtenerNombreEmpleadoPorCedula(string cedula);
         public string ObtenerCorreoEmpleadoPorCedula(string cedula);
 

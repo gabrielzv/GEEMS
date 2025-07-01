@@ -1,13 +1,14 @@
 using BackendGeems.API;
 using BackendGeems.Application;
-using BackendGeems.Infraestructure;
+using BackendGeems.Controllers;
 using BackendGeems.Domain;
+using BackendGeems.Infraestructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using Moq;
-using BackendGeems.Controllers;
 using System.Text.Json;
 
 namespace UnitTests
@@ -24,7 +25,7 @@ namespace UnitTests
         [SetUp]
         public void Setup()
         {
-
+            
         }
 
         // Test para verificar que se pueden listar las planillas de una empresa existente
@@ -56,14 +57,17 @@ namespace UnitTests
             DateTime fechaFin = new DateTime(2025, 4, 30);
 
             var repo = new PagoRepo();
-
-           
+            var configuration = new ConfigurationBuilder().Build();
+            var correoSender = new CorreoSender(configuration);
             var queryPago = new QueryPago(repo);
+            var empleadoRepo = new EmpleadoRepo();
             var servicioDeCalculo = new ServicioCalculoPago(repo);
-            var gestorPagos = new GestorPagosService(repo, servicioDeCalculo);
+            var gestorPagos = new GestorPagosService(repo, servicioDeCalculo,empleadoRepo);
             var generarPago = new GenerarPago(repo,gestorPagos);
+            var reporteService = new ReporteService(correoSender);
+            var borradoDeEmpleados = new BorradoDeEmpleados( empleadoRepo, reporteService);
 
-            var controller = new PagosController(queryPago, generarPago,gestorPagos);
+            var controller = new PagosController(queryPago, generarPago,gestorPagos,borradoDeEmpleados);
 
             // Act
             var result = controller.ResumenPlanilla(nombreEmpresa, fechaInicio, fechaFin) as OkObjectResult;
