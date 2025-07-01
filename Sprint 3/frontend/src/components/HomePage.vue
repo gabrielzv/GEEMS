@@ -388,16 +388,16 @@ const cargarResumenesPorPlanilla = async () => {
       const salarios = resSalarios.data.map(s => s.totalSalario || s.TotalSalario || 0)
       const totalSalarios = salarios.reduce((acc, cur) => acc + cur, 0)
 
-      const resDedEmpleador = await axios.get(`${API_BASE_URL}Deduccion/DeduccionesDetalladas/${totalSalarios}`)
-      const totalDeduccionesEmpleador = resDedEmpleador.data.deducciones.reduce((sum, d) => sum + (d.monto || 0), 0)
+      const DeduccionEmpleador = await axios.get(`${API_BASE_URL}Deduccion/DeduccionesDetalladas/${totalSalarios}`)
+      const totalDeduccionesEmpleador = DeduccionEmpleador.data.deducciones.reduce((sum, d) => sum + (d.monto || 0), 0)
 
-      const resDeducciones = await axios.get(`${API_BASE_URL}Reporte/deduccionesPorPlanilla/${planilla.id}`)
+      const resulDeducciones = await axios.get(`${API_BASE_URL}Reporte/deduccionesPorPlanilla/${planilla.id}`)
       
-      const beneficios = resDeducciones.data.filter(d => d.esBeneficio)
+      const beneficios = resulDeducciones.data.filter(d => d.esBeneficio)
       const totalBeneficios = beneficios.reduce((sum, d) => sum + (d.total || 0), 0)
 
-      const resDeducciones2 = await axios.get(`${API_BASE_URL}Reporte/deduccionesPorPlanilla/${planilla.id}`)
-      const deducciones = resDeducciones2.data
+      //const resDeducciones2 = await axios.get(`${API_BASE_URL}Reporte/deduccionesPorPlanilla/${planilla.id}`)
+      const deducciones = resulDeducciones.data
       
       const mapObligatorias = {}
       deducciones.forEach(d => {

@@ -13,12 +13,23 @@
             </h2>
             
           </div>
+          <div class="flex flex-col md:flex-row items-center gap-4 mt-4 md:mt-0">
           <button
-            class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded mt-4 md:mt-0"
+            class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded w-full md:w-auto min-w-[180px]"
             @click="exportarAExcel"
           >
             Generar Excel
           </button>
+
+          <button
+            class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded w-full md:w-auto min-w-[180px]"
+            @click="enviarReportePorCorreo"
+          >
+            Enviar por correo
+          </button>
+        </div>
+
+
         </div>
       </div>
 
@@ -433,6 +444,53 @@ export default {
       document.body.removeChild(link);
     };
 
+
+    const enviarReportePorCorreo = async () => {
+      try {
+
+        const persona = await axios.get(`${API_BASE_URL}Persona/${userStore.usuario.cedulaPersona}`);
+
+        console.log("Persona obtenida:", persona.data);
+
+        // Generar el archivo CSV en memoria
+        let csvContent = "Nombre empleado,Cédula,Tipo de empleado,Fecha inicio período,Fecha fin período,Fecha de pago,Salario Bruto (₡),Cargas sociales empleador (₡),Deducciones voluntarias (₡),Costo empleador (₡)\n"
+        pagosFiltrados.value.forEach((registro) => {
+          const fila = [
+            `"${registro.empleado.nombre}"`,
+            `"${registro.empleado.cedula}"`,
+            `"${registro.empleado.tipo}"`,
+            `"${formatearFecha(registro.pago.fechaInicio)}"`,
+            `"${formatearFecha(registro.pago.fechaFin)}"`,
+            `"${formatearFecha(registro.pago.fechaPago)}"`,
+            registro.pago.salarioBruto,
+            registro.pago.cargasSociales,
+            registro.pago.totalDeduccionesVoluntarias,
+            registro.pago.costoEmpleador
+          ]
+          csvContent += fila.join(",") + "\n"
+        })
+
+        // Convertir CSV a archivo
+        const blob = new Blob([csvContent], { type: "text/csv" })
+        const formData = new FormData()
+        formData.append("Archivo", blob, "reporte.csv")
+        formData.append("Correo", persona.data.email)
+        formData.append("NombreUsuario", persona.data.nombreCompleto || "")
+
+        // Enviar al backend
+        await axios.post(`${API_BASE_URL}Reporte/Reporte`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        })
+
+        alert(" Reporte enviado correctamente al correo de la persona.")
+      } catch (error) {
+        console.error("Error al enviar reporte:", error)
+        alert(" Ocurrió un error al enviar el reporte por correo.")
+      }
+    }
+
     onMounted(async () => {
       if (!userStore.empresa && userStore.usuario?.cedulaPersona) {
         await userStore.fetchEmpresa(userStore.usuario.cedulaPersona);
@@ -454,6 +512,7 @@ export default {
       exportarAExcel,
       formatearFecha,
       formatearColones,
+      enviarReportePorCorreo,
     };
   },
 };
