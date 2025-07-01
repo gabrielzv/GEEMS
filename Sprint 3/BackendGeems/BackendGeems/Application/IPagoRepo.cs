@@ -22,6 +22,7 @@ namespace BackendGeems.Application
         public int ContarPagos(Guid idEmpleado);
         public void InactivarBeneficiosPendientesPorEmpresa(string nombreEmpresa);
         public List<Pago> ObtenerPagosPorPlanilla(Guid idPlanilla);
+        public double ObtenerDeduccionesVoluntariasPorPago(Guid idPago);
     }
 
 }
