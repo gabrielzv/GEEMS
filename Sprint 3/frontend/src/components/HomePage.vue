@@ -69,15 +69,83 @@
             </div>
           </div>
         </template>
-          
+        
+        <!-- Dashboard empleado -->
+
         <template v-else-if="userStore.usuario?.tipo === 'Empleado'">
-          <div class="bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 text-center">Resumen de desempeño</h2>
-            <div class="w-full h-96">
-              <Bar :data="chartEmpleadoData" :options="chartEmpleadoOptions" />
+          <section class="bg-white rounded-xl shadow-md p-6 space-y-6">
+            <h2 class="text-2xl font-semibold text-center text-gray-800">Historial de pagos</h2>
+
+           
+            <div class="w-full h-96 flex items-center justify-center" v-if="loadingPagosEmpleado">
+              <p class="text-gray-500">Cargando datos...</p>
             </div>
-          </div>
+
+            <!-- Contenido -->
+            <div v-else class="w-full h-full">
+              <!-- Gráfico de barras -->
+              <Bar
+                :data="chartEmpleadoData"
+                :options="chartEmpleadoOptions"
+                :plugins="[ChartDataLabels]"
+              />
+
+              <!-- Detalle de deducciones -->
+              <div
+                class="mt-6 bg-gray-50 p-6 rounded-xl shadow-inner"
+                v-if="pagoSeleccionadoId && deduccionesPorPago[pagoSeleccionadoId]"
+              >
+                <h3 class="text-md font-bold text-gray-700 mb-4 text-center">
+                  Detalle de deducciones para el pago seleccionado
+                </h3>
+
+                <div class="flex flex-col md:flex-row gap-6">
+                  <!-- Lista de deducciones dividida -->
+                  <div class="md:w-1/2 space-y-4">
+                    <div v-if="deduccionesPorPago[pagoSeleccionadoId].some(d => d.tipoDeduccion?.toLowerCase() === 'voluntaria')">
+                      <h4 class="text-sm font-semibold text-blue-600 mb-1">Deducciones voluntarias</h4>
+                      <ul class="list-disc list-inside text-sm text-gray-700">
+                        <li
+                          v-for="(deduccion, i) in deduccionesPorPago[pagoSeleccionadoId].filter(d => d.tipoDeduccion?.toLowerCase() === 'voluntaria')"
+                          :key="'vol-' + i"
+                        >
+                          {{ deduccion.nombre }}: {{ formatearColones(deduccion.monto || 0) }}
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div v-if="deduccionesPorPago[pagoSeleccionadoId].some(d => d.tipoDeduccion?.toLowerCase() !== 'voluntaria')">
+                      <h4 class="text-sm font-semibold text-yellow-600 mt-4 mb-1">Deducciones obligatorias</h4>
+                      <ul class="list-disc list-inside text-sm text-gray-700">
+                        <li
+                          v-for="(deduccion, i) in deduccionesPorPago[pagoSeleccionadoId].filter(d => d.tipoDeduccion?.toLowerCase() !== 'voluntaria')"
+                          :key="'obl-' + i"
+                        >
+                          {{ deduccion.nombre }}: {{ formatearColones(deduccion.monto || 0) }}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <!-- Gráfico de pastel de las deducciones -->
+                  <div class="md:w-1/2 flex items-center justify-center">
+                    <div class="w-full max-w-[200px] h-[200px]">
+                      <Pie
+                        v-if="chartDeduccionPorTipo"
+                        :data="chartDeduccionPorTipo"
+                        :options="{ responsive: true, plugins: { legend: { position: 'bottom' } } }"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                
+              </div>
+            </div>
+          </section>
         </template>
+
+
       </div>
     </div>
   </div>
@@ -93,13 +161,20 @@ import {
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement, 
+  BarElement,
+  CategoryScale,  
+  LinearScale
 } from 'chart.js'
 import { useUserStore } from '@/store/user'
 import axios from 'axios'
 import { API_BASE_URL } from '@/config'
+import { Bar } from 'vue-chartjs'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
+ChartJS.register(ChartDataLabels)
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement)
+
+ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
 const userStore = useUserStore()
 const empleados = ref([])
@@ -111,9 +186,134 @@ const salariosPorContrato = ref([])
 const deduccionesEmpleador = ref([])
 const deduccionesObligatorias = ref([])
 const beneficios = ref([])
+const chartEmpleadoData = ref(null)
+const loadingPagosEmpleado = ref(true)
+const deduccionesPorPago = ref({})
+const pagosOrdenados = ref([])
+const pagoSeleccionadoId = ref(null)
 
 
-//const empleado = userStore.empleado;
+
+const chartEmpleadoOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top'
+    },
+    tooltip: {
+      mode: 'index',
+      intersect: false
+    },
+    datalabels: {
+      anchor: 'end',
+      align: 'top',
+      formatter: (value) => new Intl.NumberFormat('es-CR').format(value),
+      color: '#374151',
+      font: {
+        weight: 'bold'
+      }
+    }
+  },
+  onClick: (e, elements) => {
+    if (elements.length > 0) {
+      const index = elements[0].index
+      const idPago = pagosOrdenados.value[index]?.id
+      pagoSeleccionadoId.value = idPago
+    }
+  },
+  scales: {
+    y: {
+      beginAtZero: true
+    }
+  }
+}
+
+
+
+
+const cargarPagosEmpleado = async () => {
+  try {
+    const empleadoId = userStore.usuario?.id
+    if (!empleadoId) return
+
+    const res = await axios.get(`${API_BASE_URL}Pagos/${empleadoId}`)
+
+    pagosOrdenados.value = res.data
+      .sort((a, b) => new Date(b.fechaFinal) - new Date(a.fechaFinal))
+      .slice(0, 2)
+
+    const labels = pagosOrdenados.value.map(p =>
+      `${new Date(p.fechaInicio).toLocaleDateString()} - ${new Date(p.fechaFinal).toLocaleDateString()}`
+    )
+
+    const montoBruto = pagosOrdenados.value.map(p => p.montoBruto)
+    const montoNeto = pagosOrdenados.value.map(p => p.montoPago)
+    const deducciones = pagosOrdenados.value.map(p => p.montoBruto - p.montoPago)
+
+    chartEmpleadoData.value = {
+      labels,
+      datasets: [
+        {
+          label: 'Salario bruto',
+          data: montoBruto,
+          backgroundColor: '#60A5FA'
+        },
+        {
+          label: 'Pago neto',
+          data: montoNeto,
+          backgroundColor: '#10B981'
+        },
+        {
+          label: 'Deducciones',
+          data: deducciones,
+          backgroundColor: '#F87171'
+        }
+      ]
+    }
+
+    // Obtener deducciones por pago
+    for (const pago of pagosOrdenados.value) {
+      try {
+        const resDeducciones = await axios.get(`${API_BASE_URL}Deducciones/${pago.id}`)
+        deduccionesPorPago.value[pago.id] = resDeducciones.data
+      } catch (err) {
+        console.warn(`No se pudieron obtener deducciones para el pago ${pago.id}`, err)
+        deduccionesPorPago.value[pago.id] = []
+      }
+    }
+
+  } catch (err) {
+    console.error('Error al cargar pagos del empleado:', err)
+  } finally {
+    loadingPagosEmpleado.value = false
+  }
+}
+
+const chartDeduccionPorTipo = computed(() => {
+  const id = pagoSeleccionadoId.value
+  const lista = deduccionesPorPago.value[id]
+  if (!id || !lista) return null
+
+  let totalObligatorias = 0
+  let totalVoluntarias = 0
+
+  lista.forEach(d => {
+    if ((d.tipoDeduccion || '').toLowerCase() === 'voluntaria') {
+      totalVoluntarias += d.monto || 0
+    } else {
+      totalObligatorias += d.monto || 0
+    }
+  })
+
+  return {
+    labels: ['Obligatorias', 'Voluntarias'],
+    datasets: [{
+      data: [totalObligatorias, totalVoluntarias],
+      backgroundColor: ['#fbbf24', '#3b82f6']
+    }]
+  }
+})
+
 
 // Formato utilidades
 const formatearFecha = (fechaStr) => {
@@ -167,7 +367,6 @@ const cargarPlanillas = async () => {
     planillas.value = []
   }
 }
-
 
 
 // Cargar resumen por planilla
@@ -353,10 +552,11 @@ onMounted(async () => {
     await userStore.fetchEmpresa(userStore.usuario.cedulaPersona)
   }
 
-  await Promise.all([
-    cargarEmpleados(),
-    cargarPlanillas()
-  ])
+  if (userStore.usuario?.tipo === 'Empleado') {
+    await cargarPagosEmpleado()
+  }
+
+  await Promise.all([cargarEmpleados(), cargarPlanillas()])
   await cargarResumenesPorPlanilla()
   loading.value = false
 })
