@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using BackendGeems.Infraestructure;
 using System;
 using BackendGeems.Domain;
+using BackendGeems.Application;
 
 namespace BackendGeems.API
 {
@@ -11,11 +12,15 @@ namespace BackendGeems.API
     {
         private readonly GeneralRepo _repo;
         private readonly PagoRepo _pagoRepo;
+        private readonly EmpresaRepo _empresaRepo;
+        private readonly ICalculadoraDeducciones _calculadoraDeducciones;
 
         public PlanillaController()
         {
             _repo = new GeneralRepo();
             _pagoRepo = new PagoRepo();
+            _empresaRepo = new EmpresaRepo();
+            _calculadoraDeducciones = new CalculadoraDeducciones();
         }
 
     [HttpGet("listar")]
@@ -95,6 +100,51 @@ namespace BackendGeems.API
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "Error al obtener los pagos: " + ex.Message });
+            }
+        }
+
+        [HttpGet("historico")]
+        public IActionResult HistoricoPlanillas([FromQuery] string cedulaJuridica)
+        {
+            try
+            {
+                var empresa = _empresaRepo.GetEmpresa(cedulaJuridica);
+                if (empresa == null)
+                    return NotFound(new { message = "Empresa no encontrada." });
+
+                var planillas = _repo.ObtenerPlanillasPorEmpresa(empresa.Nombre);
+
+                var resultado = planillas.Select(planilla =>
+                {
+                    var pagos = _pagoRepo.ObtenerPagosPorPlanilla(planilla.Id);
+
+                    decimal salarioBruto = (decimal)pagos.Sum(p => p.MontoBruto);
+                    decimal cargasSociales = (decimal)pagos.Sum(p => _calculadoraDeducciones.Calcular((decimal)p.MontoBruto).TotalDeducciones);
+                    decimal deduccionesVoluntarias = (decimal)pagos.Sum(p => _pagoRepo.ObtenerDeduccionesVoluntariasPorPago(p.Id));
+                    decimal costoEmpleador = salarioBruto + cargasSociales + deduccionesVoluntarias;
+
+                    return new
+                    {
+                        nombreEmpresa = empresa.Nombre,
+                        frecuenciaPago = empresa.ModalidadPago,
+                        periodoPago = new
+                        {
+                            fechaInicio = planilla.FechaInicio,
+                            fechaFin = planilla.FechaFinal
+                        },
+                        fechaPago = pagos.FirstOrDefault()?.FechaRealizada,
+                        salarioBruto,
+                        cargasSocialesEmpleador = cargasSociales,
+                        deduccionesVoluntarias,
+                        costoEmpleador
+                    };
+                });
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener el histórico: " + ex.Message });
             }
         }
 

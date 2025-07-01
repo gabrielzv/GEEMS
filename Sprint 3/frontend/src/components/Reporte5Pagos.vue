@@ -242,11 +242,9 @@ export default {
     });
 
     const formatearNombre = (empleado) => {
-      if (empleado.nombreCompleto) return empleado.nombreCompleto;
-      return `${empleado.apellido1 || ""} ${empleado.apellido2 || ""}, ${
-        empleado.nombre || ""
-      }`.trim();
-    };
+      if (empleado.nombreCompleto) return empleado.nombreCompleto
+      return `${empleado.apellido1 || ''} ${empleado.apellido2 || ''} ${empleado.nombre || ''}`.trim()
+    }
 
     const formatearFecha = (fechaStr) => {
       const fecha = new Date(fechaStr);

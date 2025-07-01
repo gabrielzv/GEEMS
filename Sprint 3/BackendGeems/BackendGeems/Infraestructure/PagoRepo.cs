@@ -870,5 +870,15 @@ namespace BackendGeems.Infraestructure
             }
             return pagos;
         }
+        
+        public double ObtenerDeduccionesVoluntariasPorPago(Guid idPago)
+        {
+            double total = 0;
+            var deducciones = ObtenerDeduccionesPorPago(idPago);
+            total = deducciones
+                .Where(d => d.TipoDeduccion == "Voluntaria")
+                .Sum(d => d.Monto);
+            return total;
+        }
     }
 }
