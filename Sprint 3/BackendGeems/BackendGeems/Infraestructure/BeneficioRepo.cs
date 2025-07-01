@@ -32,61 +32,68 @@ namespace BackendGeems.Infraestructure
 
         public void CrearBeneficio(Beneficio beneficio)
         {
-            // Se verifica si el nombre del beneficio ya existe para esa empresa
-            string checkQuery = "SELECT Id FROM Beneficio WHERE Nombre = @Nombre AND CedulaJuridica = @CedulaJuridica";
-            using (SqlCommand checkCommand = new SqlCommand(checkQuery, _conexion))
+            using (SqlConnection conn = new SqlConnection(_cadenaConexion))
             {
-                checkCommand.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
-                checkCommand.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
-
-                _conexion.Open();
-                var result = checkCommand.ExecuteScalar();
-                _conexion.Close();
-
-                if (result != null)
-                    throw new Exception("Ya existe un beneficio con el mismo nombre para esta empresa.");
-            }
-
-            // Se hace la inserción del nuevo beneficio
-            Guid beneficioId = Guid.NewGuid();
-            string insertQuery = @"INSERT INTO Beneficio 
-                (Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual, Estado, EstaBorrado) 
-                VALUES 
-                (@Id, @Costo, @TiempoMinimo, @Frecuencia, @Descripcion, @Nombre, @CedulaJuridica, @NombreDeAPI, @EsApi, @EsPorcentual, @Estado, @EstaBorrado)";
-            using (SqlCommand insertCommand = new SqlCommand(insertQuery, _conexion))
-            {
-                insertCommand.Parameters.AddWithValue("@Id", beneficioId);
-                insertCommand.Parameters.AddWithValue("@Costo", beneficio.Costo);
-                insertCommand.Parameters.AddWithValue("@TiempoMinimo", beneficio.TiempoMinimo);
-                insertCommand.Parameters.AddWithValue("@Frecuencia", beneficio.Frecuencia);
-                insertCommand.Parameters.AddWithValue("@Descripcion", beneficio.Descripcion);
-                insertCommand.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
-                insertCommand.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
-                insertCommand.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
-                insertCommand.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
-                insertCommand.Parameters.AddWithValue("@EsPorcentual", beneficio.EsPorcentual);
-                insertCommand.Parameters.AddWithValue("@Estado", beneficio.Estado);
-                insertCommand.Parameters.AddWithValue("@EstaBorrado", beneficio.EstaBorrado);
-
-                _conexion.Open();
-                insertCommand.ExecuteNonQuery();
-                _conexion.Close();
-            }
-
-            // Se insertan los contratos elegibles seleccionados
-            if (beneficio.ContratosElegibles != null && beneficio.ContratosElegibles.Count > 0)
-            {
-                string contratoQuery = "INSERT INTO BeneficioContratoElegible (IdBeneficio, ContratoEmpleado) VALUES (@IdBeneficio, @ContratoEmpleado)";
-                foreach (var contrato in beneficio.ContratosElegibles)
+                conn.Open();
+                using (SqlTransaction transaction = conn.BeginTransaction())
                 {
-                    using (SqlCommand contratoCommand = new SqlCommand(contratoQuery, _conexion))
+                    try
                     {
-                        contratoCommand.Parameters.AddWithValue("@IdBeneficio", beneficioId);
-                        contratoCommand.Parameters.AddWithValue("@ContratoEmpleado", contrato);
+                        // Se verifica si el nombre del beneficio ya existe para esa empresa
+                        string checkQuery = "SELECT Id FROM Beneficio WHERE Nombre = @Nombre AND CedulaJuridica = @CedulaJuridica";
+                        using (SqlCommand checkCommand = new SqlCommand(checkQuery, conn, transaction))
+                        {
+                            checkCommand.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
+                            checkCommand.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
+                            var result = checkCommand.ExecuteScalar();
+                            if (result != null)
+                                throw new Exception("Ya existe un beneficio con el mismo nombre para esta empresa.");
+                        }
 
-                        _conexion.Open();
-                        contratoCommand.ExecuteNonQuery();
-                        _conexion.Close();
+                        // Se hace la inserción del nuevo beneficio
+                        Guid beneficioId = Guid.NewGuid();
+                        string insertQuery = @"INSERT INTO Beneficio 
+                            (Id, Costo, TiempoMinimoEnEmpresa, Frecuencia, Descripcion, Nombre, CedulaJuridica, NombreDeAPI, EsAPI, EsPorcentual, Estado, EstaBorrado) 
+                            VALUES 
+                            (@Id, @Costo, @TiempoMinimo, @Frecuencia, @Descripcion, @Nombre, @CedulaJuridica, @NombreDeAPI, @EsApi, @EsPorcentual, @Estado, @EstaBorrado)";
+                        using (SqlCommand insertCommand = new SqlCommand(insertQuery, conn, transaction))
+                        {
+                            insertCommand.Parameters.AddWithValue("@Id", beneficioId);
+                            insertCommand.Parameters.AddWithValue("@Costo", beneficio.Costo);
+                            insertCommand.Parameters.AddWithValue("@TiempoMinimo", beneficio.TiempoMinimo);
+                            insertCommand.Parameters.AddWithValue("@Frecuencia", beneficio.Frecuencia);
+                            insertCommand.Parameters.AddWithValue("@Descripcion", beneficio.Descripcion);
+                            insertCommand.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
+                            insertCommand.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
+                            insertCommand.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
+                            insertCommand.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
+                            insertCommand.Parameters.AddWithValue("@EsPorcentual", beneficio.EsPorcentual);
+                            insertCommand.Parameters.AddWithValue("@Estado", beneficio.Estado);
+                            insertCommand.Parameters.AddWithValue("@EstaBorrado", beneficio.EstaBorrado);
+                            insertCommand.ExecuteNonQuery();
+                        }
+
+                        // Se insertan los contratos elegibles seleccionados
+                        if (beneficio.ContratosElegibles != null && beneficio.ContratosElegibles.Count > 0)
+                        {
+                            string contratoQuery = "INSERT INTO BeneficioContratoElegible (IdBeneficio, ContratoEmpleado) VALUES (@IdBeneficio, @ContratoEmpleado)";
+                            foreach (var contrato in beneficio.ContratosElegibles)
+                            {
+                                using (SqlCommand contratoCommand = new SqlCommand(contratoQuery, conn, transaction))
+                                {
+                                    contratoCommand.Parameters.AddWithValue("@IdBeneficio", beneficioId);
+                                    contratoCommand.Parameters.AddWithValue("@ContratoEmpleado", contrato);
+                                    contratoCommand.ExecuteNonQuery();
+                                }
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
                     }
                 }
             }
@@ -94,78 +101,86 @@ namespace BackendGeems.Infraestructure
 
         public void EditarBeneficio(Beneficio beneficio)
         {
-            // Se verifica si el nombre del beneficio ya existe para esa empresa, excluyendo el propio beneficio
-            string checkQuery = @"SELECT COUNT(*) FROM Beneficio WHERE Nombre = @Nombre AND CedulaJuridica = @CedulaJuridica AND Id <> @Id";
-            using (SqlCommand checkCommand = new SqlCommand(checkQuery, _conexion))
+            using (SqlConnection conn = new SqlConnection(_cadenaConexion))
             {
-                checkCommand.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
-                checkCommand.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
-                checkCommand.Parameters.AddWithValue("@Id", beneficio.Id);
-
-                _conexion.Open();
-                int count = (int)checkCommand.ExecuteScalar();
-                _conexion.Close();
-
-                if (count > 0)
-                    throw new Exception("Ya existe un beneficio con el mismo nombre para esta empresa.");
-            }
-
-            // Se actualiza el beneficio
-            string updateQuery = @"UPDATE Beneficio
-                SET Nombre = @Nombre,
-                    Descripcion = @Descripcion,
-                    Costo = @Costo,
-                    TiempoMinimoEnEmpresa = @TiempoMinimo,
-                    Frecuencia = @Frecuencia,
-                    NombreDeAPI = @NombreDeAPI,
-                    EsAPI = @EsApi,
-                    EsPorcentual = @EsPorcentual,
-                    Estado = @Estado,
-                    EstaBorrado = @EstaBorrado
-                WHERE Id = @Id";
-            using (SqlCommand cmd = new SqlCommand(updateQuery, _conexion))
-            {
-                cmd.Parameters.AddWithValue("@Id", beneficio.Id);
-                cmd.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
-                cmd.Parameters.AddWithValue("@Descripcion", beneficio.Descripcion);
-                cmd.Parameters.AddWithValue("@Costo", beneficio.Costo);
-                cmd.Parameters.AddWithValue("@TiempoMinimo", beneficio.TiempoMinimo);
-                cmd.Parameters.AddWithValue("@Frecuencia", beneficio.Frecuencia);
-                cmd.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
-                cmd.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
-                cmd.Parameters.AddWithValue("@EsPorcentual", beneficio.EsPorcentual);
-                cmd.Parameters.AddWithValue("@Estado", beneficio.Estado);
-                cmd.Parameters.AddWithValue("@EstaBorrado", beneficio.EstaBorrado);
-
-                _conexion.Open();
-                cmd.ExecuteNonQuery();
-                _conexion.Close();
-            }
-
-            // Se eliminan los contratos elegibles antiguos
-            string deleteQuery = "DELETE FROM BeneficioContratoElegible WHERE IdBeneficio = @IdBeneficio";
-            using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, _conexion))
-            {
-                deleteCommand.Parameters.AddWithValue("@IdBeneficio", beneficio.Id);
-
-                _conexion.Open();
-                deleteCommand.ExecuteNonQuery();
-                _conexion.Close();
-            }
-
-            // Se insertan contratos elegibles
-            if (beneficio.ContratosElegibles != null && beneficio.ContratosElegibles.Count > 0)
-            {
-                string contratoQuery = "INSERT INTO BeneficioContratoElegible (IdBeneficio, ContratoEmpleado) VALUES (@IdBeneficio, @ContratoEmpleado)";
-                foreach (var contrato in beneficio.ContratosElegibles)
+                conn.Open();
+                using (SqlTransaction transaction = conn.BeginTransaction())
                 {
-                    using SqlCommand contratoCommand = new SqlCommand(contratoQuery, _conexion);
-                    contratoCommand.Parameters.AddWithValue("@IdBeneficio", beneficio.Id);
-                    contratoCommand.Parameters.AddWithValue("@ContratoEmpleado", contrato);
+                    try
+                    {
+                        // Se verifica si el nombre del beneficio ya existe para esa empresa, excluyendo el propio beneficio
+                        string checkQuery = @"SELECT COUNT(*) FROM Beneficio WHERE Nombre = @Nombre AND CedulaJuridica = @CedulaJuridica AND Id <> @Id";
+                        using (SqlCommand checkCommand = new SqlCommand(checkQuery, conn, transaction))
+                        {
+                            checkCommand.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
+                            checkCommand.Parameters.AddWithValue("@CedulaJuridica", beneficio.CedulaJuridica);
+                            checkCommand.Parameters.AddWithValue("@Id", beneficio.Id);
 
-                    _conexion.Open();
-                    contratoCommand.ExecuteNonQuery();
-                    _conexion.Close();
+                            int count = (int)checkCommand.ExecuteScalar();
+                            if (count > 0)
+                                throw new Exception("Ya existe un beneficio con el mismo nombre para esta empresa.");
+                        }
+
+                        // Se actualiza el beneficio
+                        string updateQuery = @"UPDATE Beneficio
+                            SET Nombre = @Nombre,
+                                Descripcion = @Descripcion,
+                                Costo = @Costo,
+                                TiempoMinimoEnEmpresa = @TiempoMinimo,
+                                Frecuencia = @Frecuencia,
+                                NombreDeAPI = @NombreDeAPI,
+                                EsAPI = @EsApi,
+                                EsPorcentual = @EsPorcentual,
+                                Estado = @Estado,
+                                EstaBorrado = @EstaBorrado
+                            WHERE Id = @Id";
+                        using (SqlCommand cmd = new SqlCommand(updateQuery, conn, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@Id", beneficio.Id);
+                            cmd.Parameters.AddWithValue("@Nombre", beneficio.Nombre);
+                            cmd.Parameters.AddWithValue("@Descripcion", beneficio.Descripcion);
+                            cmd.Parameters.AddWithValue("@Costo", beneficio.Costo);
+                            cmd.Parameters.AddWithValue("@TiempoMinimo", beneficio.TiempoMinimo);
+                            cmd.Parameters.AddWithValue("@Frecuencia", beneficio.Frecuencia);
+                            cmd.Parameters.AddWithValue("@NombreDeAPI", beneficio.NombreDeAPI);
+                            cmd.Parameters.AddWithValue("@EsApi", beneficio.EsApi);
+                            cmd.Parameters.AddWithValue("@EsPorcentual", beneficio.EsPorcentual);
+                            cmd.Parameters.AddWithValue("@Estado", beneficio.Estado);
+                            cmd.Parameters.AddWithValue("@EstaBorrado", beneficio.EstaBorrado);
+
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        // Se eliminan los contratos elegibles antiguos
+                        string deleteQuery = "DELETE FROM BeneficioContratoElegible WHERE IdBeneficio = @IdBeneficio";
+                        using (SqlCommand deleteCommand = new SqlCommand(deleteQuery, conn, transaction))
+                        {
+                            deleteCommand.Parameters.AddWithValue("@IdBeneficio", beneficio.Id);
+                            deleteCommand.ExecuteNonQuery();
+                        }
+
+                        // Se insertan contratos elegibles
+                        if (beneficio.ContratosElegibles != null && beneficio.ContratosElegibles.Count > 0)
+                        {
+                            string contratoQuery = "INSERT INTO BeneficioContratoElegible (IdBeneficio, ContratoEmpleado) VALUES (@IdBeneficio, @ContratoEmpleado)";
+                            foreach (var contrato in beneficio.ContratosElegibles)
+                            {
+                                using (SqlCommand contratoCommand = new SqlCommand(contratoQuery, conn, transaction))
+                                {
+                                    contratoCommand.Parameters.AddWithValue("@IdBeneficio", beneficio.Id);
+                                    contratoCommand.Parameters.AddWithValue("@ContratoEmpleado", contrato);
+                                    contratoCommand.ExecuteNonQuery();
+                                }
+                            }
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
             }
         }
@@ -340,108 +355,105 @@ namespace BackendGeems.Infraestructure
 
         public void EliminarBeneficio(string IdBeneficio)
         {
-            bool tieneEmpleados = ExisteMatriculaDeBeneficio(IdBeneficio);
-
-            if (!tieneEmpleados)
+            using (SqlConnection conn = new SqlConnection(_cadenaConexion))
             {
-                // Se hace el caso 1, se elimina el beneficio
-                RealizarEliminacion(IdBeneficio);
-                return;
-            }
+                conn.Open();
+                using (SqlTransaction transaction = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        bool tieneEmpleados;
+                        string existeMatriculaQuery = @"SELECT COUNT(*) FROM BeneficiosEmpleado WHERE IdBeneficio = @id";
+                        using (SqlCommand command = new SqlCommand(existeMatriculaQuery, conn, transaction))
+                        {
+                            command.Parameters.AddWithValue("@id", IdBeneficio);
+                            tieneEmpleados = (int)command.ExecuteScalar() > 0;
+                        }
 
-            bool planillaPagada = HayPagosRelacionados(IdBeneficio);
+                        if (!tieneEmpleados)
+                        {
+                            // Se hace el caso 1, se elimina el beneficio
+                            RealizarEliminacion(IdBeneficio, conn, transaction);
+                            transaction.Commit();
+                            return;
+                        }
 
-            if (!planillaPagada)
-            {
-                // Se hace el caso 2, se elimina el beneficio, las asociaciones y se notifica al empleado
-                NotificarEmpleados(IdBeneficio);
-                RealizarEliminacion(IdBeneficio);
-            }
-            else
-            {
-                // Se hace el caso 3, se hace el borrado lógico del beneficio y se notifica al empleado
-                NotificarEmpleados(IdBeneficio);
-                BorradoLogico(IdBeneficio);
+                        bool planillaPagada;
+                        string pagosRelacionadosQuery = @"
+                            SELECT COUNT(*)
+                            FROM Pago p
+                            JOIN BeneficiosEmpleado be ON p.IdEmpleado = be.IdEmpleado
+                            WHERE be.IdBeneficio = @idBeneficio";
+                        using (SqlCommand command = new SqlCommand(pagosRelacionadosQuery, conn, transaction))
+                        {
+                            command.Parameters.AddWithValue("@idBeneficio", IdBeneficio);
+                            planillaPagada = (int)command.ExecuteScalar() > 0;
+                        }
+
+                        if (!planillaPagada)
+                        {
+                            // Se hace el caso 2, se elimina el beneficio, las asociaciones y se notifica al empleado
+                            NotificarEmpleados(IdBeneficio);
+                            RealizarEliminacion(IdBeneficio, conn, transaction);
+                        }
+                        else
+                        {
+                            // Se hace el caso 3, se hace el borrado lógico del beneficio y se notifica al empleado
+                            NotificarEmpleados(IdBeneficio);
+                            BorradoLogico(IdBeneficio, conn, transaction);
+                        }
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
             }
         }
 
-        // Funciones privadas para realizar validaciones de las restricciones de los requerimientos del borrado de beneficios
-        private bool ExisteMatriculaDeBeneficio(string id)
-        {
-            var query = @"
-                    SELECT COUNT(*)
-                    FROM BeneficiosEmpleado
-                    WHERE IdBeneficio = @id";
-            using (SqlCommand command = new SqlCommand(query, _conexion))
-            {
-                command.Parameters.AddWithValue("@id", id);
-                _conexion.Open();
-                int count = (int)command.ExecuteScalar();
-                _conexion.Close();
-                return count > 0;
-            }
-        }
-
-        private bool HayPagosRelacionados(string idBeneficio)
-        {
-            var query = @"
-                    SELECT COUNT(*)
-                    FROM Pago p
-                    JOIN BeneficiosEmpleado be ON p.IdEmpleado = be.IdEmpleado
-                    WHERE be.IdBeneficio = @idBeneficio";
-            using (SqlCommand command = new SqlCommand(query, _conexion))
-            {
-                command.Parameters.AddWithValue("@idBeneficio", idBeneficio);
-                _conexion.Open();
-                int count = (int)command.ExecuteScalar();
-                _conexion.Close();
-                return count > 0;
-            }
-        }
-
-        private void RealizarEliminacion(string id)
+        // Funciones privadas para realizar validaciones de las restricciones de los requerimientos del borrado de beneficios, se hacen dentro de la transacción
+        private void RealizarEliminacion(string id, SqlConnection conn, SqlTransaction transaction)
         {
             string query = @"
-                    DELETE
-                    FROM BeneficiosEmpleado
-                    WHERE IdBeneficio = @id;
+                DELETE
+                FROM BeneficiosEmpleado
+                WHERE IdBeneficio = @id;
 
-                    DELETE
-                    FROM BeneficioContratoElegible
-                    WHERE IdBeneficio = @id;
+                DELETE
+                FROM BeneficioContratoElegible
+                WHERE IdBeneficio = @id;
 
-                    DELETE
-                    FROM Beneficio
-                    WHERE Id = @id;";
-            using (SqlCommand command = new SqlCommand(query, _conexion))
+                DELETE
+                FROM Beneficio
+                WHERE Id = @id;";
+            using (SqlCommand command = new SqlCommand(query, conn, transaction))
             {
                 command.Parameters.AddWithValue("@id", id);
-                _conexion.Open();
                 command.ExecuteNonQuery();
-                _conexion.Close();
             }
         }
 
-        private void BorradoLogico(string id)
+        private void BorradoLogico(string id, SqlConnection conn, SqlTransaction transaction)
         {
             string update = @"
-                    UPDATE Beneficio
-                    SET Estado = 'PendienteBorrado',
-                        EstaBorrado = 1
-                    WHERE Id = @id;
-                    
-                    DELETE
-                    FROM BeneficiosEmpleado
-                    WHERE IdBeneficio = @id;";
-            using (SqlCommand command = new SqlCommand(update, _conexion))
+                UPDATE Beneficio
+                SET Estado = 'PendienteBorrado',
+                    EstaBorrado = 1
+                WHERE Id = @id;
+
+                DELETE
+                FROM BeneficiosEmpleado
+                WHERE IdBeneficio = @id;";
+            using (SqlCommand command = new SqlCommand(update, conn, transaction))
             {
                 command.Parameters.AddWithValue("@id", id);
-                _conexion.Open();
                 command.ExecuteNonQuery();
-                _conexion.Close();
             }
         }
-
+        
         private void NotificarEmpleados(string IdBeneficio)
         {
             // Se obtiene primero el nombre del beneficio.
@@ -484,7 +496,6 @@ namespace BackendGeems.Infraestructure
                 }
                 _conexion.Close();
             }
-            
         }
     }
 }

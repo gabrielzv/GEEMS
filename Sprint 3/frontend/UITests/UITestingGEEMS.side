@@ -440,6 +440,111 @@
       ],
       "value": ""
     }]
+  }, {
+    "id": "b88550cc-f3cb-4a95-b184-dd41e4863517",
+    "name": "VerBeneficiosMatriculados",
+    "commands": [{
+      "id": "faf2bbc1-a469-472c-ad30-6e7b811bbfe0",
+      "comment": "",
+      "command": "open",
+      "target": "/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "cf2b6e57-2e1e-493b-b665-32fc0b4f236d",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1552x832",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "c82cfc01-5020-4dcd-b564-e427faa43067",
+      "comment": "",
+      "command": "click",
+      "target": "css=.focus\\3Aring-2",
+      "targets": [
+        ["css=.focus\\3Aring-2", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "fe242876-62ec-499a-b34e-40d135198d34",
+      "comment": "",
+      "command": "type",
+      "target": "css=.focus\\3Aring-2",
+      "targets": [
+        ["css=.focus\\3Aring-2", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "lramirez"
+    }, {
+      "id": "06080d7c-212c-4d01-a56c-78d1108baa91",
+      "comment": "",
+      "command": "click",
+      "target": "css=.px-3",
+      "targets": [
+        ["css=.px-3", "css:finder"],
+        ["xpath=//input[@type='password']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "df8c2215-db44-48a8-9906-cafad6a4738e",
+      "comment": "",
+      "command": "type",
+      "target": "css=.px-3",
+      "targets": [
+        ["css=.px-3", "css:finder"],
+        ["xpath=//input[@type='password']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "pass9999"
+    }, {
+      "id": "aa1523db-8470-470d-ab4d-8eb98383b2cf",
+      "comment": "",
+      "command": "click",
+      "target": "css=.w-full:nth-child(5)",
+      "targets": [
+        ["css=.w-full:nth-child(5)", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Entrar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "c61c1f84-361a-47ac-af66-ea78a7e982ad",
+      "comment": "",
+      "command": "click",
+      "target": "css=.w-9",
+      "targets": [
+        ["css=.w-9", "css:finder"],
+        ["xpath=//img[@alt='Avatar']", "xpath:img"],
+        ["xpath=//div[@id='app']/div/header/div/img", "xpath:idRelative"],
+        ["xpath=//div/img", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "118987af-fca7-47ef-a39c-4495461ef37b",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Mis beneficios",
+      "targets": [
+        ["linkText=Mis beneficios", "linkText"],
+        ["css=.bg-blue-600", "css:finder"],
+        ["xpath=//a[contains(text(),'Mis beneficios')]", "xpath:link"],
+        ["xpath=//div[@id='app']/div/main/div/div/div[2]/a", "xpath:idRelative"],
+        ["xpath=(//a[contains(@href, '/employeeBenefits')])[2]", "xpath:href"],
+        ["xpath=//div[2]/a", "xpath:position"]
+      ],
+      "value": ""
+    }]
   }],
   "suites": [{
     "id": "967616f3-fce2-45f6-8cd1-cc728d30019e",
