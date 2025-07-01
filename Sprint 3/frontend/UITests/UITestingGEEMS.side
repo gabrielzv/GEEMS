@@ -105,6 +105,199 @@
       ],
       "value": ""
     }]
+  }, {
+    "id": "fe0b1297-06b8-41d6-b9b3-c96e5233bf2f",
+    "name": "GenerarPlanillaTest",
+    "commands": [{
+      "id": "fdbb61cb-d40f-4cd2-bd75-599a042da9ef",
+      "comment": "",
+      "command": "open",
+      "target": "/login",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a4e7ca46-35ee-46c0-91cf-d0f0d0bdc8c3",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "974x1032",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0b51f6a8-62a0-4b8a-bd03-9578e0377c28",
+      "comment": "",
+      "command": "click",
+      "target": "css=.focus\\3Aring-2",
+      "targets": [
+        ["css=.focus\\3Aring-2", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "49af33e4-818e-4bcc-9140-3f08d44a50a1",
+      "comment": "",
+      "command": "type",
+      "target": "css=.focus\\3Aring-2",
+      "targets": [
+        ["css=.focus\\3Aring-2", "css:finder"],
+        ["xpath=//input[@type='text']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div/input", "xpath:idRelative"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "pgomez"
+    }, {
+      "id": "99de90c5-4059-42d3-bda1-86fdbac35b41",
+      "comment": "",
+      "command": "click",
+      "target": "css=.px-3",
+      "targets": [
+        ["css=.px-3", "css:finder"],
+        ["xpath=//input[@type='password']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "2508acea-4014-48c8-a4db-ded510b6b51d",
+      "comment": "",
+      "command": "type",
+      "target": "css=.px-3",
+      "targets": [
+        ["css=.px-3", "css:finder"],
+        ["xpath=//input[@type='password']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/div[2]/input", "xpath:idRelative"],
+        ["xpath=//div[2]/input", "xpath:position"]
+      ],
+      "value": "clave321"
+    }, {
+      "id": "f5c264a3-ad24-4c09-99eb-f739f715d843",
+      "comment": "",
+      "command": "click",
+      "target": "css=.w-full:nth-child(5)",
+      "targets": [
+        ["css=.w-full:nth-child(5)", "css:finder"],
+        ["xpath=//button[@type='submit']", "xpath:attributes"],
+        ["xpath=//div[@id='app']/div/div/form/button[2]", "xpath:idRelative"],
+        ["xpath=//button[2]", "xpath:position"],
+        ["xpath=//button[contains(.,'Entrar')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "60d3cabc-1e2c-4790-bf68-ccff3c417354",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Realizar Pago",
+      "targets": [
+        ["linkText=Realizar Pago", "linkText"],
+        ["css=.flex:nth-child(4)", "css:finder"],
+        ["xpath=//div[@id='app']/div/header/nav/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/selectCreatePayroll')]", "xpath:href"],
+        ["xpath=//nav/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Realizar Pago')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "71bbe21a-49d5-4e59-96d9-a98f8c5e9a1b",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "linkText=Realizar Pago",
+      "targets": [
+        ["linkText=Realizar Pago", "linkText"],
+        ["css=.flex:nth-child(4)", "css:finder"],
+        ["xpath=//div[@id='app']/div/header/nav/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/selectCreatePayroll')]", "xpath:href"],
+        ["xpath=//nav/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Realizar Pago')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "0da29196-3132-4dbf-874b-630deb38a971",
+      "comment": "",
+      "command": "mouseOut",
+      "target": "linkText=Realizar Pago",
+      "targets": [
+        ["linkText=Realizar Pago", "linkText"],
+        ["css=.text-blue-600", "css:finder"],
+        ["xpath=//div[@id='app']/div/header/nav/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/selectCreatePayroll')]", "xpath:href"],
+        ["xpath=//nav/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Realizar Pago')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "f651bb10-bf4e-4687-82c5-cb16f6907d01",
+      "comment": "",
+      "command": "click",
+      "target": "css=.w-full",
+      "targets": [
+        ["css=.w-full", "css:finder"],
+        ["xpath=//div[@id='app']/div/main/div/div/select", "xpath:idRelative"],
+        ["xpath=//select", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "da961b21-d0d4-4db5-9ed6-07e1984add87",
+      "comment": "",
+      "command": "select",
+      "target": "css=.w-full",
+      "targets": [],
+      "value": "label=1 de abril 2025 a 30 de abril 2025"
+    }, {
+      "id": "d9838929-7dca-4ae8-8504-68b486db0fb7",
+      "comment": "",
+      "command": "click",
+      "target": "css=.bg-blue-600",
+      "targets": [
+        ["css=.bg-blue-600", "css:finder"],
+        ["xpath=//div[@id='app']/div/main/div/div/button", "xpath:idRelative"],
+        ["xpath=//div/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Ver resumen de planilla')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "99ef59ef-2bb7-44bc-87d0-dc4ee2aeb565",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=.text-2xl",
+      "targets": [
+        ["css=.text-2xl", "css:finder"],
+        ["xpath=//div[@id='app']/div/main/div/h2", "xpath:idRelative"],
+        ["xpath=//h2", "xpath:position"],
+        ["xpath=//h2[contains(.,'1 de abril 2025 a 30 de abril 2025')]", "xpath:innerText"]
+      ],
+      "value": "1 de abril 2025 a 30 de abril 2025"
+    }, {
+      "id": "10d32d50-dab7-4ad2-874b-93a3c8bc818f",
+      "comment": "",
+      "command": "click",
+      "target": "css=.mt-6",
+      "targets": [
+        ["css=.mt-6", "css:finder"],
+        ["xpath=//div[@id='app']/div/main/div/button", "xpath:idRelative"],
+        ["xpath=//main/div/button", "xpath:position"],
+        ["xpath=//button[contains(.,'Pagar planilla')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "e5b5a628-01bd-4f3c-af91-df8291c13d61",
+      "comment": "",
+      "command": "assertAlert",
+      "target": "¡Planilla pagada!",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ec3b13ed-e324-462c-b1b5-7cb96da192d5",
+      "comment": "",
+      "command": "click",
+      "target": "css=.bg-gray-50",
+      "targets": [
+        ["css=.bg-gray-50", "css:finder"],
+        ["xpath=//div[@id='app']/div/main/div", "xpath:idRelative"],
+        ["xpath=//main/div", "xpath:position"]
+      ],
+      "value": ""
+    }]
   }],
   "suites": [{
     "id": "967616f3-fce2-45f6-8cd1-cc728d30019e",

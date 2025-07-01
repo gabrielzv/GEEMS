@@ -34,17 +34,20 @@
                     {NombreEmpresa}
                     ";
                 string asunto = "Notificación de Eliminación de Registro de Empleado";
-                _EmpleadoRepo.BorrarTimesheetEmpleado(Cedula);
+               
 
                 if (tienePagos)
                 {
+                    _EmpleadoRepo.BorrarTimesheetEmpleado(Cedula,false);
                     _EmpleadoRepo.BorrarLogicoEmpleado(Cedula);
                     string message = "Borrado logico completado";
                     _reporteService.EnviarCorreoAsync(CorreoEmpleado, asunto, mensaje);
+
                     return message;
                 }
                 else
                 {
+                    _EmpleadoRepo.BorrarTimesheetEmpleado(Cedula, true);
                     _EmpleadoRepo.BorrarPermanenteEmpleado(Cedula);
                     string message = "Borrado Permanente completado";
                     _reporteService.EnviarCorreoAsync(CorreoEmpleado, asunto, mensaje);
