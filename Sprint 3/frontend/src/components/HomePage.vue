@@ -183,7 +183,7 @@ const resumenesPorPlanilla = ref([])
 const planillaSeleccionada = ref(null)
 const loading = ref(true)
 const salariosPorContrato = ref([])
-const deduccionesEmpleador = ref([])
+const deduccionesEmpleador = ref(0)
 const deduccionesObligatorias = ref([])
 const beneficios = ref([])
 const chartEmpleadoData = ref(null)
@@ -227,9 +227,6 @@ const chartEmpleadoOptions = {
     }
   }
 }
-
-
-
 
 const cargarPagosEmpleado = async () => {
   try {
@@ -396,7 +393,7 @@ const cargarResumenesPorPlanilla = async () => {
       const beneficios = resulDeducciones.data.filter(d => d.esBeneficio)
       const totalBeneficios = beneficios.reduce((sum, d) => sum + (d.total || 0), 0)
 
-      //const resDeducciones2 = await axios.get(`${API_BASE_URL}Reporte/deduccionesPorPlanilla/${planilla.id}`)
+      
       const deducciones = resulDeducciones.data
       
       const mapObligatorias = {}
@@ -446,8 +443,12 @@ const cargarDetallePlanilla = async (idPlanilla) => {
 
     // Cargar deducciones empleador
     const totalSalarios = salariosPorContrato.value.reduce((sum, s) => sum + (s.TotalSalario || 0), 0)
+
     const resDedEmpleador = await axios.get(`${API_BASE_URL}Deduccion/DeduccionesDetalladas/${totalSalarios}`)
-    
+    const totalDeduccionesEmpleador = resDedEmpleador.data.deducciones.reduce((sum, d) => sum + (d.monto || 0), 0)
+
+    deduccionesEmpleador.value = totalDeduccionesEmpleador
+
 
     // Cargar deducciones obligatorias y beneficios
     const resDeducciones = await axios.get(`${API_BASE_URL}Reporte/deduccionesPorPlanilla/${idPlanilla}`)
@@ -500,8 +501,7 @@ const chartDetalleResumen = computed(() => {
 
   const totalSalarios = salariosPorContrato.value.reduce((sum, s) => sum + (s.TotalSalario || 0), 0)
   const totalPagosLey = deduccionesObligatorias.value.reduce((sum, d) => sum + (d.total || 0), 0)
-  const totalPagosLeyConEmpleador = totalPagosLey +
-    deduccionesEmpleador.value.reduce((sum, d) => sum + (d.monto || 0), 0)
+  const totalPagosLeyConEmpleador = totalPagosLey + deduccionesEmpleador.value
   const totalBeneficios = beneficios.value.reduce((sum, d) => sum + (d.total || 0), 0)
 
   return {
