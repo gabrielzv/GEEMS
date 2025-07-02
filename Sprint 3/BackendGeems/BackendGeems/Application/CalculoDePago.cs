@@ -48,7 +48,7 @@ namespace BackendGeems.Application
                 salarioBrutoQuincenal = salarioBrutoMensual/2;
             }
 
-            var resultado = CalcularDeducciones(idEmpleado, salarioBrutoQuincenal, tipoContrato, esQuincenal: true);
+            var resultado = CalcularDeducciones(idEmpleado, salarioBrutoMensual, tipoContrato, esQuincenal: true);
             resultado.SalarioBruto = salarioBrutoQuincenal;
             resultado.EsSegundaQuincena = fechaFinal.Day > 15;
 
