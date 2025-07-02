@@ -85,6 +85,11 @@ INSERT INTO Planilla VALUES (@uidPlanilla2, '2025-05-01', '2025-05-31', @uidPayr
 INSERT INTO Registro VALUES (@uidRegistro, 40, '2025-04-20', 'Aprobado', @uidColab,0);
 INSERT INTO Registro VALUES (@uidRegistro2, 20, '2025-04-21', 'Aprobado', @uidSup,0);
 
+-- Registro para UI Test
+INSERT INTO Registro (Id, NumHoras, Fecha, Estado, IdEmpleado, EstaBorrado)
+VALUES ('2E168580-7ED0-43B8-B467-AC282BE870A9', 5, '2025-07-02 00:00:00.000', 'NoRevisado', '00000000-0000-0000-0000-000000000003', 0);
+
+
 -- Pagos (bruto: 850000, neto calculado tras deducciones)
 INSERT INTO Pago (Id, FechaRealizada, MontoPago, IdEmpleado, IdPayroll, IdPlanilla, MontoBruto, FechaInicio, FechaFinal)
 VALUES (@uidPago, GETDATE(), 765000, @uidColab, @uidPayroll, @uidPlanilla, 850000, '2025-04-01', '2025-04-30');
