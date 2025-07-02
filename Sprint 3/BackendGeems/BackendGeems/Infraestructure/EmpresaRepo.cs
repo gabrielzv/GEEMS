@@ -19,48 +19,34 @@ namespace BackendGeems.Infraestructure
             using SqlConnection conn = new SqlConnection(_cadenaConexion);
             conn.Open();
 
-            using SqlTransaction transaction = conn.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
-            try
+            string query = "SELECT * FROM Empresa WHERE CedulaJuridica = @CedulaJuridica";
+
+            using SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@CedulaJuridica", cedula);
+
+            using SqlDataReader reader = cmd.ExecuteReader();
+
+            if (reader.Read())
             {
-                string query = "SELECT * FROM Empresa WHERE CedulaJuridica = @CedulaJuridica";
-
-                using SqlCommand cmd = new SqlCommand(query, conn, transaction);
-                cmd.Parameters.AddWithValue("@CedulaJuridica", cedula);
-
-                using SqlDataReader reader = cmd.ExecuteReader();
-
-                if (reader.Read())
+                return new Empresa
                 {
-                    Empresa empresa = new Empresa
-                    {
-                        CedulaJuridica = reader["CedulaJuridica"].ToString(),
-                        Nombre = reader["Nombre"].ToString(),
-                        Descripcion = reader["Descripcion"].ToString(),
-                        Telefono = reader["Telefono"].ToString(),
-                        Correo = reader["Correo"].ToString(),
-                        Provincia = reader["Provincia"].ToString(),
-                        Canton = reader["Canton"].ToString(),
-                        Distrito = reader["Distrito"].ToString(),
-                        Senas = reader["Senas"].ToString(),
-                        ModalidadPago = reader["ModalidadPago"] == DBNull.Value ? null : reader["ModalidadPago"].ToString(),
-                        MaxBeneficiosXEmpleado = Convert.ToInt32(reader["MaxBeneficiosXEmpleado"]),
-                        EstaBorrado = Convert.ToBoolean(reader["EstaBorrado"])
-                    };
-
-                    transaction.Commit();
-                    return empresa;
-                }
-
-                transaction.Commit();
-                return null;
+                    CedulaJuridica = reader["CedulaJuridica"].ToString(),
+                    Nombre = reader["Nombre"].ToString(),
+                    Descripcion = reader["Descripcion"].ToString(),
+                    Telefono = reader["Telefono"].ToString(),
+                    Correo = reader["Correo"].ToString(),
+                    Provincia = reader["Provincia"].ToString(),
+                    Canton = reader["Canton"].ToString(),
+                    Distrito = reader["Distrito"].ToString(),
+                    Senas = reader["Senas"].ToString(),
+                    ModalidadPago = reader["ModalidadPago"] == DBNull.Value ? null : reader["ModalidadPago"].ToString(),
+                    MaxBeneficiosXEmpleado = Convert.ToInt32(reader["MaxBeneficiosXEmpleado"]),
+                    EstaBorrado = Convert.ToBoolean(reader["EstaBorrado"])
+                };
             }
-            catch (Exception ex)
-            {
-                transaction.Rollback();
-                throw new Exception("Error al obtener la empresa: " + ex.Message);
-            }
+            return null;
         }
-
+        
         public List<Empleado> GetEmpleados(string cedula)
         {
             List<Empleado> empleados = new List<Empleado>();
