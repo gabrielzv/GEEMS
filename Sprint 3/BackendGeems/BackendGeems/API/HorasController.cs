@@ -1,0 +1,68 @@
+﻿using BackendGeems.Application;
+using BackendGeems.Domain;
+using BackendGeems.Infraestructure;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+
+namespace BackendGeems.API
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class HorasController : ControllerBase
+    {
+        private readonly HorasRepo _repoHoras;
+        private readonly IQueryHoras _queryHoras;
+        public HorasController(IQueryHoras queryHoras)
+        {
+            _repoHoras = new HorasRepo();
+            _queryHoras = queryHoras;
+        }
+
+        [HttpGet]
+        public bool ValidDate(DateTime date, Guid employeeId)
+        {
+            bool response = _queryHoras.ValidDate(date, employeeId);
+            return response;
+        }
+
+        [HttpPost]
+        public void InsertRegister([FromBody] Registro inserting)
+        {
+            _queryHoras.InsertRegister(inserting);
+        }
+        [HttpGet("Register")]
+        public Registro GetRegister(Guid id)
+        {
+            var registro = _queryHoras.GetRegister(id);
+            return registro;
+        }
+        [HttpPost("Editar")]
+        public void EditRegister([FromBody] Registro editing, Guid oldId)
+        {
+            _queryHoras.EditRegister(editing, oldId);
+        }
+        [HttpGet("getRegister/{IdEmpleado}")]
+        public ActionResult<List<Registro>> GetRegisterByEmpleado(Guid IdEmpleado)
+        {
+            try
+            {
+                var registros = _repoHoras.ObtenerRegistros(IdEmpleado);
+                if (registros == null || registros.Count == 0)
+                    return NotFound(new { message = "No se encontraron registros para este empleado." });
+
+                return Ok(registros);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error al obtener los registros: " + ex.Message });
+            }
+        }
+        [HttpGet("ValidHours")]
+        public bool ValidHours(DateTime date, Guid employeeId, int hours)
+        {
+            Console.WriteLine("Se entra a API ValidHours");
+            return _queryHoras.ValidHours(date, employeeId, hours);
+        }
+    }
+}
